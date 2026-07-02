@@ -81,12 +81,13 @@ jobs:
         run: |
           set -euo pipefail
           PORT="${VDS_SSH_PORT:-22}"
-          SSHOPTS="-i $HOME/.ssh/deploy_key -p $PORT -o StrictHostKeyChecking=accept-new"
+          COMMON="-i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
+          # Порт: scp хочет -P (заглавную), ssh — -p (строчную). Не путать!
           # Кладём compose-файл и Caddyfile рядом (сервер не хранит git-репозиторий).
-          scp $SSHOPTS docker-compose.yml "$VDS_USER@$VDS_HOST:$VDS_PATH/docker-compose.yml"
-          scp $SSHOPTS deploy/Caddyfile   "$VDS_USER@$VDS_HOST:$VDS_PATH/Caddyfile"
+          scp $COMMON -P "$PORT" docker-compose.yml "$VDS_USER@$VDS_HOST:$VDS_PATH/docker-compose.yml"
+          scp $COMMON -P "$PORT" deploy/Caddyfile   "$VDS_USER@$VDS_HOST:$VDS_PATH/Caddyfile"
           # На сервере: логин в GHCR (приватный образ), тянем нужный тег, поднимаем, чистим старьё.
-          ssh $SSHOPTS "$VDS_USER@$VDS_HOST" "\
+          ssh $COMMON -p "$PORT" "$VDS_USER@$VDS_HOST" "\
             cd '$VDS_PATH' && \
             echo '$GHCR_PAT' | docker login ghcr.io -u '$GHCR_OWNER' --password-stdin && \
             export IMAGE='$IMAGE' && \
