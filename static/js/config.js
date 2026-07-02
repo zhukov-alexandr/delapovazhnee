@@ -1,7 +1,7 @@
 // Shared game constants. Units: logical world pixels; y grows downward.
 export const GAME = {
   WORLD_H: 360,          // fixed logical height; width comes from viewport
-  MIN_VIEW_W: 500,       // camera (game.js resize()): minimum visible world width in
+  MIN_VIEW_W: 360,       // camera (game.js resize()): minimum visible world width in
                          // logical px — on narrow/tall mobile this caps zoom-in so the
                          // runner (RUNNER_X=90) keeps track ahead instead of sitting
                          // centered. Tuning value; adjust to taste, does not affect

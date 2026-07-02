@@ -63,26 +63,30 @@ function drawDitherBand(ctx, x, y, w, h, color, alpha) {
   ctx.restore();
 }
 
-function drawSky(ctx, w, h) {
+// Sky fills the FULL visible height: from viewTop (world-y at the canvas top —
+// negative & far up on tall/portrait mobile) down to the horizon (sea line), so
+// there's a real sunset gradient instead of a flat dead band above a short world.
+function drawSky(ctx, w, viewTop, horizon) {
+  const h = horizon - viewTop;
   if (images.sky) {
-    ctx.drawImage(images.sky, 0, 0, w, h);
+    ctx.drawImage(images.sky, 0, px(viewTop), w, px(h));
     return;
   }
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  const grad = ctx.createLinearGradient(0, viewTop, 0, horizon);
   grad.addColorStop(0, PALETTE.night);
-  grad.addColorStop(0.45, PALETTE.grape);
-  grad.addColorStop(0.75, PALETTE.flare);
+  grad.addColorStop(0.5, PALETTE.grape);
+  grad.addColorStop(0.78, PALETTE.flare);
   grad.addColorStop(1, PALETTE.sun);
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-  // Light ordered-dither banding over the lower sky for a PS1 sunset feel.
-  drawDitherBand(ctx, 0, px(h * 0.55), w, px(h * 0.2), PALETTE.flare, 0.25);
+  ctx.fillRect(0, px(viewTop), w, px(h) + 2);
+  // Ordered-dither band just above the horizon for the PS1 sunset feel.
+  drawDitherBand(ctx, 0, px(horizon - h * 0.16), w, px(h * 0.12), PALETTE.flare, 0.22);
 }
 
 function drawSun(ctx, cam, w) {
-  const cx = px(w * 0.7 - cam.x * 0.1);
-  const cy = px(SEA_Y - 46);
-  const r = 40;
+  const cx = px(w * 0.68 - cam.x * 0.08);
+  const cy = px(SEA_Y - 78);
+  const r = 66;
   if (images.sun) {
     ctx.drawImage(images.sun, cx - r, cy - r, r * 2, r * 2);
     return;
@@ -143,10 +147,10 @@ function drawSand(ctx, cam, w, h) {
 
 // Layer order: sky gradient -> sun -> sea band -> sand (each with its own
 // parallax factor driven by cam.x: sky+sun slowest, sea medium, sand fastest).
-export function drawBackground(ctx, cam, worldW) {
+export function drawBackground(ctx, cam, worldW, viewTop = 0) {
   ctx.imageSmoothingEnabled = false;
   const h = GAME.WORLD_H;
-  drawSky(ctx, worldW, h);
+  drawSky(ctx, worldW, viewTop, SEA_Y);
   drawSun(ctx, cam, worldW);
   drawSea(ctx, cam, worldW);
   drawSand(ctx, cam, worldW, h);

@@ -39,6 +39,7 @@ export class Game {
     this.canvas = null;
     this.ctx = null;
     this.worldW = 640; // visible world width in logical px; recomputed in resize()
+    this.scale = 1;    // logical->css scale; recomputed in resize()
     this.yOffset = 0;  // CSS px the world is pushed down to anchor its bottom to the
                         // canvas bottom on mobile (see resize()); 0 on desktop
     this.cam = { x: 0 }; // parallax camera; advances with elapsed time
@@ -123,6 +124,7 @@ export class Game {
     const cssW = this.canvas.clientWidth;
     if (!cssH || !cssW) return; // not laid out yet
     const scale = Math.min(cssH / GAME.WORLD_H, cssW / GAME.MIN_VIEW_W); // logical -> css
+    this.scale = scale;
     this.worldW = cssW / scale; // visible world width
     this.canvas.width = Math.round(cssW * dpr);
     this.canvas.height = Math.round(cssH * dpr);
@@ -199,7 +201,10 @@ export class Game {
     ctx.fillStyle = PALETTE.night;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.restore();
-    drawBackground(ctx, this.cam, this.worldW);
+    // viewTop = world-y at the canvas top (negative on mobile) — lets drawBackground
+    // stretch the sky gradient across the full visible height instead of a void.
+    const viewTop = this.scale ? -this.yOffset / this.scale : 0;
+    drawBackground(ctx, this.cam, this.worldW, viewTop);
     for (const o of this.game.obs.obstacles) drawObstacle(ctx, o);
     for (const item of this.game.col.items) drawCollectible(ctx, item);
     drawRunner(ctx, this.game.runner, this.t, this.charIndex);
