@@ -17,8 +17,8 @@ export const GAME = {
   RUNNER_W: 34,
   RUNNER_H: 48,
   RUNNER_X: 90,          // fixed horizontal position of the runner
-  ITEM_W: 24,
-  ITEM_H: 24,
+  ITEM_W: 40,
+  ITEM_H: 40,
   ITEM_KINDS: 3,
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
