@@ -17,11 +17,11 @@ export const GAME = {
   RUNNER_W: 34,
   RUNNER_H: 48,
   RUNNER_X: 90,          // fixed horizontal position of the runner
-  ITEM_W: 40,
-  ITEM_H: 40,
+  ITEM_W: 60,
+  ITEM_H: 60,
   ITEM_KINDS: 3,
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
-  ITEM_Y_MIN: 140,
-  ITEM_Y_MAX: 200,
+  ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays
+  ITEM_Y_MAX: 180,       // above the grounded runner (GROUND_Y-RUNNER_H..GROUND_Y) — catch by jumping
 };
