@@ -26,8 +26,9 @@ export function createAudio() {
     return ctx;
   }
 
-  // Short square-wave blip. Guarded so a missing/blocked AudioContext never throws.
-  function blip(freq, dur) {
+  // Short square-wave blip, scheduled `startOffset` seconds from now (0 for
+  // an immediate blip). Guarded so a missing/blocked AudioContext never throws.
+  function blipAt(freq, startOffset, dur) {
     try {
       const c = getCtx();
       const osc = c.createOscillator();
@@ -37,12 +38,16 @@ export function createAudio() {
       gain.gain.value = 0.15;
       osc.connect(gain);
       gain.connect(c.destination);
-      const now = c.currentTime;
-      osc.start(now);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-      osc.stop(now + dur);
+      const start = c.currentTime + startOffset;
+      osc.start(start);
+      gain.gain.setValueAtTime(0.15, start);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.stop(start + dur);
     } catch (_) { /* WebAudio unavailable — ignore */ }
+  }
+
+  function blip(freq, dur) {
+    blipAt(freq, 0, dur);
   }
 
   return {
@@ -70,6 +75,12 @@ export function createAudio() {
     },
     sfxGameOver() {
       blip(220, 0.25);
+    },
+    // Short victory sting for revealing a new lyric line: 3 ascending notes.
+    sfxReveal() {
+      blipAt(523, 0, 0.1);
+      blipAt(659, 0.11, 0.1);
+      blipAt(784, 0.22, 0.12);
     },
   };
 }

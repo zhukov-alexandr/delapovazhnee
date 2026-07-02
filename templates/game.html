@@ -46,6 +46,13 @@
       <button id="retry" class="btn big">Ещё раз</button>
       <div id="over-cta"></div>
     </div>
+
+    <!-- Lyric-reveal popup (Task 23): shown + gameplay paused every N points. -->
+    <div id="reveal-popup" class="overlay reveal-overlay hidden">
+      <p class="reveal-label">Ура, вы открыли новую строчку из песни:</p>
+      <p id="reveal-line" class="reveal-line"></p>
+      <button id="reveal-next" class="btn big">Дальше</button>
+    </div>
   </div>
 
   <script type="module" src="/static/js/selftest.js"></script>

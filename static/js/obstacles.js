@@ -4,8 +4,18 @@ import { GAME } from "./config.js";
 const SINGLE = { w: 44, h: 26 };   // sunbather on a mat — clear with single jump
 const UMBRELLA = { w: 52, h: 78 };  // sunbather with umbrella — needs double jump
 
-export function createGameState() {
-  return { obstacles: [], speed: GAME.RUN_SPEED, timeToNext: 1.2, elapsed: 0, score: 0 };
+// speedMult scales both the starting speed and the ramp cap (server-tunable
+// via /api/config, Task 21/23). Defaults to 1 so existing callers/tests are
+// unaffected.
+export function createGameState(speedMult = 1) {
+  return {
+    obstacles: [],
+    speed: GAME.RUN_SPEED * speedMult,
+    timeToNext: 1.2,
+    elapsed: 0,
+    score: 0,
+    speedMult,
+  };
 }
 
 // Balanced randomized gap (seconds) that tightens slightly as speed grows.
@@ -26,7 +36,8 @@ function spawn(state, worldW) {
 // worldW defaults large so the pure self-test (no canvas) still spawns/moves sanely.
 export function stepObstacles(state, dt, worldW = 640) {
   state.elapsed += dt;
-  state.speed = Math.min(GAME.MAX_SPEED, state.speed + GAME.SPEED_RAMP * dt);
+  const maxSpeed = GAME.MAX_SPEED * (state.speedMult || 1);
+  state.speed = Math.min(maxSpeed, state.speed + GAME.SPEED_RAMP * dt);
 
   state.timeToNext -= dt;
   if (state.timeToNext <= 0) {

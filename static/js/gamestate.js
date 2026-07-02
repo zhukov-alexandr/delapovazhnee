@@ -7,9 +7,20 @@ import { createCollectibleState, stepCollectibles, catchCollectibles } from "./c
 export function createGame() {
   return { runner: createRunner(), obs: createGameState(), col: createCollectibleState(), state: "menu", score: 0, caught: 0 };
 }
-export function startGame(g) {
-  g.runner = createRunner(); g.obs = createGameState(); g.col = createCollectibleState(); g.score = 0; g.caught = 0; g.state = "running";
+export function startGame(g, speedMult = 1) {
+  g.runner = createRunner(); g.obs = createGameState(speedMult); g.col = createCollectibleState(); g.score = 0; g.caught = 0; g.state = "running";
 }
+
+// Pure lyric-reveal helper (Task 23): every N points crosses a threshold that
+// reveals the next song line. `revealed` is how many lines are already shown;
+// returns the index to reveal next, or null if no new line is due yet.
+export function nextRevealIndex(score, n, revealed, total) {
+  if (n > 0 && revealed < total && Math.floor(score / n) > revealed) {
+    return revealed;
+  }
+  return null;
+}
+
 // Advance one frame. Returns {over, scoreDelta}. No-op unless running.
 export function stepGame(g, dt, worldW) {
   if (g.state !== "running") return { over: false, scoreDelta: 0 };

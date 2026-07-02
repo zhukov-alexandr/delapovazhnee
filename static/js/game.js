@@ -6,7 +6,7 @@
 // module can be imported (e.g. under Node for a smoke import) without side effects.
 import { GAME } from "./config.js";
 import { jump } from "./physics.js";
-import { createGame, startGame, stepGame } from "./gamestate.js";
+import { createGame, startGame, stepGame, nextRevealIndex } from "./gamestate.js";
 import { drawBackground, drawRunner, drawObstacle, drawCollectible } from "./sprites.js";
 
 // A no-op default so hooks are always callable before the shell sets real ones.
@@ -22,10 +22,18 @@ export class Game {
     // Settable by the shell (boot.js) before start(); no effect on physics.
     this.charIndex = 0;
 
+    // Server-tunable config (Task 21/23), set by boot.js from GET /api/config.
+    // Sane fallbacks here keep the game playable before that fetch resolves.
+    this.pointsPerLine = 5;   // N: score points per revealed lyric line
+    this.speedMult = 1;       // scales RUN_SPEED/MAX_SPEED (obstacles.js)
+    this.lyricsCount = 0;     // total lines available to reveal (LYRICS.length)
+    this.revealed = 0;        // how many lines have been revealed so far
+
     // Shell hooks — settable by Task 14. Kept simple and always callable.
     this.onStart = noop;
     this.onScore = noop;   // (score)
     this.onGameOver = noop; // (score)
+    this.onReveal = noop;  // (lyricIndex) — fired when a new line is revealed; game is already paused
 
     // Runtime handles created lazily in start(); null until then.
     this.canvas = null;
@@ -49,7 +57,8 @@ export class Game {
   // store, start the game state, and kick off requestAnimationFrame.
   start() {
     if (!this.canvas) this._mount();
-    startGame(this.game);
+    startGame(this.game, this.speedMult);
+    this.revealed = 0;
     this.t = 0;
     this.cam.x = 0;
     this.onStart();
@@ -64,6 +73,14 @@ export class Game {
   // Restart from a fresh state (used by the shell's replay control).
   reset() {
     this.start();
+  }
+
+  // Unpause after a lyric-reveal popup is dismissed. Resets `last` so the
+  // next frame's dt is small (otherwise the paused wall-clock gap would be
+  // read as one huge dt and could tunnel the runner through an obstacle).
+  resume() {
+    this.game.state = "running";
+    this.last = performance.now();
   }
 
   // Resolve the canvas element + 2D context and attach listeners. Idempotent.
@@ -127,11 +144,23 @@ export class Game {
   _frame(now) {
     const dt = Math.min((now - this.last) / 1000, 1 / 30); // clamp: no tunneling on tab-switch
     this.last = now;
-    this.t += dt;
 
     const { over, scoreDelta } = stepGame(this.game, dt, this.worldW);
-    // Advance the parallax camera at the current scroll speed while running.
-    if (this.game.state === "running") this.cam.x += this.game.obs.speed * dt;
+
+    // Only advance time/camera/reveal-checks while actually running — this is
+    // what makes a lyric-reveal pause read as a genuinely frozen scene rather
+    // than just obstacles halting while everything else keeps moving.
+    if (this.game.state === "running") {
+      this.t += dt;
+      this.cam.x += this.game.obs.speed * dt;
+
+      const idx = nextRevealIndex(this.game.score, this.pointsPerLine, this.revealed, this.lyricsCount);
+      if (idx !== null) {
+        this.game.state = "paused";
+        this.onReveal(idx);
+        this.revealed++;
+      }
+    }
 
     if (scoreDelta) this.onScore(this.game.score);
     if (over) this.onGameOver(this.game.score);

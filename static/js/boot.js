@@ -6,6 +6,10 @@ import { createAudio } from "./audio.js";
 import { getBest, updateBest, getChar, setChar } from "./prefs.js";
 import { drawRunner, loadSprites } from "./sprites.js";
 import { GAME } from "./config.js";
+import { LYRICS } from "./lyrics.js";
+
+// Server-tunable defaults (Task 21/23), used if GET /api/config fails.
+const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0 };
 
 // Placeholder tile art (before real PNGs exist): render the same procedural
 // runner sprites.drawRunner() draws in-game, scaled/centered into the tile's
@@ -83,8 +87,17 @@ function boot() {
   const bestScoreEl = document.getElementById("best-score");
   const bestScoreOverEl = document.getElementById("best-score-over");
   const charTiles = Array.from(document.querySelectorAll(".char-tile"));
+  const revealPopup = document.getElementById("reveal-popup");
+  const revealLineEl = document.getElementById("reveal-line");
+  const revealNextBtn = document.getElementById("reveal-next");
 
   const audio = createAudio();
+
+  // Removes the `pulse` class once its scale-up/down keyframe finishes, so a
+  // later reveal can retrigger the same animation from a clean state.
+  if (scoreEl) {
+    scoreEl.addEventListener("animationend", () => scoreEl.classList.remove("pulse"));
+  }
 
   // --- Character picker: 4 selectable tiles on the start overlay. Cosmetic
   // only — sets game.charIndex, no effect on physics. Persists via prefs.js. ---
@@ -149,6 +162,19 @@ function boot() {
   game.charIndex = getChar(localStorage);
   selectChar(game.charIndex);
 
+  // --- Server config (Task 21/23): N points per revealed lyric line + the
+  // world scroll-speed multiplier, tunable from /admin/settings. Fetch
+  // failure falls back to sane defaults so the game is always playable. ---
+  function applyConfig(cfg) {
+    game.pointsPerLine = cfg.points_per_line;
+    game.speedMult = cfg.speed_mult;
+    game.lyricsCount = LYRICS.length;
+  }
+  fetch("/api/config")
+    .then((r) => r.json())
+    .then(applyConfig)
+    .catch(() => applyConfig(CONFIG_FALLBACK));
+
   // Tracks g.caught (item catches only, not obstacle passes) so onScore can
   // tell a catch apart from a normal obstacle-passed point and play a blip.
   let lastCaught = 0;
@@ -174,6 +200,21 @@ function boot() {
     overEl.classList.remove("hidden");
     if (!isVariantA) fireCtaView(); // becomes visible only now, for variant B
   };
+  // Lyric reveal (Task 23): game.js already paused gameplay before calling
+  // this — just play the sting, pulse the score, and show the next line.
+  game.onReveal = (i) => {
+    audio.sfxReveal();
+    scoreEl.classList.remove("pulse");
+    void scoreEl.offsetWidth; // force reflow so the animation can retrigger
+    scoreEl.classList.add("pulse");
+    revealLineEl.textContent = LYRICS[i];
+    revealPopup.classList.remove("hidden");
+  };
+
+  revealNextBtn.addEventListener("click", () => {
+    revealPopup.classList.add("hidden");
+    game.resume();
+  });
 
   function startPlay() {
     startEl.classList.add("hidden");
