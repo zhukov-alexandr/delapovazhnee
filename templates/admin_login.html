@@ -1,12 +1,24 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title>Вход — админка</title>
-<link rel="stylesheet" href="/static/css/admin.css"></head>
-<body class="login">
-  <form method="post" action="/admin/login" class="login-card">
-    <h1>Админка</h1>
-    {% if error %}<p class="err">Неверный логин или пароль</p>{% endif %}
-    <input name="username" placeholder="Логин" autocomplete="username">
-    <input name="password" type="password" placeholder="Пароль" autocomplete="current-password">
-    <button type="submit">Войти</button>
-  </form>
+<html lang="ru"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход — админка</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin login-page">
+  <main class="login-wrap">
+    <form method="post" action="/admin/login" class="card login-card">
+      <h1 class="login-title">Админка</h1>
+      {% if error %}<p class="err">Неверный логин или пароль</p>{% endif %}
+      <div class="field">
+        <label for="username">Логин</label>
+        <input id="username" name="username" placeholder="Логин" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Пароль</label>
+        <input id="password" name="password" type="password" placeholder="Пароль" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Войти</button>
+    </form>
+  </main>
 </body></html>

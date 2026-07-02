@@ -1,46 +1,117 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title>Дашборд — A/B пресейв</title>
-<link rel="stylesheet" href="/static/css/admin.css"></head>
+<html lang="ru"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Дашборд — A/B пресейв</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
 <body class="admin">
-  <header><h1>Дашборд A/B пресейва</h1>
-    <a href="/admin/export.csv" class="btn">Экспорт CSV</a>
-    <a href="/admin/logout" class="btn">Выйти</a>
-  </header>
+  <div class="admin-shell">
+    {% include "_admin_nav.html" %}
 
-  {% set A = d.variants.A %}{% set B = d.variants.B %}
-  <table class="metrics">
-    <thead><tr><th>Метрика</th><th>Вариант A (старт)</th><th>Вариант B (Game Over)</th></tr></thead>
-    <tbody>
-      <tr><td>Уникальные сессии</td><td>{{ A.sessions }}</td><td>{{ B.sessions }}</td></tr>
-      <tr><td>CTA показы (уник. сессий)</td><td>{{ A.cta_view_sessions }}</td><td>{{ B.cta_view_sessions }}</td></tr>
-      <tr><td>CTA клики (уник. сессий)</td><td>{{ A.cta_click_sessions }}</td><td>{{ B.cta_click_sessions }}</td></tr>
-      <tr><td>— кнопка / QR</td><td>{{ A.cta_click_button }} / {{ A.cta_click_qr }}</td><td>{{ B.cta_click_button }} / {{ B.cta_click_qr }}</td></tr>
-      <tr class="hi"><td>CVR</td><td>{{ '%.1f'|format(A.cvr*100) }}%</td><td>{{ '%.1f'|format(B.cvr*100) }}%</td></tr>
-      <tr><td>Игр начато / завершено</td><td>{{ A.games_started }} / {{ A.games_finished }}</td><td>{{ B.games_started }} / {{ B.games_finished }}</td></tr>
-      <tr><td>Средний счёт</td><td>{{ '%.1f'|format(A.avg_score) }}</td><td>{{ '%.1f'|format(B.avg_score) }}</td></tr>
-    </tbody>
-  </table>
+    <main class="admin-main">
+      <h1 class="page-title">Дашборд A/B пресейва</h1>
 
-  <p class="leader">
-    {% if d.leader %}Лидирует <b>Вариант {{ d.leader }}</b>{% else %}Пока паритет{% endif %}
-    {% if d.prob_b_beats_a is not none %}
-      — вероятность, что B лучше A: <b>{{ '%.0f'|format(d.prob_b_beats_a * 100) }}%</b>;
-      точный тест Фишера: p={{ '%.3f'|format(d.fisher_p) }}
-      <span class="caveat">(при малом трафике выводы делайте осторожно)</span>
-    {% else %}
-      — данных пока недостаточно для сравнения
-    {% endif %}
-  </p>
+      {% set A = d.variants.A %}{% set B = d.variants.B %}
+      <section class="cards-grid">
+        <div class="card stat-card">
+          <div class="stat-label">Уникальные сессии</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.sessions }}</span>
+            <span class="pill pill-b">B {{ B.sessions }}</span>
+          </div>
+        </div>
 
-  <h2>Заходы по дням</h2>
-  <div class="bars">
-    {% set maxv = (d.daily | map(attribute='A') | list + d.daily | map(attribute='B') | list + [1]) | max %}
-    {% for row in d.daily %}
-      <div class="day">
-        <div class="bar a" style="height: {{ (row.A / maxv * 100)|round }}%" title="A: {{ row.A }}"></div>
-        <div class="bar b" style="height: {{ (row.B / maxv * 100)|round }}%" title="B: {{ row.B }}"></div>
-        <span class="lbl">{{ row.date[5:] }}</span>
-      </div>
-    {% endfor %}
+        <div class="card stat-card">
+          <div class="stat-label">CTA показы (сессии)</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.cta_view_sessions }}</span>
+            <span class="pill pill-b">B {{ B.cta_view_sessions }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">CTA клики — кнопка / QR</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.cta_click_button }} / {{ A.cta_click_qr }}</span>
+            <span class="pill pill-b">B {{ B.cta_click_button }} / {{ B.cta_click_qr }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card stat-card--hi">
+          <div class="stat-label">CVR</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ '%.1f'|format(A.cvr*100) }}%</span>
+            <span class="pill pill-b">B {{ '%.1f'|format(B.cvr*100) }}%</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Игр начато / завершено</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.games_started }} / {{ A.games_finished }}</span>
+            <span class="pill pill-b">B {{ B.games_started }} / {{ B.games_finished }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Средний счёт</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ '%.1f'|format(A.avg_score) }}</span>
+            <span class="pill pill-b">B {{ '%.1f'|format(B.avg_score) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card confidence-card">
+        <h2 class="card-title">Достоверность</h2>
+        <p class="leader-line">
+          {% if d.leader %}Лидирует <b>Вариант {{ d.leader }}</b>{% else %}Пока паритет{% endif %}
+        </p>
+        {% if d.prob_b_beats_a is not none %}
+          <p>Вероятность, что B лучше A: <b>{{ '%.0f'|format(d.prob_b_beats_a * 100) }}%</b>
+             &middot; точный тест Фишера: p={{ '%.3f'|format(d.fisher_p) }}</p>
+          <p class="muted">При малом трафике выводы делайте осторожно.</p>
+        {% else %}
+          <p class="muted">Данных пока недостаточно для сравнения</p>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Заходы по дням</h2>
+        <div class="bars">
+          {% set maxv = (d.daily | map(attribute='A') | list + d.daily | map(attribute='B') | list + [1]) | max %}
+          {% for row in d.daily %}
+            <div class="day">
+              <div class="bar bar-a" style="height: {{ (row.A / maxv * 100)|round }}%" title="A: {{ row.A }}"></div>
+              <div class="bar bar-b" style="height: {{ (row.B / maxv * 100)|round }}%" title="B: {{ row.B }}"></div>
+              <span class="lbl">{{ row.date[5:] }}</span>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="legend">
+          <span class="dot dot-a"></span> Вариант A
+          <span class="dot dot-b"></span> Вариант B
+        </div>
+      </section>
+
+      <section class="card table-card">
+        <h2 class="card-title">Все метрики</h2>
+        <div class="table-scroll">
+          <table class="metrics">
+            <thead><tr><th>Метрика</th><th>Вариант A</th><th>Вариант B</th></tr></thead>
+            <tbody>
+              <tr><td>Уникальные сессии</td><td>{{ A.sessions }}</td><td>{{ B.sessions }}</td></tr>
+              <tr><td>CTA показы (уник. сессий)</td><td>{{ A.cta_view_sessions }}</td><td>{{ B.cta_view_sessions }}</td></tr>
+              <tr><td>CTA клики (уник. сессий)</td><td>{{ A.cta_click_sessions }}</td><td>{{ B.cta_click_sessions }}</td></tr>
+              <tr><td>— кнопка / QR</td><td>{{ A.cta_click_button }} / {{ A.cta_click_qr }}</td><td>{{ B.cta_click_button }} / {{ B.cta_click_qr }}</td></tr>
+              <tr class="hi"><td>CVR</td><td>{{ '%.1f'|format(A.cvr*100) }}%</td><td>{{ '%.1f'|format(B.cvr*100) }}%</td></tr>
+              <tr><td>Игр начато / завершено</td><td>{{ A.games_started }} / {{ A.games_finished }}</td><td>{{ B.games_started }} / {{ B.games_finished }}</td></tr>
+              <tr><td>Средний счёт</td><td>{{ '%.1f'|format(A.avg_score) }}</td><td>{{ '%.1f'|format(B.avg_score) }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
 </body></html>

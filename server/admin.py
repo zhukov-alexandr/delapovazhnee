@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from server.config import Settings
 from server.db import get_conn, fetch_all_events
 from server.metrics import compute_dashboard
+from server.settings import get_settings, set_settings
 
 
 def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRouter:
@@ -47,7 +48,39 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
             data = compute_dashboard(conn)
         finally:
             conn.close()
-        return templates.TemplateResponse(request, "admin.html", {"d": data})
+        return templates.TemplateResponse(
+            request, "admin.html", {"d": data, "active": "ab"})
+
+    @router.get("/settings", response_class=HTMLResponse)
+    def settings_form(request: Request, saved: int = 0):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            cfg = get_settings(conn)
+        finally:
+            conn.close()
+        return templates.TemplateResponse(
+            request, "admin_settings.html",
+            {"cfg": cfg, "saved": bool(saved), "active": "settings"})
+
+    @router.post("/settings")
+    def settings_save(
+        request: Request,
+        points_per_line: str = Form(default=""),
+        speed_mult: str = Form(default=""),
+    ):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            set_settings(conn, {
+                "points_per_line": points_per_line,
+                "speed_mult": speed_mult,
+            })
+        finally:
+            conn.close()
+        return RedirectResponse("/admin/settings?saved=1", status_code=303)
 
     @router.get("/export.csv")
     def export_csv(request: Request):

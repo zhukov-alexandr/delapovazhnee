@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Настройки игры — админка</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin">
+  <div class="admin-shell">
+    {% include "_admin_nav.html" %}
+
+    <main class="admin-main">
+      <h1 class="page-title">Настройки игры</h1>
+
+      {% if saved %}<div class="notice">Сохранено</div>{% endif %}
+
+      <section class="card form-card">
+        <form method="post" action="/admin/settings">
+          <div class="field">
+            <label for="points_per_line">N (очков на строчку)</label>
+            <input type="number" id="points_per_line" name="points_per_line"
+                   min="1" step="1" value="{{ cfg.points_per_line }}" required>
+          </div>
+
+          <div class="field">
+            <label for="speed_mult">Скорость игры
+              <span class="value-badge" id="speed_mult_val">{{ '%.2f'|format(cfg.speed_mult) }}</span>
+            </label>
+            <input type="range" id="speed_mult" name="speed_mult"
+                   min="0.6" max="1.2" step="0.05" value="{{ cfg.speed_mult }}">
+          </div>
+
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var slider = document.getElementById('speed_mult');
+      var label = document.getElementById('speed_mult_val');
+      function fmt(v) { return Number(v).toFixed(2); }
+      if (slider && label) {
+        label.textContent = fmt(slider.value);
+        slider.addEventListener('input', function () {
+          label.textContent = fmt(slider.value);
+        });
+      }
+    })();
+  </script>
+</body></html>

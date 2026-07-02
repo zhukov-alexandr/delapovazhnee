@@ -52,3 +52,50 @@ def test_export_csv_returns_rows(client, settings):
     assert "text/csv" in r.headers["content-type"]
     assert r.text.splitlines()[0] == "id,ts,session_id,variant,event_type,meta"
     assert "a1" in r.text
+
+
+from server.settings import get_settings
+
+
+def test_admin_settings_requires_login(client):
+    r = client.get("/admin/settings", follow_redirects=False)
+    assert r.status_code in (302, 307)
+    assert "/admin/login" in r.headers["location"]
+
+def test_admin_settings_form_shows_current_values(client, settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    _login(client)
+    r = client.get("/admin/settings")
+    assert r.status_code == 200
+    assert "Настройки игры" in r.text
+    assert 'name="points_per_line"' in r.text
+    assert 'name="speed_mult"' in r.text
+
+def test_admin_settings_post_saves(client, settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    _login(client)
+    r = client.post("/admin/settings",
+                    data={"points_per_line": "7", "speed_mult": "0.9"},
+                    follow_redirects=False)
+    assert r.status_code in (302, 303)
+    cfg = get_settings(conn)
+    assert cfg["points_per_line"] == 7
+    assert cfg["speed_mult"] == 0.9
+
+def test_admin_settings_post_clamps_speed(client, settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    _login(client)
+    r = client.post("/admin/settings",
+                    data={"points_per_line": "5", "speed_mult": "5"},
+                    follow_redirects=False)
+    assert r.status_code in (302, 303)
+    cfg = get_settings(conn)
+    assert cfg["speed_mult"] == 1.2
+
+def test_admin_dashboard_shows_both_tabs(client):
+    _login(client)
+    r = client.get("/admin")
+    assert r.status_code == 200
+    assert "Настройки игры" in r.text
+    assert 'href="/admin"' in r.text
+    assert 'href="/admin/settings"' in r.text
