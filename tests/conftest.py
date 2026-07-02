@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from server.config import Settings
+from server.db import get_conn, init_db
 from main import create_app
 
 
@@ -16,6 +17,16 @@ def settings(tmp_path) -> Settings:
         secret_key="test-secret-key",
         public_base_url="http://testserver",
     )
+
+
+@pytest.fixture(autouse=True)
+def init_test_db(settings):
+    """Initialize the test database schema for all tests."""
+    conn = get_conn(settings.db_path)
+    try:
+        init_db(conn)
+    finally:
+        conn.close()
 
 
 @pytest.fixture

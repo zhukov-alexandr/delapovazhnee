@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from server.config import Settings
 from server.db import get_conn, insert_event
 from server.qr import build_presave_url, make_qr_png
+from server.settings import get_settings
 
 Variant = Literal["A", "B"]
 EventType = Literal["visit", "game_start", "game_over", "cta_view", "cta_click"]
@@ -62,5 +63,18 @@ def build_api_router(settings: Settings) -> APIRouter:
         png = make_qr_png(target)
         return Response(png, media_type="image/png",
                         headers={"Cache-Control": "no-store"})
+
+    @router.get("/api/config")
+    def get_config():
+        """Public config endpoint: returns current game settings."""
+        conn = _conn()
+        try:
+            config = get_settings(conn)
+            return {
+                "points_per_line": config["points_per_line"],
+                "speed_mult": config["speed_mult"],
+            }
+        finally:
+            conn.close()
 
     return router
