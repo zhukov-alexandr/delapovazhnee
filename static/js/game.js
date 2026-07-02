@@ -7,7 +7,7 @@
 import { GAME } from "./config.js";
 import { jump } from "./physics.js";
 import { createGame, startGame, stepGame, nextRevealIndex } from "./gamestate.js";
-import { drawBackground, drawRunner, drawObstacle, drawCollectible } from "./sprites.js";
+import { drawBackground, drawRunner, drawObstacle, drawCollectible, PALETTE } from "./sprites.js";
 
 // A no-op default so hooks are always callable before the shell sets real ones.
 const noop = () => {};
@@ -39,6 +39,8 @@ export class Game {
     this.canvas = null;
     this.ctx = null;
     this.worldW = 640; // visible world width in logical px; recomputed in resize()
+    this.yOffset = 0;  // CSS px the world is pushed down to anchor its bottom to the
+                        // canvas bottom on mobile (see resize()); 0 on desktop
     this.cam = { x: 0 }; // parallax camera; advances with elapsed time
     this.t = 0;          // seconds elapsed, drives run-bob + parallax
     this.raf = 0;
@@ -104,17 +106,32 @@ export class Game {
 
   // Fixed logical height (WORLD_H); CSS fills the viewport; backing store is
   // scaled by devicePixelRatio for crisp pixels. worldW = visible world width.
+  //
+  // Camera fit (Task 24): height-fit alone over-zooms on tall/narrow phones —
+  // the visible world width shrinks along with the height scale, so the fixed
+  // runner (GAME.RUNNER_X=90) ends up near the horizontal center with almost
+  // no track ahead to react to. Capping the scale so the visible width never
+  // drops below GAME.MIN_VIEW_W fixes that: desktop/landscape (cssH/WORLD_H is
+  // the smaller term) renders exactly as before; narrow/tall mobile picks the
+  // smaller cssW/MIN_VIEW_W term instead, zooming out so everything is smaller
+  // and the runner sits well left of center with real track ahead. This is a
+  // camera-only change — RUNNER_X and all obstacle/physics logic are untouched.
   _resize() {
     if (!this.canvas || !this.ctx) return;
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const cssH = this.canvas.clientHeight;
     const cssW = this.canvas.clientWidth;
     if (!cssH || !cssW) return; // not laid out yet
-    const scale = cssH / GAME.WORLD_H; // logical -> css
+    const scale = Math.min(cssH / GAME.WORLD_H, cssW / GAME.MIN_VIEW_W); // logical -> css
     this.worldW = cssW / scale; // visible world width
     this.canvas.width = Math.round(cssW * dpr);
     this.canvas.height = Math.round(cssH * dpr);
-    this.ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+    // On mobile the scaled world (WORLD_H * scale) is shorter than the canvas
+    // — anchor it to the bottom (world y=WORLD_H -> canvas bottom) so the
+    // ground/sea/sand band stays put instead of floating mid-screen. On
+    // desktop this offset is 0 (world already fills the height).
+    this.yOffset = cssH - GAME.WORLD_H * scale; // CSS px
+    this.ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, dpr * this.yOffset);
     this.ctx.imageSmoothingEnabled = false;
   }
 
@@ -172,6 +189,16 @@ export class Game {
   _render() {
     const ctx = this.ctx;
     if (!ctx) return;
+    // On mobile the world (anchored to the bottom by _resize()) is shorter
+    // than the canvas, leaving empty space above it. Paint that space with
+    // the sky's top color first (in device space, transform reset) so it
+    // reads as more sky rather than a blank strip; drawBackground's gradient
+    // then draws over the world area as usual.
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = PALETTE.night;
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.restore();
     drawBackground(ctx, this.cam, this.worldW);
     for (const o of this.game.obs.obstacles) drawObstacle(ctx, o);
     for (const item of this.game.col.items) drawCollectible(ctx, item);

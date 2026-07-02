@@ -1,6 +1,11 @@
 // Shared game constants. Units: logical world pixels; y grows downward.
 export const GAME = {
   WORLD_H: 360,          // fixed logical height; width comes from viewport
+  MIN_VIEW_W: 500,       // camera (game.js resize()): minimum visible world width in
+                         // logical px — on narrow/tall mobile this caps zoom-in so the
+                         // runner (RUNNER_X=90) keeps track ahead instead of sitting
+                         // centered. Tuning value; adjust to taste, does not affect
+                         // obstacle/collision logic.
   GROUND_Y: 300,         // runner baseline (top of feet band)
   GRAVITY: 2600,         // px/s^2
   JUMP_V: -760,          // px/s initial velocity, single jump
