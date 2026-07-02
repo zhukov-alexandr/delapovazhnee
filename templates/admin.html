@@ -95,23 +95,6 @@
         </div>
       </section>
 
-      <section class="card table-card">
-        <h2 class="card-title">Все метрики</h2>
-        <div class="table-scroll">
-          <table class="metrics">
-            <thead><tr><th>Метрика</th><th>Вариант A</th><th>Вариант B</th></tr></thead>
-            <tbody>
-              <tr><td>Уникальные сессии</td><td>{{ A.sessions }}</td><td>{{ B.sessions }}</td></tr>
-              <tr><td>CTA показы (уник. сессий)</td><td>{{ A.cta_view_sessions }}</td><td>{{ B.cta_view_sessions }}</td></tr>
-              <tr><td>CTA клики (уник. сессий)</td><td>{{ A.cta_click_sessions }}</td><td>{{ B.cta_click_sessions }}</td></tr>
-              <tr><td>— кнопка / QR</td><td>{{ A.cta_click_button }} / {{ A.cta_click_qr }}</td><td>{{ B.cta_click_button }} / {{ B.cta_click_qr }}</td></tr>
-              <tr class="hi"><td>CVR</td><td>{{ '%.1f'|format(A.cvr*100) }}%</td><td>{{ '%.1f'|format(B.cvr*100) }}%</td></tr>
-              <tr><td>Игр начато / завершено</td><td>{{ A.games_started }} / {{ A.games_finished }}</td><td>{{ B.games_started }} / {{ B.games_finished }}</td></tr>
-              <tr><td>Средний счёт</td><td>{{ '%.1f'|format(A.avg_score) }}</td><td>{{ '%.1f'|format(B.avg_score) }}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
     </main>
   </div>
 </body></html>
