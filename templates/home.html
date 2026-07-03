@@ -142,12 +142,15 @@
       }
       .single .section__eyebrow { color: #b9a892; }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-      .single__left { display: flex; flex-direction: column; align-items: center; }
-      .single__cover-wrap { position: relative; width: 100%; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
-      /* cue placements in the single block: static-flow button — desktop under the
-         cover (horizontal, not rotated), mobile in a row right of the release badge */
+      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      /* The wrap fills the one-screen section, so the desktop cue (base .cue
+         offsets) lands in the SAME on-screen spot as the hero's cue: bottom-left
+         of the screen. Mobile uses a static cue in the release-date row instead. */
+      .single .wrap { position: relative; flex: 1 1 auto; }
+      /* +6px on both axes mirrors the hero photo's paper border, so both cues
+         land on the exact same screen pixel */
+      .cue--desktop { left: calc(clamp(14px, 2vw, 26px) + 6px); bottom: calc(clamp(14px, 2vw, 24px) + 6px); }
       .cue--flow { position: static; }
-      .cue--desktop { margin-top: clamp(18px, 3vh, 30px); }
       .cue--mobile { display: none; }
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
@@ -252,11 +255,8 @@
       <div class="wrap">
         <div class="section__eyebrow eyebrow">Пресейв</div>
         <div class="single__grid">
-          <div class="single__left">
-            <div class="single__cover-wrap">
-              <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
-            </div>
-            <a class="cue cue--flow cue--desktop" href="#concerts">Концерты <span class="arr">↓</span></a>
+          <div class="single__cover-wrap">
+            <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
           </div>
           <div>
             <div class="release-row">
@@ -271,6 +271,8 @@
             </div>
           </div>
         </div>
+        <!-- desktop: same on-screen spot as the hero's cue (bottom-left of the screen) -->
+        <a class="cue cue--desktop" href="#concerts">Концерты <span class="arr">↓</span></a>
       </div>
     </section>
 
