@@ -88,6 +88,7 @@ function boot() {
     item_0: "/static/sprites/items/item1.png",
     item_1: "/static/sprites/items/item2.png",
     item_2: "/static/sprites/items/item3.png",
+    item_3: "/static/sprites/items/item4.png",
   });
 
   const root = document.documentElement;
@@ -208,14 +209,16 @@ function boot() {
     return location.origin + "/presave/return/" + id + "/" + session.sid + "/" + session.variant;
   }
 
-  // Only these three resolve correctly through band.link's save-presave gateway
-  // AND honor our redirectUrl. Through that gateway Spotify/Apple silently fall
-  // back to a Yandex login, so they are built directly below (verified against
-  // the original dnkmusic.ru page).
-  const GATEWAY_SERVICES = new Set(["yandex", "vkmusic", "mts"]);
+  // These resolve correctly through band.link's save-presave gateway AND honor
+  // our redirectUrl. Spotify/Apple fall back to a Yandex login through the
+  // gateway (so they're built directly below). КИОН/mts finalizes only when
+  // redirectUrl is band.link's OWN smartlink domain (ERROR_1009 otherwise), so
+  // it's a plain external link to the original page — no in-game detection.
+  const GATEWAY_SERVICES = new Set(["yandex", "vkmusic"]);
 
-  // Opens the correct presave flow for one service in a popup. No "noopener":
-  // the /presave/return popup needs window.opener to postMessage back here.
+  // Opens the correct presave flow for one service in a popup. No "noopener" on
+  // the detected flows: the /presave/return popup needs window.opener to
+  // postMessage back here.
   function openPresave(id) {
     const ret = presaveReturnUrl(id);
 
@@ -225,6 +228,14 @@ function boot() {
         "&bandlink_id=undefined&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
         "&redirectUrl=" + encodeURIComponent(ret);
       window.open(url, "_blank");
+      return;
+    }
+
+    if (id === "mts") {
+      // КИОН/МТС: band.link's finalize accepts only its own smartlink domain in
+      // redirectUrl (external → ERROR_1009), so we can't route it back to us.
+      // Just open the original band.link page — the presave completes there.
+      window.open("https://dnkmusic.ru/devyatnadtsat", "_blank", "noopener");
       return;
     }
 
@@ -287,7 +298,8 @@ function boot() {
     li.appendChild(actionSpan);
     li.addEventListener("click", () => {
       if (li.querySelector(".el-link__action_disabled")) return; // already saved
-      emit("streaming_click", { service: svc.id });
+      // КИОН is just an external link to the original page — no stats for it.
+      if (svc.id !== "mts") emit("streaming_click", { service: svc.id });
       openPresave(svc.id);
     });
     presaveServicesEl.appendChild(li);

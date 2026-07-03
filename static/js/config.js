@@ -19,7 +19,7 @@ export const GAME = {
   RUNNER_X: 90,          // fixed horizontal position of the runner
   ITEM_W: 60,
   ITEM_H: 60,
-  ITEM_KINDS: 3,
+  ITEM_KINDS: 4,
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays

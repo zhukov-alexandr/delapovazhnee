@@ -56,7 +56,8 @@ ssh root@IP 'bash /root/bootstrap-vds.sh'            # не под root? → ssh
 
 - `/opt/delapovazhnee/static/assets/music.mp3`
 - `/opt/delapovazhnee/static/sprites/characters/char1.png … char4.png`
-- `/opt/delapovazhnee/static/sprites/items/item1.png … item3.png`
+
+(Айтемы `item1…item4.png` теперь запекаются в образ из git — заливать на VDS не нужно.)
 
 БД (`sqlite`) живёт в docker-volume `dbdata` и тоже переживает пересоздание контейнера.
 

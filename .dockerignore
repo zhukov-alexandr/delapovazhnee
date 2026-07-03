@@ -19,5 +19,4 @@ deploy
 *.md
 static/assets
 static/sprites/characters
-static/sprites/items
 static/home/cover.*
