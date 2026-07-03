@@ -49,14 +49,14 @@ def create_app(settings: Settings) -> FastAPI:
     def home_page():
         return FileResponse(BASE_DIR / "templates" / "home.html")
 
-    # Make the browser revalidate static assets on every load (cheap 304 via the
-    # ETag StaticFiles already sends) instead of heuristically caching JS/CSS for
-    # a long time — otherwise a code update (e.g. game.js) isn't picked up without
-    # a manual hard refresh.
+    # Make the browser revalidate the HTML pages and static assets on every load
+    # (cheap 304 via ETag/Last-Modified) instead of heuristically caching them —
+    # otherwise a landing/game/JS/CSS update isn't picked up without a hard refresh.
     @app.middleware("http")
-    async def _static_no_cache(request: Request, call_next):
+    async def _no_cache(request: Request, call_next):
         response = await call_next(request)
-        if request.url.path.startswith("/static/"):
+        path = request.url.path
+        if path.startswith("/static/") or path in ("/", "/home", "/home/"):
             response.headers["Cache-Control"] = "no-cache"
         return response
 
