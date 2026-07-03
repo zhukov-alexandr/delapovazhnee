@@ -54,6 +54,16 @@ export class Game {
     this.last = 0;
     this.running = false; // whether the RAF loop is active
 
+    // Offscreen 1:1-logical render buffer (created in _resize): the scene is
+    // drawn here at crisp integer pixels and upscaled to the device canvas in a
+    // single blit, which kills the moving-pixel-art shimmer.
+    this.buffer = null;
+    this.bufferCtx = null;
+    this.bufW = 0;
+    this.bufH = 0;
+    this.viewTop = 0;
+    this.skyShift = 0;
+
     // Bound listeners so we can add/remove the exact same references.
     this._onResize = this._resize.bind(this);
     this._onKeyDown = this.__keydown.bind(this);
@@ -141,7 +151,21 @@ export class Game {
     // ground/sea/sand band stays put instead of floating mid-screen. On
     // desktop this offset is 0 (world already fills the height).
     this.yOffset = cssH - GAME.WORLD_H * scale; // CSS px
-    this.ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, dpr * this.yOffset);
+    this.viewTop = scale ? -this.yOffset / scale : 0; // world-y at the canvas top
+
+    // (Re)build the offscreen buffer at logical resolution. Everything is drawn
+    // into it at integer logical pixels (px() rounds to 1px); a single uniform
+    // upscale to the device canvas then avoids the per-sprite sub-pixel shimmer
+    // you get drawing moving pixel art directly through the fractional dpr*scale
+    // transform (fillRect edges re-alias every frame).
+    this.bufW = Math.max(1, Math.ceil(this.worldW));
+    this.bufH = Math.max(1, Math.ceil(GAME.WORLD_H - this.viewTop));
+    this.skyShift = Math.round(this.viewTop); // integer sky offset in the buffer
+    if (!this.buffer) this.buffer = document.createElement("canvas");
+    this.buffer.width = this.bufW;
+    this.buffer.height = this.bufH;
+    this.bufferCtx = this.buffer.getContext("2d");
+    this.bufferCtx.imageSmoothingEnabled = false;
     this.ctx.imageSmoothingEnabled = false;
   }
 
@@ -211,28 +235,31 @@ export class Game {
   }
 
   _render() {
+    const bctx = this.bufferCtx;
     const ctx = this.ctx;
-    if (!ctx) return;
-    // On mobile the world (anchored to the bottom by _resize()) is shorter
-    // than the canvas, leaving empty space above it. Paint that space with
-    // the sky's top color first (in device space, transform reset) so it
-    // reads as more sky rather than a blank strip; drawBackground's gradient
-    // then draws over the world area as usual.
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = PALETTE.night;
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.restore();
-    // viewTop = world-y at the canvas top (negative on mobile) — lets drawBackground
-    // stretch the sky gradient across the full visible height instead of a void.
-    const viewTop = this.scale ? -this.yOffset / this.scale : 0;
-    drawBackground(ctx, this.cam, this.worldW, viewTop);
-    for (const o of this.game.obs.obstacles) drawObstacle(ctx, o);
-    for (const item of this.game.col.items) drawCollectible(ctx, item);
+    if (!bctx || !ctx) return;
+
+    // 1) Draw the whole scene into the logical-resolution buffer. Content at
+    // logical y lands at buffer y = logical_y - skyShift, so the sky top sits at
+    // the buffer's top edge (mobile has extra sky above the world). The night
+    // fill first covers any strip the background doesn't reach.
+    bctx.setTransform(1, 0, 0, 1, 0, 0);
+    bctx.fillStyle = PALETTE.night;
+    bctx.fillRect(0, 0, this.bufW, this.bufH);
+    bctx.setTransform(1, 0, 0, 1, 0, -this.skyShift);
+    drawBackground(bctx, this.cam, this.worldW, this.viewTop);
+    for (const o of this.game.obs.obstacles) drawObstacle(bctx, o);
+    for (const item of this.game.col.items) drawCollectible(bctx, item);
     // Blink the runner while invulnerable (post-life-loss grace) as feedback.
     const invulnerable = this.t < this.invulnUntil;
     if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
-      drawRunner(ctx, this.game.runner, this.t, this.charIndex);
+      drawRunner(bctx, this.game.runner, this.t, this.charIndex);
     }
+
+    // 2) Upscale the crisp buffer to the device canvas in one uniform blit —
+    // temporally stable, so moving pixels no longer shimmer.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.drawImage(this.buffer, 0, 0, this.bufW, this.bufH, 0, 0, this.canvas.width, this.canvas.height);
   }
 }
