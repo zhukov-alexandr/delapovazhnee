@@ -138,9 +138,8 @@ function boot() {
   const ctaTpl = document.getElementById("cta-tpl");
   const ctaFrag = ctaTpl.content.cloneNode(true);
   const ctaRoot = ctaFrag.querySelector(".cta");
-  const ctaImg = ctaFrag.querySelector(".qr");
+  // Cover image is static in the template; only the presave link is dynamic.
   const ctaLink = ctaFrag.querySelector(".presave");
-  ctaImg.src = "/qr?v=" + session.variant + "&sid=" + session.sid;
   ctaLink.href = goPresaveUrl(session.variant, session.sid, "button");
   // No client-side cta_click emit here: /go/presave (server) already logs
   // cta_click when the link is followed — emitting here would double-count.

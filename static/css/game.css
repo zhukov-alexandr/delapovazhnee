@@ -195,13 +195,12 @@ p {
   color: var(--ink);
 }
 
-.cta .qr {
-  width: clamp(110px, 30vw, 140px);
-  height: clamp(110px, 30vw, 140px);
+.cta .cover {
+  width: clamp(140px, 42vw, 200px);
+  height: auto;
   display: block;
-  background: var(--foam);
-  border-radius: 8px;
-  image-rendering: pixelated;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .cta .presave {
