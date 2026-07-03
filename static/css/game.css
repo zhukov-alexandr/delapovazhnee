@@ -122,13 +122,12 @@ p {
 }
 .heart.lost { color: rgba(255, 244, 226, 0.28); text-shadow: none; }
 
-/* Life-lost popup — same clean VT323 look as the "Очки"/"Рекорд" (.best) line,
-   both for the «ОЙ!» title and the lives line. */
-.life-lost-title {
-  font-family: "VT323", monospace;
-}
+/* Life-lost popup: «ОЙ!» keeps the h1 Handjet title font (the earlier "weird"
+   look was a stale cache, not the font). The lives line uses plain monospace —
+   same look as «Очки»/«Рекорд» but digits match the text size (VT323's digits
+   render smaller than the monospace-fallback Cyrillic). */
 .lives-left {
-  font-family: "VT323", monospace;
+  font-family: monospace;
   color: var(--sun);
   font-size: clamp(18px, 4.2vw, 26px);
   margin: 0 0 clamp(6px, 1.5vh, 12px);
@@ -278,10 +277,11 @@ p {
 
 .char-tile:active { transform: translateY(1px); }
 
-/* Best-score line on start + game-over overlays */
+/* Best-score line on start + game-over overlays (plain monospace so the score
+   digits match the Cyrillic — VT323's digits render smaller than the fallback). */
 .best {
-  font-family: "VT323", monospace;
-  font-size: clamp(16px, 3vw, 20px);
+  font-family: monospace;
+  font-size: clamp(17px, 3.4vw, 22px);
   color: var(--sun);
   margin: 0 0 clamp(10px, 2vh, 16px);
 }
@@ -325,9 +325,9 @@ p {
 }
 
 .reveal-label {
-  /* Same clean VT323 look as the "Очки"/"Рекорд" line (the pixel body font was
+  /* Clean monospace, same as the "Очки"/"Рекорд" line (the pixel body font was
      hard to read for a full sentence); the stylised look stays on the lyric line. */
-  font-family: "VT323", monospace;
+  font-family: monospace;
   color: var(--sun);
   font-size: clamp(16px, 3.4vw, 22px);
   line-height: 1.4;
