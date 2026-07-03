@@ -111,9 +111,8 @@
         display: flex; align-items: center; justify-content: space-between;
         padding: 22px 0;
       }
-      .mark { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
-      .mark svg { width: 44px; height: auto; display: block; }
-      .mark span { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: 15px; letter-spacing: 0.01em; }
+      .mark { display: flex; align-items: center; color: var(--ink); text-decoration: none; }
+      .mark span { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: 16px; letter-spacing: 0.01em; }
       .topbar__link { font-family: "Golos Text", sans-serif; font-weight: 600; color: var(--ink); text-decoration: none; text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; border-bottom: 2px solid var(--crimson); padding-bottom: 3px; }
 
       /* ---- Hero ---- */
@@ -193,8 +192,7 @@
         padding: clamp(52px, 8vw, 96px) 0 40px;
       }
       .footer__top { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; align-items: flex-start; }
-      .footer__mark svg { width: 96px; height: auto; }
-      .footer__mark .display { font-size: clamp(30px, 5vw, 52px); margin-top: 16px; color: var(--paper); }
+      .footer__mark .display { font-size: clamp(30px, 5vw, 52px); color: var(--paper); }
       .footer__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #b9a892; margin-bottom: 14px; }
       .footer__links { display: flex; flex-direction: column; gap: 9px; }
       .footer__links a { color: var(--paper); text-decoration: none; font-weight: 500; opacity: 0.9; width: fit-content; border-bottom: 1px solid transparent; }
@@ -216,22 +214,10 @@
     </style>
 </head>
 <body>
-    <!-- Band mark (hand-drawn mountain squiggle, redrawn) reused in top bar + footer -->
-    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-      <symbol id="mtn" viewBox="0 0 120 60">
-        <path d="M4 46 C10 44 16 42 22 30 C26 22 30 14 36 24 C40 31 44 40 50 30 C55 22 60 14 66 26 C70 34 74 40 82 34 C92 27 104 40 116 34"
-              fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="34" cy="52" r="3.2" fill="currentColor"/>
-        <circle cx="52" cy="52" r="3.2" fill="currentColor"/>
-        <circle cx="70" cy="52" r="3.2" fill="currentColor"/>
-      </symbol>
-    </svg>
-
     <header class="hero">
       <div class="wrap">
         <div class="topbar">
           <a class="mark" href="/home" aria-label="Дела поважнее">
-            <svg><use href="#mtn"/></svg>
             <span>Дела поважнее</span>
           </a>
           <a class="topbar__link" href="/">Играть →</a>
@@ -300,7 +286,6 @@
       <div class="wrap">
         <div class="footer__top">
           <div class="footer__mark">
-            <svg aria-hidden="true"><use href="#mtn"/></svg>
             <div class="display">Дела<br>поважнее</div>
           </div>
           <div class="footer__col">
