@@ -59,6 +59,17 @@
       <p id="reveal-line" class="reveal-line"></p>
       <button id="reveal-next" class="btn big">Дальше</button>
     </div>
+
+    <!-- Presave modal (Task 26): opened by the CTA button (both variants).
+         Service rows are built by boot.js from PRESAVE.SERVICES. -->
+    <div id="presave-modal" class="overlay presave-overlay hidden">
+      <div class="presave-card">
+        <button type="button" id="presave-close" class="presave-close" aria-label="Закрыть">×</button>
+        <img class="presave-cover" alt="Обложка сингла" src="/static/sprites/cover.jpg" />
+        <h2 class="presave-title">Пресейв</h2>
+        <ul id="presave-services" class="presave-services"></ul>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/static/js/selftest.js"></script>

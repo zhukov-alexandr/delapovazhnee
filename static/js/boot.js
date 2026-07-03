@@ -1,12 +1,32 @@
 // Page boot: wires the session/analytics (ab.js), the game controller
 // (game.js), audio (audio.js), and the start/HUD/game-over overlays together.
-import { readSession, markVisited, createEmitter, goPresaveUrl } from "./ab.js";
+import { readSession, markVisited, createEmitter } from "./ab.js";
 import { Game } from "./game.js";
 import { createAudio } from "./audio.js";
 import { getBest, updateBest, getChar, setChar } from "./prefs.js";
 import { drawRunner, loadSprites } from "./sprites.js";
-import { GAME } from "./config.js";
+import { GAME, PRESAVE } from "./config.js";
 import { LYRICS } from "./lyrics.js";
+
+// localStorage key: JSON array of service ids already presaved (Task 26).
+const PRESAVED_KEY = "dp_presaved";
+
+function readPresaved(store) {
+  try {
+    const raw = store.getItem(PRESAVED_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function addPresaved(store, id) {
+  const ids = readPresaved(store);
+  if (!ids.includes(id)) ids.push(id);
+  try { store.setItem(PRESAVED_KEY, JSON.stringify(ids)); } catch (_) { /* ignore */ }
+  return ids;
+}
 
 // Server-tunable defaults (Task 21/23), used if GET /api/config fails.
 const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0 };
@@ -138,11 +158,14 @@ function boot() {
   const ctaTpl = document.getElementById("cta-tpl");
   const ctaFrag = ctaTpl.content.cloneNode(true);
   const ctaRoot = ctaFrag.querySelector(".cta");
-  // Cover image is static in the template; only the presave link is dynamic.
+  // Cover image is static in the template; the presave link no longer
+  // navigates — it opens the in-page presave modal (Task 26).
   const ctaLink = ctaFrag.querySelector(".presave");
-  ctaLink.href = goPresaveUrl(session.variant, session.sid, "button");
-  // No client-side cta_click emit here: /go/presave (server) already logs
-  // cta_click when the link is followed — emitting here would double-count.
+  ctaLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    emit("cta_click", { src: "button" });
+    openPresaveModal();
+  });
 
   const isVariantA = session.variant === "A";
   const ctaHost = document.getElementById(isVariantA ? "start-cta" : "over-cta");
@@ -155,6 +178,77 @@ function boot() {
     emit("cta_view", {});
   }
   if (isVariantA) fireCtaView(); // visible immediately on the start overlay
+
+  // --- Presave modal (Task 26): white "bandlink-style" card with one row per
+  // streaming service. Shared between variants A/B — mounted once in the DOM. ---
+  const presaveModal = document.getElementById("presave-modal");
+  const presaveClose = document.getElementById("presave-close");
+  const presaveServicesEl = document.getElementById("presave-services");
+
+  function savedActionSpan() {
+    const span = document.createElement("span");
+    span.className = "el-link__action el-link__action_disabled";
+    span.title = "Релиз автоматически добавится в раздел Коллекция";
+    span.textContent = "Сохранено";
+    return span;
+  }
+
+  function markRowSaved(id) {
+    const row = presaveServicesEl.querySelector(`li[data-service="${id}"]`);
+    if (!row) return;
+    const action = row.querySelector(".el-link__action");
+    if (action) action.replaceWith(savedActionSpan());
+  }
+
+  // Build the 5 rows once; click opens the band.link popup unless the
+  // service is already saved (then the row is inert).
+  for (const svc of PRESAVE.SERVICES) {
+    const li = document.createElement("li");
+    li.className = "bl-row";
+    li.dataset.service = svc.id;
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "bl-name";
+    nameSpan.textContent = svc.name;
+
+    const actionSpan = document.createElement("span");
+    actionSpan.className = "el-link__action";
+    actionSpan.textContent = "Пресейв";
+
+    li.appendChild(nameSpan);
+    li.appendChild(actionSpan);
+    li.addEventListener("click", () => {
+      if (li.querySelector(".el-link__action_disabled")) return; // already saved
+      emit("streaming_click", { service: svc.id });
+      const redirectUrl = location.origin + "/presave/return?service=" + svc.id +
+        "&sid=" + session.sid + "&v=" + session.variant;
+      const url = "https://band.link/save-presave?type=" + svc.id +
+        "&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
+        "&redirectUrl=" + encodeURIComponent(redirectUrl);
+      // No "noopener": the /presave/return popup needs window.opener to
+      // postMessage the "Сохранено" state back to this tab.
+      window.open(url, "_blank");
+    });
+    presaveServicesEl.appendChild(li);
+  }
+
+  function openPresaveModal() {
+    for (const id of readPresaved(localStorage)) markRowSaved(id);
+    presaveModal.classList.remove("hidden");
+  }
+
+  presaveClose.addEventListener("click", () => {
+    presaveModal.classList.add("hidden");
+  });
+
+  const PRESAVE_IDS = new Set(PRESAVE.SERVICES.map((s) => s.id));
+  window.addEventListener("message", (e) => {
+    const data = e.data;
+    if (!data || data.dp !== "presave_done" || !PRESAVE_IDS.has(data.service)) return;
+    addPresaved(localStorage, data.service);
+    markRowSaved(data.service);
+    // Server already logged presave_done for this return — no emit here.
+  });
 
   // --- Game wiring ---
   const game = new Game("game");

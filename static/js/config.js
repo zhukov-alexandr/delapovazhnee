@@ -25,3 +25,17 @@ export const GAME = {
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays
   ITEM_Y_MAX: 180,       // above the grounded runner (GROUND_Y-RUNNER_H..GROUND_Y) — catch by jumping
 };
+
+// Presave modal (Task 26): band.link identifiers + the streaming services
+// listed as rows in the modal, in display order.
+export const PRESAVE = {
+  HASH: "ywthC",
+  UPC: "4610605713098",
+  SERVICES: [
+    { id: "yandex", name: "Яндекс Музыка" },
+    { id: "vkmusic", name: "VK Музыка" },
+    { id: "zvuk", name: "Звук" },
+    { id: "mts", name: "МТС Музыка" },
+    { id: "apple", name: "Apple Music" },
+  ],
+};
