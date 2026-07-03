@@ -146,6 +146,7 @@ function boot() {
   const showScoresOver = document.getElementById("show-scores-over");
   const nameInput = document.getElementById("name-input");
   const saveScoreBtn = document.getElementById("save-score");
+  const toMenuBtn = document.getElementById("to-menu");
 
   const audio = createAudio();
 
@@ -546,6 +547,13 @@ function boot() {
 
   playBtn.addEventListener("click", startPlay);
   retryBtn.addEventListener("click", startPlay);
+
+  // Game over -> back to the start screen (re-pick a character, etc.).
+  toMenuBtn.addEventListener("click", () => {
+    overEl.classList.add("hidden");
+    leaderboardEl.classList.add("hidden");
+    startEl.classList.remove("hidden");
+  });
 
   muteBtn.addEventListener("click", () => {
     const muted = audio.toggleMute();

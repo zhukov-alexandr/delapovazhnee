@@ -16,7 +16,6 @@
     <div id="hud" class="hud hidden"><span id="score">0</span></div>
     <div id="lives" class="lives hidden" aria-label="Жизни"></div>
     <button id="mute" class="mute" aria-label="Звук">🔊</button>
-    <a id="home" class="home" href="/home">На главную</a>
 
     <!-- CTA block (moved into #start for variant A, into #over for variant B by boot.js) -->
     <template id="cta-tpl">
@@ -43,7 +42,10 @@
         <li><span class="manual-icon" aria-hidden="true">🏖️</span>Перепрыгивай отдыхающих</li>
       </ul>
       <button id="play" class="btn big">Играть</button>
-      <button id="show-scores-start" class="btn ghost">Таблица результатов</button>
+      <div class="menu-actions">
+        <button id="show-scores-start" class="btn ghost">Рекорды</button>
+        <a class="btn ghost" href="/home">На сайт</a>
+      </div>
       <div id="start-cta"></div>
     </div>
 
@@ -57,7 +59,11 @@
         <button id="save-score" class="btn">Сохранить результат</button>
       </div>
       <button id="retry" class="btn big">Ещё раз</button>
-      <button id="show-scores-over" class="btn ghost">Таблица результатов</button>
+      <div class="menu-actions">
+        <button id="to-menu" class="btn ghost">Главное меню</button>
+        <button id="show-scores-over" class="btn ghost">Рекорды</button>
+        <a class="btn ghost" href="/home">На сайт</a>
+      </div>
       <div id="over-cta"></div>
     </div>
 

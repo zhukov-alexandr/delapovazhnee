@@ -154,22 +154,17 @@ p {
   cursor: pointer;
 }
 
-.home {
-  position: absolute;
-  bottom: calc(env(safe-area-inset-bottom) + 10px);
-  left: calc(env(safe-area-inset-left) + 10px);
-  z-index: 6;
-  font-family: "Pixelify Sans", sans-serif;
-  font-size: clamp(12px, 2vw, 14px);
-  color: var(--foam);
-  opacity: 0.8;
-  text-decoration: none;
-  padding: 8px 10px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
+/* Secondary menu actions (Рекорды / Главное меню / На сайт) — a wrapping row of
+   uniform ghost buttons under the primary action on the start + game-over overlays. */
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: min(360px, 92%);
+  margin-top: 8px;
 }
-.home:hover { opacity: 1; }
+.menu-actions .btn { flex: 1 1 auto; margin-top: 0; }
 
 /* Overlays */
 .overlay {
@@ -181,6 +176,7 @@ p {
   align-items: center;
   justify-content: center;
   padding: clamp(16px, 4vh, 32px) clamp(16px, 6vw, 32px);
+  overflow-y: auto; /* tall menus (game over) scroll instead of clipping on short screens */
   background: rgba(36, 21, 57, 0.72); /* --night scrim */
   text-align: center;
 }
