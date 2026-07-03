@@ -24,6 +24,9 @@ export const GAME = {
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays
   ITEM_Y_MAX: 180,       // above the grounded runner (GROUND_Y-RUNNER_H..GROUND_Y) — catch by jumping
+  MAX_LIVES: 3,          // hearts; each obstacle hit costs one life (game.js)
+  INVULN_TIME: 1.4,      // seconds of pass-through grace after losing a life, so
+                         // resuming doesn't instantly re-hit the same obstacle
 };
 
 // Presave modal (Task 26): band.link identifiers + the streaming services

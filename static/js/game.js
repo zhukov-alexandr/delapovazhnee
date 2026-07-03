@@ -29,11 +29,17 @@ export class Game {
     this.lyricsCount = 0;     // total lines available to reveal (LYRICS.length)
     this.revealed = 0;        // how many lines have been revealed so far
 
+    // Lives (hearts): each obstacle hit costs one; the last hit is game over.
+    this.lives = GAME.MAX_LIVES;
+    this.invulnUntil = 0;     // this.t value until which collisions are ignored
+                              // (pass-through grace after losing a life)
+
     // Shell hooks — settable by Task 14. Kept simple and always callable.
     this.onStart = noop;
     this.onScore = noop;   // (score)
     this.onGameOver = noop; // (score)
     this.onReveal = noop;  // (lyricIndex) — fired when a new line is revealed; game is already paused
+    this.onLifeLost = noop; // (livesLeft, score) — fired on a non-fatal hit; game is already paused
 
     // Runtime handles created lazily in start(); null until then.
     this.canvas = null;
@@ -62,6 +68,8 @@ export class Game {
     if (!this.canvas) this._mount();
     startGame(this.game, this.speedMult);
     this.revealed = 0;
+    this.lives = GAME.MAX_LIVES;
+    this.invulnUntil = 0;
     this.t = 0;
     this.cam.x = 0;
     this.onStart();
@@ -164,7 +172,8 @@ export class Game {
     const dt = Math.min((now - this.last) / 1000, 1 / 30); // clamp: no tunneling on tab-switch
     this.last = now;
 
-    const { over, scoreDelta } = stepGame(this.game, dt, this.worldW);
+    const invulnerable = this.t < this.invulnUntil;
+    const { over, scoreDelta } = stepGame(this.game, dt, this.worldW, invulnerable);
 
     // Only advance time/camera/reveal-checks while actually running — this is
     // what makes a lyric-reveal pause read as a genuinely frozen scene rather
@@ -182,7 +191,20 @@ export class Game {
     }
 
     if (scoreDelta) this.onScore(this.game.score);
-    if (over) this.onGameOver(this.game.score);
+
+    // A hit costs a life. With lives left: pause + grant pass-through grace so
+    // resuming doesn't re-hit the same obstacle, and let the shell show the
+    // "life lost" popup. Out of lives: the existing game-over flow.
+    if (over) {
+      this.lives -= 1;
+      if (this.lives > 0) {
+        this.game.state = "paused";
+        this.invulnUntil = this.t + GAME.INVULN_TIME;
+        this.onLifeLost(this.lives, this.game.score);
+      } else {
+        this.onGameOver(this.game.score);
+      }
+    }
 
     this._render();
     this.raf = requestAnimationFrame(this._frame);
@@ -207,6 +229,10 @@ export class Game {
     drawBackground(ctx, this.cam, this.worldW, viewTop);
     for (const o of this.game.obs.obstacles) drawObstacle(ctx, o);
     for (const item of this.game.col.items) drawCollectible(ctx, item);
-    drawRunner(ctx, this.game.runner, this.t, this.charIndex);
+    // Blink the runner while invulnerable (post-life-loss grace) as feedback.
+    const invulnerable = this.t < this.invulnUntil;
+    if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
+      drawRunner(ctx, this.game.runner, this.t, this.charIndex);
+    }
   }
 }

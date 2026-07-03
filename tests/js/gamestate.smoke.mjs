@@ -15,6 +15,12 @@ g1.obs.obstacles.push({ x: GAME.RUNNER_X, y: GAME.GROUND_Y - 26, w: 44, h: 26, t
 const r1 = stepGame(g1, 1 / 60, 640);
 ok(r1.over === true && g1.state === "over", "collision ends the run");
 
+// Invulnerable (post-life-loss grace) -> the same overlap does NOT end the run.
+const g1b = createGame(); startGame(g1b);
+g1b.obs.obstacles.push({ x: GAME.RUNNER_X, y: GAME.GROUND_Y - 26, w: 44, h: 26, type: "single", passed: false });
+const r1b = stepGame(g1b, 1 / 60, 640, true);
+ok(r1b.over === false && g1b.state === "running", "invulnerable skips collision (pass-through grace)");
+
 // Score increments when an obstacle passes the runner. Place it LEFT of the runner's
 // x-lane (right edge < RUNNER_X) so it scores this tick WITHOUT colliding — a standing
 // runner's box overlaps any obstacle in its own lane, so we must avoid the lane here.

@@ -78,6 +78,29 @@ function sfxCatch() {
   } catch (_) { /* WebAudio unavailable — ignore */ }
 }
 
+// Short descending "hit" blip on losing a life (best-effort, same as sfxCatch).
+function sfxHit() {
+  try {
+    if (!catchAudioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      catchAudioCtx = new AC();
+    }
+    const c = catchAudioCtx;
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = "sawtooth";
+    osc.connect(gain);
+    gain.connect(c.destination);
+    const now = c.currentTime;
+    osc.frequency.setValueAtTime(330, now);
+    osc.frequency.exponentialRampToValueAtTime(90, now + 0.18);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  } catch (_) { /* WebAudio unavailable — ignore */ }
+}
+
 function boot() {
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
   loadSprites({
@@ -111,6 +134,11 @@ function boot() {
   const revealPopup = document.getElementById("reveal-popup");
   const revealLineEl = document.getElementById("reveal-line");
   const revealNextBtn = document.getElementById("reveal-next");
+  const livesEl = document.getElementById("lives");
+  const lifeLostEl = document.getElementById("life-lost");
+  const livesLeftEl = document.getElementById("lives-left");
+  const lifeLostScoreEl = document.getElementById("life-lost-score");
+  const continueBtn = document.getElementById("continue");
 
   const audio = createAudio();
 
@@ -153,6 +181,25 @@ function boot() {
     if (bestScoreOverEl) bestScoreOverEl.textContent = String(best);
   }
   renderBest();
+
+  // --- Lives (hearts): MAX_LIVES filled, spent ones dimmed. ---
+  function renderLives(n) {
+    if (!livesEl) return;
+    livesEl.innerHTML = "";
+    for (let i = 0; i < GAME.MAX_LIVES; i++) {
+      const h = document.createElement("span");
+      h.className = i < n ? "heart" : "heart lost";
+      h.textContent = "♥";
+      livesEl.appendChild(h);
+    }
+  }
+  // "Осталась 1 жизнь" / "Осталось 2 жизни" / "Осталось 5 жизней".
+  function livesLeftText(n) {
+    if (n % 10 === 1 && n % 100 !== 11) return `Осталась ${n} жизнь`;
+    const d = n % 10, dd = n % 100;
+    const form = (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) ? "жизни" : "жизней";
+    return `Осталось ${n} ${form}`;
+  }
 
   // --- CTA: build once from the <template>, mount by variant, and fire
   // cta_view exactly once when it actually becomes visible to the player. ---
@@ -323,6 +370,17 @@ function boot() {
     // Server already logged presave_done for this return — no emit here.
   });
 
+  // The life-lost popup offers the same presave (cover + button → modal). It's a
+  // separate CTA surface, tagged src:"life_lost" so it doesn't skew the
+  // start-vs-gameover A/B click split; no cta_view is fired for it.
+  const lifeLostCta = ctaTpl.content.cloneNode(true);
+  lifeLostCta.querySelector(".presave").addEventListener("click", (e) => {
+    e.preventDefault();
+    emit("cta_click", { src: "life_lost" });
+    openPresaveModal();
+  });
+  document.getElementById("life-lost-cta").appendChild(lifeLostCta.querySelector(".cta"));
+
   // --- Game wiring ---
   const game = new Game("game");
   game.charIndex = getChar(localStorage);
@@ -349,6 +407,7 @@ function boot() {
     emit("game_start", {});
     audio.startMusic();
     lastCaught = 0;
+    renderLives(GAME.MAX_LIVES);
   };
   game.onScore = (s) => {
     scoreEl.textContent = String(s);
@@ -362,9 +421,20 @@ function boot() {
     finalScoreEl.textContent = String(s);
     updateBest(localStorage, s);
     renderBest();
+    renderLives(0);
     hud.classList.add("hidden");
+    livesEl.classList.add("hidden");
     overEl.classList.remove("hidden");
     if (!isVariantA) fireCtaView(); // becomes visible only now, for variant B
+  };
+  // Non-fatal hit: game.js already paused + granted grace. Show the popup with
+  // lives left, current score, Continue, and the presave CTA.
+  game.onLifeLost = (livesLeft, score) => {
+    sfxHit();
+    renderLives(livesLeft);
+    livesLeftEl.textContent = livesLeftText(livesLeft);
+    lifeLostScoreEl.textContent = String(score);
+    lifeLostEl.classList.remove("hidden");
   };
   // Lyric reveal (Task 23): game.js already paused gameplay before calling
   // this — just play the sting, pulse the score, and show the next line.
@@ -382,10 +452,17 @@ function boot() {
     game.resume();
   });
 
+  continueBtn.addEventListener("click", () => {
+    lifeLostEl.classList.add("hidden");
+    game.resume(); // grace window was already armed in game.js on the hit
+  });
+
   function startPlay() {
     startEl.classList.add("hidden");
     overEl.classList.add("hidden");
+    lifeLostEl.classList.add("hidden");
     hud.classList.remove("hidden");
+    livesEl.classList.remove("hidden");
     scoreEl.textContent = "0";
     game.start();
   }

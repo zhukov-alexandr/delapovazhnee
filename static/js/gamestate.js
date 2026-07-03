@@ -22,7 +22,9 @@ export function nextRevealIndex(score, n, revealed, total) {
 }
 
 // Advance one frame. Returns {over, scoreDelta}. No-op unless running.
-export function stepGame(g, dt, worldW) {
+// `invulnerable` (post-life-loss grace, game.js) skips collision so the runner
+// passes through the obstacle that just hit it instead of instantly dying again.
+export function stepGame(g, dt, worldW, invulnerable = false) {
   if (g.state !== "running") return { over: false, scoreDelta: 0 };
   stepRunner(g.runner, dt);
   const before = g.obs.score;
@@ -34,8 +36,10 @@ export function stepGame(g, dt, worldW) {
   g.caught += caught;
   g.score = g.obs.score + g.caught;
   const scoreDelta = obstacleDelta + caught;
-  for (const o of g.obs.obstacles) {
-    if (collides(box, o)) { g.state = "over"; return { over: true, scoreDelta }; }
+  if (!invulnerable) {
+    for (const o of g.obs.obstacles) {
+      if (collides(box, o)) { g.state = "over"; return { over: true, scoreDelta }; }
+    }
   }
   return { over: false, scoreDelta };
 }

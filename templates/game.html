@@ -14,6 +14,7 @@
     <canvas id="game"></canvas>
 
     <div id="hud" class="hud hidden"><span id="score">0</span></div>
+    <div id="lives" class="lives hidden" aria-label="Жизни"></div>
     <button id="mute" class="mute" aria-label="Звук">🔊</button>
     <a id="home" class="home" href="/home">На главную</a>
 
@@ -51,6 +52,16 @@
       <p class="best">Рекорд: <span id="best-score-over">0</span></p>
       <button id="retry" class="btn big">Ещё раз</button>
       <div id="over-cta"></div>
+    </div>
+
+    <!-- Life-lost popup: shown on a non-fatal hit (lives remain). Continue
+         resumes the run; the presave CTA is cloned in by boot.js. -->
+    <div id="life-lost" class="overlay hidden">
+      <h1 class="life-lost-title">Ой!</h1>
+      <p id="lives-left" class="lives-left"></p>
+      <p class="best">Очки: <span id="life-lost-score">0</span></p>
+      <button id="continue" class="btn big">Продолжить</button>
+      <div id="life-lost-cta"></div>
     </div>
 
     <!-- Lyric-reveal popup (Task 23): shown + gameplay paused every N points. -->
