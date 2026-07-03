@@ -1,228 +1,351 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Дела поважнее – официальный сайт</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <link rel="stylesheet" href="/static/home/styles.css">
+    <title>Дела поважнее — новый сингл «19»</title>
+    <meta name="description" content="Дела поважнее — новый сингл «19». Сделай пресейв, слушай в стримингах, приходи на концерты.">
+    <link rel="icon" href="/static/home/favicon-32x32.png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Montserrat:wght@700;800;900&display=swap">
+
     <!-- Yandex.Metrika counter -->
-    <script type="text/javascript" >
+    <script type="text/javascript">
         (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
             m[i].l=1*new Date();
             for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
             k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
         (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-        ym(98554115, "init", {
-            clickmap:true,
-            trackLinks:true,
-            accurateTrackBounce:true
-        });
+        ym(98554115, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/98554115" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
+
+    <style>
+      :root {
+        --kraft: #c8a67c;      /* warm cardboard — the poster paper */
+        --kraft-deep: #b7935f; /* deeper kraft for edges/cards */
+        --ink: #17130f;        /* warm near-black — heavy type */
+        --paper: #f0e9dc;      /* torn-paper off-white */
+        --crimson: #b32a38;    /* accent, from the single's cover */
+        --crimson-deep: #8c1f2a;
+        --muted: #6f5b45;      /* kraft-toned muted text */
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html { scroll-behavior: smooth; }
+      body {
+        font-family: "Golos Text", system-ui, sans-serif;
+        background: var(--kraft);
+        color: var(--ink);
+        line-height: 1.5;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Unobtrusive paper grain over everything (the "transparent background"). */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.06;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      .wrap { width: min(1120px, 92vw); margin: 0 auto; }
+
+      /* ---- Type roles ---- */
+      .display {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 0.9;
+        letter-spacing: -0.02em;
+      }
+      .eyebrow {
+        font-family: "Golos Text", sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        font-size: clamp(11px, 1.4vw, 13px);
+      }
+
+      /* ---- Buttons ---- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-size: clamp(13px, 1.6vw, 15px);
+        padding: 15px 26px;
+        border-radius: 2px;
+        border: 2px solid var(--ink);
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform .12s ease, background .15s ease, color .15s ease;
+        white-space: nowrap;
+      }
+      .btn--fill { background: var(--crimson); border-color: var(--crimson); color: var(--paper); }
+      .btn--fill:hover { transform: translateY(-2px); background: var(--crimson-deep); border-color: var(--crimson-deep); }
+      .btn--ink { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+      .btn--ink:hover { transform: translateY(-2px); }
+      .btn--outline { background: transparent; color: var(--ink); }
+      .btn--outline:hover { transform: translateY(-2px); background: var(--ink); color: var(--paper); }
+      .btn--paper { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+      .btn--paper:hover { transform: translateY(-2px); }
+      .btn:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; }
+      a:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; }
+
+      /* ---- Top bar ---- */
+      .topbar {
+        position: relative; z-index: 3;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 22px 0;
+      }
+      .mark { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
+      .mark svg { width: 44px; height: auto; display: block; }
+      .mark span { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: 15px; letter-spacing: 0.01em; }
+      .topbar__link { font-family: "Golos Text", sans-serif; font-weight: 600; color: var(--ink); text-decoration: none; text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; border-bottom: 2px solid var(--crimson); padding-bottom: 3px; }
+
+      /* ---- Hero ---- */
+      .hero { position: relative; padding-bottom: clamp(40px, 7vw, 90px); }
+      .hero__head { position: relative; margin-top: clamp(20px, 4vw, 48px); }
+      .hero__title { font-size: clamp(46px, 13.2vw, 188px); letter-spacing: -0.03em; }
+      .hero__title .l2 { color: var(--crimson); }
+      .hero__tag {
+        position: absolute; top: 4px; right: 0; text-align: right;
+        font-family: "Golos Text", sans-serif; font-weight: 600;
+        text-transform: lowercase; color: var(--muted);
+        font-size: clamp(13px, 1.8vw, 18px); line-height: 1.3;
+      }
+      .hero__tag b { display: block; color: var(--crimson); font-weight: 700; }
+
+      .hero__photo {
+        position: relative; margin-top: clamp(26px, 4vw, 44px);
+        aspect-ratio: 3 / 1.55;
+        background: var(--kraft-deep) url("/static/home/band.jpg") center 30% / cover no-repeat;
+        border: 6px solid var(--paper);
+        box-shadow: 0 24px 60px rgba(23,19,15,0.32);
+        /* torn bottom edge — the poster's ripped-paper motif */
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
+      }
+      .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vw, 40px); }
+
+      /* ---- Section frame ---- */
+      .section { position: relative; padding: clamp(56px, 9vw, 120px) 0; }
+      .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--muted); margin-bottom: clamp(22px, 4vw, 40px); }
+      .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
+
+      /* Presave — dark, so the crimson cover glows */
+      .presave {
+        background: var(--ink); color: var(--paper);
+        /* torn top edge revealing the kraft above */
+        clip-path: polygon(0 18px, 6% 4px, 12% 16px, 19% 3px, 26% 15px, 33% 5px, 41% 18px, 48% 4px, 56% 14px, 63% 3px, 70% 16px, 77% 5px, 84% 17px, 91% 4px, 96% 14px, 100% 6px, 100% 100%, 0 100%);
+        margin-top: -6px;
+      }
+      .presave .section__eyebrow { color: #b9a892; }
+      .presave__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
+      .presave__cover {
+        width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
+        border: 6px solid var(--paper);
+        transform: rotate(-2.5deg);
+        box-shadow: 0 26px 60px rgba(0,0,0,0.5);
+      }
+      .presave__title { font-size: clamp(40px, 6.5vw, 92px); color: var(--paper); }
+      .presave__title em { font-style: normal; color: var(--crimson); }
+      .presave__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
+      .presave__cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+      /* Concerts */
+      .concerts { background: var(--kraft); }
+      .poster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(20px, 3.5vw, 40px); }
+      .poster {
+        display: flex; flex-direction: column;
+        background: var(--paper);
+        padding: 12px 12px 0;
+        box-shadow: 0 16px 40px rgba(23,19,15,0.22);
+        transition: transform .15s ease, box-shadow .15s ease;
+      }
+      .poster:nth-child(odd) { transform: rotate(-1deg); }
+      .poster:nth-child(even) { transform: rotate(1deg); }
+      .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(23,19,15,0.3); }
+      .poster img { width: 100%; display: block; aspect-ratio: 3/4; object-fit: cover; background: var(--kraft-deep); }
+      .poster__meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 8px; }
+      .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(15px, 2vw, 20px); line-height: 1; }
+      .poster__where { font-size: 13px; color: var(--muted); margin-top: 4px; }
+      .poster__tix { font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: 0.04em; color: var(--paper); background: var(--crimson); padding: 10px 16px; border-radius: 2px; text-decoration: none; white-space: nowrap; }
+      .poster__tix:hover { background: var(--crimson-deep); }
+
+      /* Footer */
+      .footer {
+        background: var(--ink); color: var(--paper);
+        clip-path: polygon(0 18px, 7% 4px, 14% 15px, 22% 4px, 30% 16px, 38% 4px, 47% 15px, 55% 3px, 63% 16px, 71% 5px, 79% 15px, 87% 4px, 95% 15px, 100% 6px, 100% 100%, 0 100%);
+        margin-top: -6px;
+        padding: clamp(52px, 8vw, 96px) 0 40px;
+      }
+      .footer__top { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; align-items: flex-start; }
+      .footer__mark svg { width: 96px; height: auto; }
+      .footer__mark .display { font-size: clamp(30px, 5vw, 52px); margin-top: 16px; color: var(--paper); }
+      .footer__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #b9a892; margin-bottom: 14px; }
+      .footer__links { display: flex; flex-direction: column; gap: 9px; }
+      .footer__links a { color: var(--paper); text-decoration: none; font-weight: 500; opacity: 0.9; width: fit-content; border-bottom: 1px solid transparent; }
+      .footer__links a:hover { opacity: 1; border-bottom-color: var(--crimson); }
+      .footer__bottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: clamp(36px, 6vw, 64px); padding-top: 22px; border-top: 1px solid rgba(240,233,220,0.16); font-size: 13px; color: #9c8c78; }
+      .footer__play { color: var(--paper); text-decoration: none; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; border-bottom: 2px solid var(--crimson); padding-bottom: 3px; }
+
+      @media (max-width: 760px) {
+        .presave__grid { grid-template-columns: 1fr; }
+        .presave__cover { max-width: 320px; margin: 0 auto; }
+        .poster-grid { grid-template-columns: 1fr; }
+        .hero__tag { display: none; }
+        .hero__head { margin-top: 10px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { scroll-behavior: auto !important; }
+        .btn, .poster { transition: none; }
+      }
+    </style>
 </head>
 <body>
-    <div class="header">
-        <!-- Здесь будет адаптированное изображение -->
-    </div>
-    <section id="release">
-        <div class="container">
-            <!-- Вкладки -->
-            <div class="tabs">
-                <button class="tab-button" data-tab="release-tab">Релиз</button>
-                <button class="tab-button active" data-tab="tour-tab">Тур</button>
-            </div>
+    <!-- Band mark (hand-drawn mountain squiggle, redrawn) reused in top bar + footer -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <symbol id="mtn" viewBox="0 0 120 60">
+        <path d="M4 46 C10 44 16 42 22 30 C26 22 30 14 36 24 C40 31 44 40 50 30 C55 22 60 14 66 26 C70 34 74 40 82 34 C92 27 104 40 116 34"
+              fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="34" cy="52" r="3.2" fill="currentColor"/>
+        <circle cx="52" cy="52" r="3.2" fill="currentColor"/>
+        <circle cx="70" cy="52" r="3.2" fill="currentColor"/>
+      </symbol>
+    </svg>
 
-            <!-- Контент вкладки "Релиз" -->
-            <div id="release-tab" class="tab-content">
-                <div class="streaming-list">
-                    <a href="https://boom.ru/redirect/album/29907377" target="_blank" class="streaming-item">
-                        <img src="/static/home/resources/vk_music.svg" alt="VK Музыка" class="streaming-icon">
-                        <span class="streaming-text">VK Музыка</span>
-                    </a>
-                    <a href="https://music.yandex.ru/album/36570162" target="_blank" class="streaming-item">
-                        <img src="/static/home/resources/ya_music.png" alt="Яндекс Музыка" class="streaming-icon">
-                        <span class="streaming-text">Яндекс Музыка</span>
-                    </a>
-                    <a href="https://open.spotify.com/album/1Zs7XpiOGDRvgFqXPOjQHf" target="_blank" class="streaming-item">
-                        <img src="/static/home/resources/spotify.svg" alt="Spotify" class="streaming-icon">
-                        <span class="streaming-text">Spotify</span>
-                    </a>
-                    <a href="https://music.youtube.com/playlist?list=OLAK5uy_m8So-5otfMe_y7UoIwpcFmbjzW4k1-flw" target="_blank" class="streaming-item">
-                        <img src="/static/home/resources/youtube_music.svg" alt="YouTube Music" class="streaming-icon">
-                        <span class="streaming-text">YouTube Music</span>
-                    </a>
-                    <a href="https://music.apple.com/nz/album/%D1%84%D0%B5%D0%B2%D1%80%D0%B0%D0%BB%D1%8C-single/1794114655?at=1000lqjf&ct=bq&ls=1" target="_blank" class="streaming-item">
-                        <img src="/static/home/resources/apple_music.svg" alt="Apple Music" class="streaming-icon">
-                        <span class="streaming-text">Apple Music</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Контент вкладки "Тур" -->
-            <div id="tour-tab" class="tab-content active">
-                <h2 class="tour-header">Тур 2025</h2>
-                <div class="tour-list">
-                    <div class="tour-item">
-                        <div class="tour-info">
-                            <div class="tour-date">_24_МАЯ_</div>
-                            <div class="tour-city">Нижний Новгород</div>
-                        </div>
-                        <a href="https://ticketscloud.com/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU&lang=ru&event=67dade23312ad933e972a344&s=1" class="tour-ticket">Купить билет</a>
-                    </div>
-                    <div class="tour-item">
-                        <div class="tour-info">
-                            <div class="tour-date">_25_МАЯ_</div>
-                            <div class="tour-city">Казань</div>
-                        </div>
-                        <a href="https://ticketscloud.com/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU&lang=ru&event=67dc0913e216954965fb6df8&s=1" class="tour-ticket">Купить билет</a>
-                    </div>
-                    <div class="tour-item">
-                        <div class="tour-info">
-                            <div class="tour-date">_27_МАЯ_</div>
-                            <div class="tour-city">Самара</div>
-                        </div>
-                        <a href="https://5beeb8a3c580ac000b516248.ticketscloud.org/e/67dc223f9b842113aa08e1ae" class="tour-ticket">Купить билет</a>
-                    </div>
-                    <div class="tour-item">
-                        <div class="tour-info">
-                            <div class="tour-date">_1_ИЮНЯ_</div>
-                            <div class="tour-city">Санкт-Петербург</div>
-                        </div>
-                        <a href="https://ticketscloud.com/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU&lang=ru&event=67dadb265d7df75ab688edd3&s=1" class="tour-ticket">Купить билет</a>
-                    </div>
-                    <div class="tour-item">
-                        <div class="tour-info">
-                            <div class="tour-date">_7_ИЮНЯ_</div>
-                            <div class="tour-city">Москва</div>
-                        </div>
-                        <a href="https://www.16tons.ru/concert/2025-dela-povazhnee-07jun/" class="tour-ticket">Купить билет</a>
-                    </div>
-                </div>
-            </div>
+    <header class="hero">
+      <div class="wrap">
+        <div class="topbar">
+          <a class="mark" href="/home" aria-label="Дела поважнее">
+            <svg><use href="#mtn"/></svg>
+            <span>Дела поважнее</span>
+          </a>
+          <a class="topbar__link" href="/">Играть →</a>
         </div>
+
+        <div class="hero__head">
+          <h1 class="display hero__title">Дела<br><span class="l2">поважнее</span></h1>
+          <p class="hero__tag">новый сингл<b>«19»</b></p>
+        </div>
+
+        <div class="hero__photo" role="img" aria-label="Группа «Дела поважнее»"></div>
+
+        <div class="hero__cta">
+          <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener">Сделать пресейв</a>
+          <a class="btn btn--outline" href="/">Играть в раннер</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="section presave">
+      <div class="wrap">
+        <div class="section__eyebrow eyebrow">Пресейв</div>
+        <div class="presave__grid">
+          <img class="presave__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
+          <div>
+            <h2 class="display presave__title">Новый<br>сингл <em>«19»</em></h2>
+            <p class="presave__lead">Сохрани сингл заранее — как только он выйдет, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.</p>
+            <div class="presave__cta">
+              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener">Сделать пресейв</a>
+              <a class="btn btn--paper" href="/">…или сыграй и сохрани</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="contacts">
-        <div class="container">
-            <div class="contacts-frame" style="background-color: #f9f7e8; padding: 1%;">
-            <h2 class="contact-header" style="font-weight: 900; font-size: 1.5em; text-transform: uppercase; margin-bottom: 40px; text-align: center;">Соцсети</h2>
-            
-                <div class="social-list">
-                    <div class="social-item">
-                        <div class="social-info">
-                            <div class="social-name">Telegram</div>
-                        </div>
-                        <a href="https://t.me/delapovazhnee" target="_blank" class="social-link">Подписаться</a>
-                    </div>
-                    <div class="social-item">
-                        <div class="social-info">
-                            <div class="social-name">VK</div>
-                        </div>
-                        <a href="https://vk.com/delapovazhnee" target="_blank" class="social-link">Подписаться</a>
-                    </div>
-                    <div class="social-item">
-                        <div class="social-info">
-                            <div class="social-name">Email</div>
-                        </div>
-                        <a href="mailto:contact@delapovazhnee.ru" class="social-link">Написать</a>
-                    </div>
-                </div>
+    <section class="section concerts">
+      <div class="wrap">
+        <div class="section__eyebrow eyebrow">Концерты · презентация альбома</div>
+        <div class="poster-grid">
+          <article class="poster">
+            <img src="/static/home/poster-msk.jpg" alt="Афиша концерта в Москве, 18 ноября, Урбан">
+            <div class="poster__meta">
+              <div>
+                <div class="poster__when">18 ноября · Москва</div>
+                <div class="poster__where">Урбан · Большая Новодмитровская, 36с24</div>
+              </div>
+              <a class="poster__tix" href="#" target="_blank" rel="noopener">Билеты</a>
             </div>
+          </article>
+          <article class="poster">
+            <img src="/static/home/poster-spb.jpg" alt="Афиша концерта в Санкт-Петербурге, 21 ноября, Севкабель Порт">
+            <div class="poster__meta">
+              <div>
+                <div class="poster__when">21 ноября · Санкт-Петербург</div>
+                <div class="poster__where">Севкабель Порт · Кожевенная линия, 34</div>
+              </div>
+              <a class="poster__tix" href="#" target="_blank" rel="noopener">Билеты</a>
+            </div>
+          </article>
         </div>
+      </div>
     </section>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footer__top">
+          <div class="footer__mark">
+            <svg aria-hidden="true"><use href="#mtn"/></svg>
+            <div class="display">Дела<br>поважнее</div>
+          </div>
+          <div class="footer__col">
+            <h4>Соцсети</h4>
+            <div class="footer__links">
+              <a href="https://t.me/delapovazhnee" target="_blank" rel="noopener">Telegram</a>
+              <a href="https://vk.com/delapovazhnee" target="_blank" rel="noopener">ВКонтакте</a>
+              <a href="mailto:contact@delapovazhnee.ru">contact@delapovazhnee.ru</a>
+            </div>
+          </div>
+          <div class="footer__col">
+            <h4>Слушать</h4>
+            <div class="footer__links">
+              <a href="https://music.yandex.ru/album/36570162" target="_blank" rel="noopener">Яндекс Музыка</a>
+              <a href="https://boom.ru/redirect/album/29907377" target="_blank" rel="noopener">VK Музыка</a>
+              <a href="https://open.spotify.com/album/1Zs7XpiOGDRvgFqXPOjQHf" target="_blank" rel="noopener">Spotify</a>
+              <a href="https://music.apple.com/album/1794114655" target="_blank" rel="noopener">Apple Music</a>
+            </div>
+          </div>
+        </div>
+        <div class="footer__bottom">
+          <span>© Дела поважнее, 2026</span>
+          <a class="footer__play" href="/">Играть в раннер →</a>
+        </div>
+      </div>
+    </footer>
 
     <script>
-        // Функция для парсинга UTM-меток из URL
-        function parseUtmParams() {
-            // Получаем строку запроса из URL
-            const queryString = window.location.search;
-            // Если строка запроса пустая, прекращаем выполнение функции
-            if (!queryString) return {};
-            
-            // Создаем объект для хранения UTM-меток
-            const utmParams = {};
-            
-            // Создаем объект URLSearchParams для удобного парсинга параметров
-            const urlParams = new URLSearchParams(queryString);
-            
-            // Массив с названиями UTM-меток, которые мы хотим отслеживать
-            const utmTags = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-            
-            // Проходим по всем возможным UTM-меткам и добавляем их в объект, если они есть
-            utmTags.forEach(tag => {
-                if (urlParams.has(tag)) {
-                    utmParams[tag] = urlParams.get(tag);
-                }
-            });
-            
-            return utmParams;
-        }
-
-        // Функция для добавления UTM-меток ко всем ссылкам на странице
-        function addUtmToLinks() {
-            // Получаем UTM-метки из URL
-            const utmParams = parseUtmParams();
-            
-            // Если UTM-меток нет, прекращаем выполнение функции
-            if (Object.keys(utmParams).length === 0) return;
-            
-            // Получаем все ссылки на странице
-            const links = document.querySelectorAll('a[href]');
-            
-            // Создаем строку с UTM-метками для добавления к ссылкам
-            const utmString = Object.entries(utmParams)
-                .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-                .join('&');
-            
-            // Проходим по всем ссылкам и добавляем UTM-метки
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                
-                // Пропускаем якоря, телефоны, почты и другие специальные ссылки
-                if (href.startsWith('#') || href.startsWith('tel:') || href.startsWith('mailto:')) {
-                    return;
-                }
-                
-                // Если в ссылке уже есть UTM-метки, не добавляем новые
-                if (href.includes('utm_')) {
-                    return;
-                }
-                
-                // Добавляем UTM-метки к ссылке
-                const separator = href.includes('?') ? '&' : '?';
-                link.setAttribute('href', href + separator + utmString);
-            });
-        }
-
-        // Запускаем функцию после загрузки страницы
-        document.addEventListener('DOMContentLoaded', addUtmToLinks);
-        // JavaScript для переключения вкладок
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Удаление активного класса у всех кнопок и контента
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-
-                    // Добавление активного класса к нажатой кнопке
-                    button.classList.add('active');
-
-                    // Показ соответствующего контента
-                    const tabId = button.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
+      // Propagate UTM params to outbound links (kept from the previous site).
+      (function () {
+        var qs = window.location.search;
+        if (!qs) return;
+        var p = new URLSearchParams(qs);
+        var tags = ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"];
+        var parts = [];
+        tags.forEach(function (t) { if (p.has(t)) parts.push(t + "=" + encodeURIComponent(p.get(t))); });
+        if (!parts.length) return;
+        var utm = parts.join("&");
+        document.querySelectorAll("a[href]").forEach(function (a) {
+          var h = a.getAttribute("href");
+          if (!h || h[0] === "#" || h.indexOf("mailto:") === 0 || h.indexOf("tel:") === 0 || h.indexOf("utm_") !== -1) return;
+          a.setAttribute("href", h + (h.indexOf("?") !== -1 ? "&" : "?") + utm);
         });
+      })();
+
     </script>
-    <script>
 </body>
 </html>
