@@ -108,15 +108,15 @@
         clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
       }
       /* nav overlaid on the photo, bottom-left — jumps to the single */
-      .hero__cue {
+      .cue {
         position: absolute; left: clamp(14px, 2vw, 26px); bottom: clamp(14px, 2vw, 24px); z-index: 2;
         display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
         background: rgba(23,19,15,0.6); backdrop-filter: blur(4px); color: var(--paper);
         font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em;
         font-size: clamp(12px, 1.5vw, 15px); padding: 12px 18px; border-radius: 2px; border: 2px solid rgba(240,233,220,0.5);
       }
-      .hero__cue:hover { background: var(--crimson); border-color: var(--crimson); }
-      .hero__cue .arr { animation: bob 1.6s ease-in-out infinite; }
+      .cue:hover { background: var(--crimson); border-color: var(--crimson); }
+      .cue .arr { animation: bob 1.6s ease-in-out infinite; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
       /* ---- Single (presave) ---- */
@@ -126,7 +126,9 @@
       }
       .single .section__eyebrow { color: #b9a892; }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-      .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
+      .single__cta { display: flex; flex-wrap: wrap; gap: 12px; }
       .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--crimson); background: rgba(179,42,56,0.14); border: 1px solid rgba(179,42,56,0.5); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); margin-bottom: 18px; }
       .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
       .single__title em { font-style: normal; color: var(--crimson); }
@@ -174,7 +176,7 @@
       }
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
-        .single__cover { max-width: 300px; margin: 0 auto; }
+        .single__cover-wrap { max-width: 300px; margin: 0 auto; }
         .poster-grid { grid-template-columns: 1fr; }
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
@@ -182,7 +184,7 @@
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
-        .hero__cue .arr, .btn, .poster, .nav__links { animation: none; transition: none; }
+        .cue .arr, .btn, .poster, .nav__links { animation: none; transition: none; }
       }
     </style>
 </head>
@@ -209,7 +211,7 @@
           <p class="hero__tag">новый сингл<b>«19»</b></p>
         </div>
         <div class="hero__photo" role="img" aria-label="Группа «Дела поважнее»">
-          <a class="hero__cue" href="#single">Новый сингл «19» <span class="arr">↓</span></a>
+          <a class="cue" href="#single">Новый сингл «19» <span class="arr">↓</span></a>
         </div>
       </div>
     </header>
@@ -218,12 +220,18 @@
       <div class="wrap">
         <div class="section__eyebrow eyebrow">Пресейв</div>
         <div class="single__grid">
-          <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
+          <div class="single__cover-wrap">
+            <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
+            <a class="cue" href="#concerts">Концерты <span class="arr">↓</span></a>
+          </div>
           <div>
             <span class="release-date">Релиз · 17 июля 2026</span>
             <h2 class="display single__title">Новый<br>сингл <em>«19»</em></h2>
             <p class="single__lead">Сохрани сингл заранее — как только он выйдет 17 июля, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.</p>
-            <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener">Сделать пресейв</a>
+            <div class="single__cta">
+              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener">Сделать пресейв</a>
+              <a class="btn btn--paper" href="/">…или сыграй и сохрани</a>
+            </div>
           </div>
         </div>
       </div>
@@ -261,7 +269,7 @@
       <div class="wrap">
         <div class="section__eyebrow eyebrow">Слушать</div>
         <div class="listen__grid">
-          <h2 class="display listen__title">Мы<br>в эфире</h2>
+          <h2 class="display listen__title">Дела<br>поважнее</h2>
           <div class="listen__col">
             <h4>Стриминги</h4>
             <div class="link-list">
