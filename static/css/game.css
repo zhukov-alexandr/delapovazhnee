@@ -365,7 +365,15 @@ p {
   letter-spacing: normal;
   font-size: clamp(18px, 4vw, 22px);
   font-weight: 700;
-  margin: 0 0 12px;
+  margin: 0 0 2px;
+  text-align: left;
+}
+
+/* Release name under the «Пресейв» heading (Дела поважнее — 19). */
+.presave-release {
+  margin: 0 0 14px;
+  font-size: clamp(13px, 3.2vw, 15px);
+  color: #666;
   text-align: left;
 }
 
