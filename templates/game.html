@@ -43,6 +43,7 @@
         <li><span class="manual-icon" aria-hidden="true">🏖️</span>Перепрыгивай отдыхающих</li>
       </ul>
       <button id="play" class="btn big">Играть</button>
+      <button id="show-scores-start" class="btn ghost">Таблица результатов</button>
       <div id="start-cta"></div>
     </div>
 
@@ -50,7 +51,13 @@
       <h1>Игра окончена</h1>
       <p>Счёт: <span id="final-score">0</span></p>
       <p class="best">Рекорд: <span id="best-score-over">0</span></p>
+      <div class="save-score">
+        <input id="name-input" class="name-input" type="text" maxlength="24" autocomplete="off"
+               placeholder="Твоё имя" aria-label="Имя для таблицы результатов" />
+        <button id="save-score" class="btn">Сохранить результат</button>
+      </div>
       <button id="retry" class="btn big">Ещё раз</button>
+      <button id="show-scores-over" class="btn ghost">Таблица результатов</button>
       <div id="over-cta"></div>
     </div>
 
@@ -62,6 +69,16 @@
       <p class="best">Очки: <span id="life-lost-score">0</span></p>
       <button id="continue" class="btn big">Продолжить</button>
       <div id="life-lost-cta"></div>
+    </div>
+
+    <!-- Leaderboard (top 10): opened by the "Таблица результатов" buttons on the
+         start + game-over overlays; the list is fetched + rendered by boot.js. -->
+    <div id="leaderboard" class="overlay leaderboard-overlay hidden">
+      <div class="leaderboard-card">
+        <h2 class="leaderboard-title">Топ-10</h2>
+        <ul id="leaderboard-list" class="leaderboard-list"></ul>
+        <button id="leaderboard-close" class="btn big">Закрыть</button>
+      </div>
     </div>
 
     <!-- Lyric-reveal popup (Task 23): shown + gameplay paused every N points. -->

@@ -139,6 +139,13 @@ function boot() {
   const livesLeftEl = document.getElementById("lives-left");
   const lifeLostScoreEl = document.getElementById("life-lost-score");
   const continueBtn = document.getElementById("continue");
+  const leaderboardEl = document.getElementById("leaderboard");
+  const leaderboardList = document.getElementById("leaderboard-list");
+  const leaderboardClose = document.getElementById("leaderboard-close");
+  const showScoresStart = document.getElementById("show-scores-start");
+  const showScoresOver = document.getElementById("show-scores-over");
+  const nameInput = document.getElementById("name-input");
+  const saveScoreBtn = document.getElementById("save-score");
 
   const audio = createAudio();
 
@@ -381,6 +388,71 @@ function boot() {
   });
   document.getElementById("life-lost-cta").appendChild(lifeLostCta.querySelector(".cta"));
 
+  // --- Leaderboard (top 10): read-only modal opened from the start + game-over
+  // overlays; scores are saved from the game-over name input and persisted
+  // server-side (POST /api/score, GET /api/scores). ---
+  const NAME_KEY = "dp_name";
+  let lastGameScore = 0;
+
+  function renderScores(list) {
+    leaderboardList.innerHTML = "";
+    if (!list.length) {
+      const li = document.createElement("li");
+      li.className = "lb-empty";
+      li.textContent = "Пока пусто — стань первым!";
+      leaderboardList.appendChild(li);
+      return;
+    }
+    list.forEach((s, i) => {
+      const li = document.createElement("li");
+      li.className = "lb-row";
+      const rank = document.createElement("span");
+      rank.className = "lb-rank";
+      rank.textContent = String(i + 1);
+      const nm = document.createElement("span");
+      nm.className = "lb-name";
+      nm.textContent = s.name; // textContent -> no HTML injection from stored names
+      const sc = document.createElement("span");
+      sc.className = "lb-score";
+      sc.textContent = String(s.score);
+      li.append(rank, nm, sc);
+      leaderboardList.appendChild(li);
+    });
+  }
+
+  function openLeaderboard() {
+    fetch("/api/scores")
+      .then((r) => r.json())
+      .then((d) => renderScores(d.scores || []))
+      .catch(() => renderScores([]));
+    leaderboardEl.classList.remove("hidden");
+  }
+
+  showScoresStart.addEventListener("click", openLeaderboard);
+  showScoresOver.addEventListener("click", openLeaderboard);
+  leaderboardClose.addEventListener("click", () => leaderboardEl.classList.add("hidden"));
+
+  saveScoreBtn.addEventListener("click", () => {
+    const name = (nameInput.value || "").trim().slice(0, 24);
+    saveScoreBtn.disabled = true;
+    saveScoreBtn.textContent = "Сохранение…";
+    fetch("/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, score: lastGameScore }),
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("save failed");
+        localStorage.setItem(NAME_KEY, name);
+        saveScoreBtn.textContent = "Сохранено ✓";
+        openLeaderboard();
+      })
+      .catch(() => {
+        saveScoreBtn.disabled = false;
+        saveScoreBtn.textContent = "Сохранить результат";
+      });
+  });
+
   // --- Game wiring ---
   const game = new Game("game");
   game.charIndex = getChar(localStorage);
@@ -422,6 +494,11 @@ function boot() {
     updateBest(localStorage, s);
     renderBest();
     renderLives(0);
+    // Arm the "save to leaderboard" control for this fresh result.
+    lastGameScore = s;
+    saveScoreBtn.disabled = false;
+    saveScoreBtn.textContent = "Сохранить результат";
+    nameInput.value = localStorage.getItem(NAME_KEY) || "";
     hud.classList.add("hidden");
     livesEl.classList.add("hidden");
     overEl.classList.remove("hidden");

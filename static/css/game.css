@@ -452,6 +452,101 @@ p {
   cursor: default;
 }
 
+/* Secondary "ghost" button (leaderboard opener) — outline, not the loud arcade fill. */
+.btn.ghost {
+  background: transparent;
+  color: var(--foam);
+  border: 2px solid var(--grape);
+  box-shadow: none;
+  font-size: clamp(13px, 2.4vw, 16px);
+  padding: 9px 18px;
+  margin-top: 8px;
+}
+.btn.ghost:hover { border-color: var(--sand); }
+
+/* Save-score row on the game-over overlay: name field + save button. */
+.save-score {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: min(320px, 90%);
+  margin: 0 0 clamp(10px, 2vh, 16px);
+}
+.name-input {
+  flex: 1 1 140px;
+  min-width: 0;
+  font-family: monospace;
+  font-size: clamp(14px, 3vw, 16px);
+  padding: 10px 12px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 2px solid var(--grape);
+  background: rgba(36, 21, 57, 0.6);
+  color: var(--foam);
+}
+.name-input::placeholder { color: rgba(255, 244, 226, 0.5); }
+.name-input:focus { outline: none; border-color: var(--arcade); }
+.save-score .btn { flex: 1 1 auto; white-space: nowrap; }
+
+/* Leaderboard (top 10) modal — sunset-styled card. */
+.leaderboard-overlay {
+  z-index: 22; /* above HUD/mute; below the reveal + presave popups */
+  background: rgba(36, 21, 57, 0.86);
+}
+.leaderboard-card {
+  width: 100%;
+  max-width: 360px;
+  max-height: 82vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: rgba(36, 21, 57, 0.96);
+  border: 2px solid var(--grape);
+  border-radius: 16px;
+  padding: clamp(16px, 3vh, 24px);
+}
+.leaderboard-title {
+  font-family: "Handjet", sans-serif;
+  font-weight: 700;
+  color: var(--sun);
+  text-shadow: 0 0 12px rgba(255, 211, 92, 0.5);
+  text-align: center;
+  font-size: clamp(24px, 6vw, 34px);
+  margin: 0 0 clamp(10px, 2vh, 16px);
+}
+.leaderboard-list {
+  list-style: none;
+  margin: 0 0 clamp(14px, 2.5vh, 20px);
+  padding: 0;
+}
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: clamp(15px, 3.6vw, 18px);
+}
+.lb-row:nth-child(odd) { background: rgba(109, 46, 139, 0.28); }
+.lb-rank { width: 1.8em; text-align: right; color: var(--sun); }
+.lb-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--foam);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-score { color: var(--arcade); font-weight: 600; }
+.lb-empty {
+  text-align: center;
+  color: rgba(255, 244, 226, 0.6);
+  font-family: monospace;
+  padding: 16px 0;
+}
+
 /* Landscape: keep overlays from feeling cramped in short viewports */
 @media (orientation: landscape) and (max-height: 480px) {
   .overlay { justify-content: center; gap: 4px; }

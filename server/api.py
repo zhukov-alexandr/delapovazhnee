@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from server.config import Settings
-from server.db import get_conn, insert_event
+from server.db import get_conn, insert_event, insert_score, top_scores
 from server.settings import get_settings
 
 Variant = Literal["A", "B"]
@@ -28,6 +28,11 @@ class EventIn(BaseModel):
     meta: dict = {}
 
 
+class ScoreIn(BaseModel):
+    name: str = Field(default="", max_length=24)
+    score: int = Field(ge=0, le=1_000_000)
+
+
 def build_api_router(settings: Settings) -> APIRouter:
     router = APIRouter()
 
@@ -42,6 +47,27 @@ def build_api_router(settings: Settings) -> APIRouter:
         finally:
             conn.close()
         return {"ok": True}
+
+    # --- Leaderboard: name + score, persisted in the scores table (survives
+    # redeploys via the dbdata volume, same as events). ---
+    @router.post("/api/score")
+    def post_score(s: ScoreIn):
+        name = (s.name or "").strip()[:24] or "Аноним"
+        conn = _conn()
+        try:
+            insert_score(conn, name, s.score)
+        finally:
+            conn.close()
+        return {"ok": True}
+
+    @router.get("/api/scores")
+    def get_scores():
+        conn = _conn()
+        try:
+            rows = top_scores(conn, 10)
+        finally:
+            conn.close()
+        return {"scores": [{"name": r["name"], "score": r["score"]} for r in rows]}
 
     @router.get("/go/presave")
     def go_presave(

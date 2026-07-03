@@ -21,6 +21,13 @@ CREATE TABLE IF NOT EXISTS settings (
     key   TEXT PRIMARY KEY,
     value TEXT
 );
+CREATE TABLE IF NOT EXISTS scores (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts    TEXT NOT NULL,
+    name  TEXT NOT NULL,
+    score INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_scores_score ON scores(score DESC);
 """
 
 
@@ -60,3 +67,20 @@ def insert_event(conn, session_id: str, variant: str, event_type: str, meta: dic
 
 def fetch_all_events(conn) -> list:
     return conn.execute("SELECT * FROM events ORDER BY id").fetchall()
+
+
+def insert_score(conn, name: str, score: int) -> int:
+    cur = conn.execute(
+        "INSERT INTO scores (ts, name, score) VALUES (?, ?, ?)",
+        (_now_iso(), name, score),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def top_scores(conn, limit: int = 10) -> list:
+    # Highest score first; earlier submissions (lower id) win ties.
+    return conn.execute(
+        "SELECT name, score FROM scores ORDER BY score DESC, id ASC LIMIT ?",
+        (limit,),
+    ).fetchall()
