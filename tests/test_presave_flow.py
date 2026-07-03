@@ -32,10 +32,11 @@ def test_post_event_still_rejects_unknown_type(client):
     assert r.status_code == 422
 
 
-# --- GET /presave/return ---
+# --- GET /presave/return/{service}/{sid}/{variant} ---
+# band.link appends a "…Presaved=<upc>" marker on success; a bare return is a cancel.
 
 def test_presave_return_logs_event_and_returns_html(client, settings):
-    r = client.get("/presave/return", params={"service": "yandex", "sid": "sid-1", "v": "B"})
+    r = client.get("/presave/return/yandex/sid-1/B?yandexPresaved=4610605713098")
     assert r.status_code == 200
     assert "text/html" in r.headers["content-type"]
     assert "Сохранено" in r.text
@@ -49,14 +50,23 @@ def test_presave_return_logs_event_and_returns_html(client, settings):
 
 
 def test_presave_return_coerces_unknown_service(client, settings):
-    r = client.get("/presave/return", params={"service": "deezer", "sid": "sid-2", "v": "A"})
+    r = client.get("/presave/return/deezer/sid-2/A?deezerPresaved=4610605713098")
     assert r.status_code == 200
     rows = fetch_all_events(get_conn(settings.db_path))
     assert json.loads(rows[0]["meta"]) == {"service": "unknown"}
 
 
+def test_presave_return_without_marker_is_not_counted(client, settings):
+    # A bare return (user opened the flow but did not save) logs nothing and
+    # does not postMessage the row into the «Сохранено» state.
+    r = client.get("/presave/return/yandex/sid-3/A")
+    assert r.status_code == 200
+    assert "postMessage" not in r.text
+    assert fetch_all_events(get_conn(settings.db_path)) == []
+
+
 def test_presave_return_bad_variant_400(client):
-    r = client.get("/presave/return", params={"service": "yandex", "sid": "s", "v": "Q"})
+    r = client.get("/presave/return/yandex/s/Q?yandexPresaved=1")
     assert r.status_code == 400
 
 

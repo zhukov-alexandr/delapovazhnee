@@ -202,9 +202,10 @@ function boot() {
 
   // Our return URL — band.link redirects the popup here after a save; the page
   // logs presave_done and postMessages back so the row flips to «Сохранено».
+  // Path params (no query!): band.link appends its own "?…Presaved=<upc>" success
+  // marker with a literal "?", which would corrupt a URL that already had a query.
   function presaveReturnUrl(id) {
-    return location.origin + "/presave/return?service=" + id +
-      "&sid=" + session.sid + "&v=" + session.variant;
+    return location.origin + "/presave/return/" + id + "/" + session.sid + "/" + session.variant;
   }
 
   // Only these three resolve correctly through band.link's save-presave gateway
@@ -219,8 +220,9 @@ function boot() {
     const ret = presaveReturnUrl(id);
 
     if (GATEWAY_SERVICES.has(id)) {
+      // "bandlink_id=undefined" mirrors the original page's request byte-for-byte.
       const url = "https://band.link/save-presave?type=" + id +
-        "&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
+        "&bandlink_id=undefined&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
         "&redirectUrl=" + encodeURIComponent(ret);
       window.open(url, "_blank");
       return;

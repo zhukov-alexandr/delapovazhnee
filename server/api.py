@@ -61,31 +61,40 @@ def build_api_router(settings: Settings) -> APIRouter:
             conn.close()
         return RedirectResponse(settings.presave_url, status_code=302)
 
-    @router.get("/presave/return")
-    def presave_return(
-        service: str = Query("unknown"),
-        sid: str = Query(""),
-        v: str = Query(...),
-    ):
-        if v not in ("A", "B"):
+    @router.get("/presave/return/{service}/{sid}/{variant}")
+    def presave_return(request: Request, service: str, sid: str, variant: str):
+        # Path params (not query) so the redirectUrl we hand band.link carries NO
+        # query string. On a successful save band.link appends its own
+        # "?<service>Presaved=<upc>" marker with a LITERAL "?"; if our URL already
+        # had a query the result is a corrupt double-"?" (v becomes "B?..."). A
+        # bare-path URL keeps that marker as a clean query we can read.
+        if variant not in ("A", "B"):
             raise HTTPException(status_code=400, detail="bad variant")
         if service not in PRESAVE_SERVICES:
             service = "unknown"
-        conn = _conn()
-        try:
-            insert_event(conn, sid, v, "presave_done", {"service": service})
-        finally:
-            conn.close()
+        # band.link redirects here only after the user completes the save,
+        # tagging the URL "…Presaved=<upc>". Treat that marker as the success
+        # signal; a bare return (no marker) is a cancel and is not counted.
+        saved = any("presav" in k.lower() for k in request.query_params.keys())
+        if saved:
+            conn = _conn()
+            try:
+                insert_event(conn, sid, variant, "presave_done", {"service": service})
+            finally:
+                conn.close()
+        post = (
+            "try{if(window.opener){window.opener.postMessage({dp:\"presave_done\",service:\""
+            + service + "\"},\"*\")}}catch(e){};"
+        ) if saved else ""
+        msg = "Сохранено! Возвращайся в игру." if saved else "Возвращайся в игру."
         html = (
             "<!doctype html><html lang=\"ru\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-            "<title>Сохранено</title></head>"
+            "<title>Пресейв</title></head>"
             "<body style=\"font-family:sans-serif;text-align:center;padding:40px 16px;\">"
-            "<p>Сохранено! Возвращайся в игру.</p>"
+            "<p>" + msg + "</p>"
             "<script>"
-            "try{if(window.opener){window.opener.postMessage({dp:\"presave_done\",service:\""
-            + service +
-            "\"},\"*\")}}catch(e){};"
+            + post +
             "setTimeout(function(){try{window.close()}catch(e){}},400)"
             "</script>"
             "</body></html>"
