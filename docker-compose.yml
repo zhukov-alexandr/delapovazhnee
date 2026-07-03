@@ -21,9 +21,14 @@ services:
     restart: unless-stopped
     depends_on:
       - app
+    environment:
+      # Пусто → HTTP на :80 (по IP). Задай SITE_ADDRESS=домен в .env → авто-HTTPS.
+      # Нужен для рабочего пресейва: band.link-шлюз (Яндекс/VK/КИОН) принимает
+      # redirectUrl только как публичный HTTPS-домен, иначе ERROR_1009.
+      - SITE_ADDRESS=${SITE_ADDRESS:-:80}
     ports:
       - "80:80"
-      - "443:443"                  # пригодится при переходе на домен+HTTPS
+      - "443:443"                  # авто-HTTPS при SITE_ADDRESS=домен
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
