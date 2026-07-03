@@ -17,7 +17,9 @@ EventType = Literal[
     "streaming_click", "presave_done",
 ]
 
-PRESAVE_SERVICES = {"yandex", "vkmusic", "mts", "zvuk", "apple"}
+# Streaming services shown in the in-game presave modal (ids match
+# static/js/config.js PRESAVE.SERVICES). "mts" == КИОН Музыка.
+PRESAVE_SERVICES = {"yandex", "spotify", "vkmusic", "applemusic", "mts"}
 
 
 class EventIn(BaseModel):

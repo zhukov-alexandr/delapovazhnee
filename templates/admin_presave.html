@@ -55,6 +55,7 @@
         </div>
       </section>
 
+      {% set SVC_NAMES = {"yandex": "Яндекс Музыка", "spotify": "Spotify", "vkmusic": "VK Музыка", "applemusic": "Apple Music", "mts": "КИОН Музыка"} %}
       <section class="card">
         <h2 class="card-title">Разбивка по сервисам</h2>
         <div class="cards-grid">
@@ -63,7 +64,7 @@
             {% if A.services %}
               <ul>
               {% for svc, n in A.services.items() %}
-                <li>{{ svc }}: {{ n }}</li>
+                <li>{{ SVC_NAMES.get(svc, svc) }}: {{ n }}</li>
               {% endfor %}
               </ul>
             {% else %}
@@ -75,7 +76,7 @@
             {% if B.services %}
               <ul>
               {% for svc, n in B.services.items() %}
-                <li>{{ svc }}: {{ n }}</li>
+                <li>{{ SVC_NAMES.get(svc, svc) }}: {{ n }}</li>
               {% endfor %}
               </ul>
             {% else %}

@@ -27,15 +27,21 @@ export const GAME = {
 };
 
 // Presave modal (Task 26): band.link identifiers + the streaming services
-// listed as rows in the modal, in display order.
+// listed as rows in the modal, in display order. Services + order match the
+// original band.link page (dnkmusic.ru/devyatnadtsat) — verified by rendering
+// it. КИОН Музыка is band.link type "mts". See boot.js openPresave() for how
+// each service's presave URL is built (they are NOT uniform).
 export const PRESAVE = {
   HASH: "ywthC",
   UPC: "4610605713098",
+  // Spotify uses band.link's own static OAuth client; the return URL is
+  // injected into the OAuth `state`, not a redirectUrl param.
+  SPOTIFY_CLIENT_ID: "b4a316c64a59474d976ffc5dbf6e25e0",
   SERVICES: [
     { id: "yandex", name: "Яндекс Музыка" },
+    { id: "spotify", name: "Spotify" },
     { id: "vkmusic", name: "VK Музыка" },
-    { id: "zvuk", name: "Звук" },
-    { id: "mts", name: "МТС Музыка" },
-    { id: "apple", name: "Apple Music" },
+    { id: "applemusic", name: "Apple Music" },
+    { id: "mts", name: "КИОН Музыка" },
   ],
 };

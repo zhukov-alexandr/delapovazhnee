@@ -49,7 +49,7 @@ def test_presave_return_logs_event_and_returns_html(client, settings):
 
 
 def test_presave_return_coerces_unknown_service(client, settings):
-    r = client.get("/presave/return", params={"service": "spotify", "sid": "sid-2", "v": "A"})
+    r = client.get("/presave/return", params={"service": "deezer", "sid": "sid-2", "v": "A"})
     assert r.status_code == 200
     rows = fetch_all_events(get_conn(settings.db_path))
     assert json.loads(rows[0]["meta"]) == {"service": "unknown"}

@@ -200,7 +200,73 @@ function boot() {
     if (action) action.replaceWith(savedActionSpan());
   }
 
-  // Build the 5 rows once; click opens the band.link popup unless the
+  // Our return URL — band.link redirects the popup here after a save; the page
+  // logs presave_done and postMessages back so the row flips to «Сохранено».
+  function presaveReturnUrl(id) {
+    return location.origin + "/presave/return?service=" + id +
+      "&sid=" + session.sid + "&v=" + session.variant;
+  }
+
+  // Only these three resolve correctly through band.link's save-presave gateway
+  // AND honor our redirectUrl. Through that gateway Spotify/Apple silently fall
+  // back to a Yandex login, so they are built directly below (verified against
+  // the original dnkmusic.ru page).
+  const GATEWAY_SERVICES = new Set(["yandex", "vkmusic", "mts"]);
+
+  // Opens the correct presave flow for one service in a popup. No "noopener":
+  // the /presave/return popup needs window.opener to postMessage back here.
+  function openPresave(id) {
+    const ret = presaveReturnUrl(id);
+
+    if (GATEWAY_SERVICES.has(id)) {
+      const url = "https://band.link/save-presave?type=" + id +
+        "&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
+        "&redirectUrl=" + encodeURIComponent(ret);
+      window.open(url, "_blank");
+      return;
+    }
+
+    if (id === "spotify") {
+      // Direct Spotify OAuth with band.link's static client (same as the
+      // original). band.link/spotify parses `state` (pipe-delimited) and, after
+      // saving, redirects the popup to the 2nd field — our return URL.
+      const u = new URL("https://accounts.spotify.com/authorize");
+      u.searchParams.set("response_type", "code");
+      u.searchParams.set("client_id", PRESAVE.SPOTIFY_CLIENT_ID);
+      u.searchParams.set("scope", "user-follow-modify user-read-email user-library-modify");
+      u.searchParams.set("redirect_uri", "https://band.link/spotify");
+      u.searchParams.set("state", "undefined|" + ret + "|" + PRESAVE.UPC + "|" + PRESAVE.HASH);
+      window.open(u.toString(), "_blank");
+      return;
+    }
+
+    if (id === "applemusic") {
+      // Apple MusicKit web-OAuth. The URL embeds a band.link developer token
+      // that expires ~daily, so fetch a fresh one at click time (public
+      // endpoint, permissive CORS). Open the popup synchronously first so the
+      // async fetch doesn't trip the popup blocker.
+      const win = window.open("about:blank", "_blank");
+      fetch("https://api.band.link/apple/dev-token")
+        .then((r) => r.json())
+        .then(({ token }) => {
+          const payload = JSON.stringify({
+            thirdPartyIconURL: location.origin + "/static/sprites/19_2.jpg",
+            thirdPartyName: location.host,
+            thirdPartyToken: token,
+          });
+          const a = btoa(unescape(encodeURIComponent(payload)))
+            .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+          const url = "https://authorize.music.apple.com/woa?a=" + encodeURIComponent(a) +
+            "&referrer=" + encodeURIComponent(ret) + "&app=music&p=subscribe";
+          if (win) win.location.href = url;
+          else window.open(url, "_blank");
+        })
+        .catch(() => { if (win) win.close(); });
+      return;
+    }
+  }
+
+  // Build the 5 rows once; click opens the service's presave popup unless the
   // service is already saved (then the row is inert).
   for (const svc of PRESAVE.SERVICES) {
     const li = document.createElement("li");
@@ -220,14 +286,7 @@ function boot() {
     li.addEventListener("click", () => {
       if (li.querySelector(".el-link__action_disabled")) return; // already saved
       emit("streaming_click", { service: svc.id });
-      const redirectUrl = location.origin + "/presave/return?service=" + svc.id +
-        "&sid=" + session.sid + "&v=" + session.variant;
-      const url = "https://band.link/save-presave?type=" + svc.id +
-        "&bandlink_hash=" + PRESAVE.HASH + "&upc=" + PRESAVE.UPC +
-        "&redirectUrl=" + encodeURIComponent(redirectUrl);
-      // No "noopener": the /presave/return popup needs window.opener to
-      // postMessage the "Сохранено" state back to this tab.
-      window.open(url, "_blank");
+      openPresave(svc.id);
     });
     presaveServicesEl.appendChild(li);
   }
