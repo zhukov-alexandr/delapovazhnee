@@ -33,6 +33,7 @@
         --crimson-deep: #8c1f2a;
         --muted: #6f5b45;
         --nav-h: 60px;
+        --peek: 40px; /* strip of the NEXT section visible at each screen's bottom */
       }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,16 +93,18 @@
       .nav--open .nav__toggle span:nth-child(2) { opacity: 0; }
       .nav--open .nav__toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-      /* ---- One section = one screen: each fills exactly 100svh (its background
-           runs to the bottom — nothing from the next section peeks in). Content
-           starts right under the fixed nav; leftover space stays as background.
-           On small screens content may exceed 100svh — the section then grows. ---- */
+      /* ---- One section = one screen, minus a --peek strip: the next section's
+           torn edge stays visible at the bottom of every screen as a "there's
+           more below" teaser. Content starts right under the fixed nav; leftover
+           space is background. On small screens content may exceed the height —
+           the section then grows and scrolls. ---- */
       .screen {
-        min-height: 100svh;
+        min-height: calc(100svh - var(--peek));
         display: flex; flex-direction: column;
         padding: calc(var(--nav-h) + clamp(12px, 2.5vh, 28px)) 0 clamp(20px, 3.5vh, 40px);
         position: relative;
       }
+      #listen { min-height: 100svh; } /* last screen — nothing peeks after it */
       .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--muted); margin-bottom: clamp(22px, 4vw, 40px); }
       .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
 
@@ -132,7 +135,10 @@
       /* ---- Single (presave) ---- */
       .single {
         background: var(--ink); color: var(--paper);
-        clip-path: polygon(0 18px, 6% 4px, 12% 16px, 19% 3px, 26% 15px, 33% 5px, 41% 18px, 48% 4px, 56% 14px, 63% 3px, 70% 16px, 77% 5px, 84% 17px, 91% 4px, 96% 14px, 100% 6px, 100% 100%, 0 100%);
+        /* torn top AND torn bottom — the bottom wavy line is what peeks into the
+           single screen's fold as the concerts teaser */
+        clip-path: polygon(0 18px, 6% 4px, 12% 16px, 19% 3px, 26% 15px, 33% 5px, 41% 18px, 48% 4px, 56% 14px, 63% 3px, 70% 16px, 77% 5px, 84% 17px, 91% 4px, 96% 14px, 100% 6px,
+                           100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
       }
       .single .section__eyebrow { color: #b9a892; }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
@@ -151,7 +157,7 @@
       .poster-grid {
         display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(20px, 3.5vw, 40px);
         width: 100%; margin: 0 auto;
-        max-width: min(100%, calc((100svh - 340px) * 1.5 + 40px));
+        max-width: min(100%, calc((100svh - 340px - var(--peek)) * 1.5 + 40px));
       }
       .poster { display: flex; flex-direction: column; background: var(--paper); padding: 12px 12px 0; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
