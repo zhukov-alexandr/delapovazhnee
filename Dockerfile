@@ -18,7 +18,7 @@ RUN useradd -m app && mkdir -p /app/db && chown -R app /app
 USER app
 
 EXPOSE 8000
-# --proxy-headers + доверие прокси (Caddy в той же docker-сети): request.base_url для QR берёт
-# внешний scheme/host из X-Forwarded-* — так QR корректен и по IP (http), и позже по домену (https).
+# --proxy-headers + доверие прокси (Caddy в той же docker-сети): request.base_url берёт
+# внешний scheme/host из X-Forwarded-* — корректные абсолютные URL и по IP (http), и по домену (https).
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", \
      "--proxy-headers", "--forwarded-allow-ips", "*"]

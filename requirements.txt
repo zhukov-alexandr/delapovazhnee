@@ -3,5 +3,4 @@ uvicorn[standard]
 jinja2
 python-multipart
 itsdangerous
-qrcode[pil]
 python-dotenv

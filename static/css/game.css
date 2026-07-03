@@ -182,7 +182,7 @@ p {
   margin-top: 4px;
 }
 
-/* CTA (QR + presave button), mounted into #start-cta or #over-cta by boot.js */
+/* CTA (cover + presave button), mounted into #start-cta or #over-cta by boot.js */
 .cta {
   margin-top: clamp(16px, 3vh, 24px);
   display: flex;
@@ -415,7 +415,6 @@ p {
   h1 { font-size: clamp(20px, 5vw, 32px); margin-bottom: 4px; }
   p { margin-bottom: 8px; }
   .cta { margin-top: 8px; padding: 8px; flex-direction: row; gap: 12px; }
-  .cta .qr { width: 72px; height: 72px; }
   .char-picker { margin-bottom: 6px; }
   .best { margin-bottom: 6px; }
   .reveal-line { font-size: clamp(18px, 4vw, 26px); margin-bottom: 10px; }

@@ -1,14 +1,13 @@
-"""Public API: event ingestion (presave redirect and QR are added in later tasks)."""
+"""Public API: event ingestion + presave redirect/return endpoints."""
 from __future__ import annotations
 
 from typing import Literal
 from fastapi import APIRouter, Query, HTTPException, Request
-from fastapi.responses import RedirectResponse, Response, HTMLResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from server.config import Settings
 from server.db import get_conn, insert_event
-from server.qr import build_presave_url, make_qr_png
 from server.settings import get_settings
 
 Variant = Literal["A", "B"]
@@ -100,16 +99,6 @@ def build_api_router(settings: Settings) -> APIRouter:
             "</body></html>"
         )
         return HTMLResponse(html)
-
-    @router.get("/qr")
-    def qr(request: Request, v: str = Query(...), sid: str = Query("")):
-        if v not in ("A", "B"):
-            raise HTTPException(status_code=400, detail="bad variant")
-        base = settings.public_base_url or str(request.base_url)
-        target = build_presave_url(base, v, sid, "qr")
-        png = make_qr_png(target)
-        return Response(png, media_type="image/png",
-                        headers={"Cache-Control": "no-store"})
 
     @router.get("/api/config")
     def get_config():

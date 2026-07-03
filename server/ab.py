@@ -1,8 +1,8 @@
 """Server-side A/B assignment: random 50/50 on first visit, sticky via cookie.
 
 The variant cookie is intentionally NOT httponly — the frontend reads it (via the
-injected data-* attributes) to place the CTA and build the QR. Source of truth is
-the server, so the split is authoritative and cannot be skewed by the client.
+injected data-* attributes) to place the CTA. Source of truth is the server, so
+the split is authoritative and cannot be skewed by the client.
 """
 from __future__ import annotations
 
