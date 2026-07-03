@@ -4,25 +4,16 @@
 // there, it is blitted via drawImage and the primitive fallback is skipped.
 import { GAME } from "./config.js";
 
-// Sunset pixel-art palette — from the "ПАЛИТРА" brief (album-cover-derived:
-// sunset + handwritten lyrics + paper). Existing names kept; values are the
-// brief's exact hexes, plus a few new named roles it introduces.
+// Summer Sunset Pixel (PS1/Sega) — authoritative palette, reused across game + admin.
 export const PALETTE = {
-  night: "#211234",     // 1. sky top
-  grape: "#5E2A7E",     // 1. sky mid
-  flare: "#FF6870",     // 1. sunset / horizon
-  raspberry: "#A9324B", // 1. raspberry texture (horizon glow / album tie-in)
-  sun: "#FFD665",       // 1. sun / coins
-  sunStripe: "#FF9A65", // 1. sun stripes / warm accent
-  road: "#6C2A86",      // 2. road / platform
-  mark: "#FFF0D5",      // 2. road markings
-  sand: "#F4C172",      // 2. sand / ground
-  ink: "#171023",       // 2. outline / shadows
-  arcade: "#56E6D2",    // 3. character accent
-  charShadow: "#5B233C",// 3. character shadow
-  paper: "#F4ECE4",     // 4. paper
-  hbBlue: "#7FA8DF",    // 4. handwritten blue
-  foam: "#FFF0D5",      // (kept alias for light ticks/text; == road markings)
+  night: "#241539",
+  grape: "#6D2E8B",
+  flare: "#FF5D73",
+  sun: "#FFD35C",
+  sand: "#F2C078",
+  foam: "#FFF4E2",
+  arcade: "#2FE6D6",
+  ink: "#2A1533",
 };
 
 // name -> HTMLImageElement. Empty until loadSprites() populates it.
@@ -72,17 +63,13 @@ function drawDitherBand(ctx, x, y, w, h, color, alpha) {
   ctx.restore();
 }
 
-// Sky fills the FULL visible height: from viewTop (world-y at the canvas top —
-// negative & far up on tall/portrait mobile) down to the horizon (sea line), so
-// there's a real sunset gradient instead of a flat dead band above a short world.
 // Static deterministic star field (dots + a few "+" sparkles) over the dark
-// upper sky — per the brief's example composition. Fixed pattern so it doesn't
-// flicker frame-to-frame.
+// upper sky. Fixed pattern so it doesn't flicker frame-to-frame.
 function drawStars(ctx, w, viewTop, horizon) {
   const h = horizon - viewTop;
   const region = h * 0.6; // only the dark upper part gets stars
   ctx.save();
-  ctx.fillStyle = PALETTE.paper;
+  ctx.fillStyle = PALETTE.foam;
   const cols = Math.max(6, Math.floor(w / 64));
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < 9; j++) {
@@ -103,6 +90,9 @@ function drawStars(ctx, w, viewTop, horizon) {
   ctx.restore();
 }
 
+// Sky fills the FULL visible height: from viewTop (world-y at the canvas top —
+// negative & far up on tall/portrait mobile) down to the horizon (sea line), so
+// there's a real sunset gradient instead of a flat dead band above a short world.
 function drawSky(ctx, w, viewTop, horizon) {
   const h = horizon - viewTop;
   if (images.sky) {
@@ -111,13 +101,14 @@ function drawSky(ctx, w, viewTop, horizon) {
   }
   const grad = ctx.createLinearGradient(0, viewTop, 0, horizon);
   grad.addColorStop(0, PALETTE.night);
-  grad.addColorStop(0.55, PALETTE.grape);
-  grad.addColorStop(0.9, PALETTE.flare); // horizon ends pink; the sun disc sits on it
+  grad.addColorStop(0.5, PALETTE.grape);
+  grad.addColorStop(0.78, PALETTE.flare);
+  grad.addColorStop(1, PALETTE.sun);
   ctx.fillStyle = grad;
   ctx.fillRect(0, px(viewTop), w, px(h) + 2);
   drawStars(ctx, w, viewTop, horizon);
   // Ordered-dither band just above the horizon for the PS1 sunset feel.
-  drawDitherBand(ctx, 0, px(horizon - h * 0.14), w, px(h * 0.1), PALETTE.sunStripe, 0.2);
+  drawDitherBand(ctx, 0, px(horizon - h * 0.16), w, px(h * 0.12), PALETTE.flare, 0.22);
 }
 
 function drawSun(ctx, cam, w) {
@@ -135,9 +126,9 @@ function drawSun(ctx, cam, w) {
   ctx.fill();
   ctx.restore();
   // Ordered-dither horizontal stripes across the lower half of the disc —
-  // the "signature" dithered sunset look (warm sun-stripe accent).
+  // the "signature" dithered sunset look.
   ctx.save();
-  ctx.fillStyle = PALETTE.sunStripe;
+  ctx.fillStyle = PALETTE.flare;
   for (let dy = 0; dy < r; dy += 4) {
     const rowY = cy + dy;
     const half = Math.sqrt(Math.max(0, r * r - dy * dy));
@@ -153,14 +144,13 @@ function drawSea(ctx, cam, w) {
     ctx.drawImage(images.sea, 0, SEA_Y, w, SEA_H);
     return;
   }
-  const offset = ((cam.x * 0.4) % 44 + 44) % 44;
-  // The band the runner travels on = the brief's "road / platform" (#6C2A86)
-  // with dashed markings (#FFF0D5).
-  ctx.fillStyle = PALETTE.road;
+  const offset = ((cam.x * 0.4) % 40 + 40) % 40;
+  ctx.fillStyle = PALETTE.grape;
   ctx.fillRect(0, px(SEA_Y), w, SEA_H);
-  ctx.fillStyle = PALETTE.mark;
-  for (let x = -offset; x < w; x += 44) {
-    ctx.fillRect(px(x), px(SEA_Y + SEA_H / 2 - 1), 20, 3);
+  // Parallax "wave" ticks scrolling with a medium factor of cam.x.
+  ctx.fillStyle = PALETTE.foam;
+  for (let x = -offset; x < w; x += 40) {
+    ctx.fillRect(px(x), px(SEA_Y + 6), 16, 2);
   }
 }
 
@@ -179,17 +169,6 @@ function drawSand(ctx, cam, w, h) {
   ctx.globalAlpha = 0.15;
   for (let x = -offset; x < w; x += 24) {
     ctx.fillRect(px(x), px(y + 10), 4, 4);
-  }
-  ctx.restore();
-  // Small foreground shrubs (dark tufts) along the sand edge — brief composition.
-  ctx.save();
-  ctx.fillStyle = PALETTE.ink;
-  const soff = ((cam.x % 150) + 150) % 150;
-  for (let x = -soff; x < w; x += 150) {
-    const bx = px(x + 40), by = px(y + 5);
-    ctx.fillRect(bx, by - 9, 2, 9);
-    ctx.fillRect(bx + 4, by - 13, 2, 13);
-    ctx.fillRect(bx + 8, by - 8, 2, 8);
   }
   ctx.restore();
 }

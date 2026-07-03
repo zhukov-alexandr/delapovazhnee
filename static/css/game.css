@@ -1,17 +1,14 @@
 /* Game shell — Summer Sunset Pixel (see docs/superpowers/specs/2026-07-01-visual-directions.md §1) */
 
 :root {
-  /* Palette from the "ПАЛИТРА" brief (album-cover-derived sunset). */
-  --night: #211234;
-  --grape: #5E2A7E;
-  --flare: #FF6870;
-  --sun: #FFD665;
-  --sand: #F4C172;
-  --foam: #FFF0D5;
-  --arcade: #56E6D2;
-  --ink: #171023;
-  --paper: #F4ECE4;
-  --sun-stripe: #FF9A65;
+  --night: #241539;
+  --grape: #6D2E8B;
+  --flare: #FF5D73;
+  --sun: #FFD35C;
+  --sand: #F2C078;
+  --foam: #FFF4E2;
+  --arcade: #2FE6D6;
+  --ink: #2A1533;
 }
 
 * { box-sizing: border-box; }
