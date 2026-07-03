@@ -49,6 +49,17 @@ def create_app(settings: Settings) -> FastAPI:
     def home_page():
         return FileResponse(BASE_DIR / "templates" / "home.html")
 
+    # Make the browser revalidate static assets on every load (cheap 304 via the
+    # ETag StaticFiles already sends) instead of heuristically caching JS/CSS for
+    # a long time — otherwise a code update (e.g. game.js) isn't picked up without
+    # a manual hard refresh.
+    @app.middleware("http")
+    async def _static_no_cache(request: Request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
     # Game assets (also serves the landing's assets under /static/home/).
     app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
