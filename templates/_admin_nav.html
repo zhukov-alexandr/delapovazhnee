@@ -1,7 +1,8 @@
 <header class="admin-nav">
   <div class="admin-nav-brand">Админка</div>
   <nav class="admin-tabs" aria-label="Разделы">
-    <a class="admin-tab{{ ' is-active' if active == 'ab' else '' }}" href="/admin">A/B</a>
+    <a class="admin-tab{{ ' is-active' if active == 'ab' else '' }}" href="/admin">A/B: клики</a>
+    <a class="admin-tab{{ ' is-active' if active == 'presave' else '' }}" href="/admin/presave">A/B: пресейвы</a>
     <a class="admin-tab{{ ' is-active' if active == 'settings' else '' }}" href="/admin/settings">Настройки игры</a>
   </nav>
   <div class="admin-nav-actions">

@@ -85,6 +85,55 @@ def _daily(conn) -> list:
     return [{"date": r["date"], "A": r["a"] or 0, "B": r["b"] or 0} for r in rows]
 
 
+def _presave_variant_stats(conn, v: str) -> dict:
+    row = conn.execute(
+        """
+        SELECT
+          COUNT(DISTINCT session_id) AS sessions,
+          COUNT(DISTINCT CASE WHEN event_type='cta_view'  THEN session_id END) AS cta_view_sessions,
+          COUNT(DISTINCT CASE WHEN event_type='cta_click' THEN session_id END) AS cta_click_sessions,
+          COUNT(DISTINCT CASE WHEN event_type='streaming_click' THEN session_id END) AS streaming_click_sessions,
+          COUNT(DISTINCT CASE WHEN event_type='presave_done' THEN session_id END) AS presave_done_sessions,
+          SUM(event_type='presave_done')                               AS presave_done_total
+        FROM events WHERE variant=?
+        """, (v,)).fetchone()
+    d = {k: (row[k] or 0) for k in row.keys()}
+    service_rows = conn.execute(
+        """
+        SELECT json_extract(meta,'$.service') AS service, COUNT(*) AS n
+        FROM events WHERE variant=? AND event_type='presave_done'
+        GROUP BY service
+        """, (v,)).fetchall()
+    d["services"] = {r["service"]: r["n"] for r in service_rows if r["service"]}
+    views = d["cta_view_sessions"]
+    d["cvr"] = (d["presave_done_sessions"] / views) if views else 0.0
+    return d
+
+
+def compute_presave_dashboard(conn) -> dict:
+    a = _presave_variant_stats(conn, "A")
+    b = _presave_variant_stats(conn, "B")
+    enough = a["cta_view_sessions"] > 0 and b["cta_view_sessions"] > 0
+    prob_b = fisher_p = None
+    if enough:
+        prob_b = prob_b_beats_a(a["presave_done_sessions"], a["cta_view_sessions"],
+                                b["presave_done_sessions"], b["cta_view_sessions"])
+        na = max(0, a["cta_view_sessions"] - a["presave_done_sessions"])
+        nb = max(0, b["cta_view_sessions"] - b["presave_done_sessions"])
+        fisher_p = fisher_exact_two_sided(a["presave_done_sessions"], na,
+                                          b["presave_done_sessions"], nb)
+    leader = None
+    if a["cvr"] != b["cvr"]:
+        leader = "A" if a["cvr"] > b["cvr"] else "B"
+    return {
+        "variants": {"A": a, "B": b},
+        "leader": leader,
+        "prob_b_beats_a": prob_b,   # None until both variants have CTA views
+        "fisher_p": fisher_p,
+        "enough_data": enough,
+    }
+
+
 def compute_dashboard(conn) -> dict:
     a = _variant_stats(conn, "A")
     b = _variant_stats(conn, "B")

@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from server.config import Settings
 from server.db import get_conn, fetch_all_events
-from server.metrics import compute_dashboard
+from server.metrics import compute_dashboard, compute_presave_dashboard
 from server.settings import get_settings, set_settings
 
 
@@ -50,6 +50,18 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
             conn.close()
         return templates.TemplateResponse(
             request, "admin.html", {"d": data, "active": "ab"})
+
+    @router.get("/presave", response_class=HTMLResponse)
+    def presave_dashboard(request: Request):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            data = compute_presave_dashboard(conn)
+        finally:
+            conn.close()
+        return templates.TemplateResponse(
+            request, "admin_presave.html", {"d": data, "active": "presave"})
 
     @router.get("/settings", response_class=HTMLResponse)
     def settings_form(request: Request, saved: int = 0):

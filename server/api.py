@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal
 from fastapi import APIRouter, Query, HTTPException, Request
-from fastapi.responses import RedirectResponse, Response
+from fastapi.responses import RedirectResponse, Response, HTMLResponse
 from pydantic import BaseModel, Field
 
 from server.config import Settings
@@ -12,7 +12,12 @@ from server.qr import build_presave_url, make_qr_png
 from server.settings import get_settings
 
 Variant = Literal["A", "B"]
-EventType = Literal["visit", "game_start", "game_over", "cta_view", "cta_click"]
+EventType = Literal[
+    "visit", "game_start", "game_over", "cta_view", "cta_click",
+    "streaming_click", "presave_done",
+]
+
+PRESAVE_SERVICES = {"yandex", "vkmusic", "mts", "zvuk", "apple"}
 
 
 class EventIn(BaseModel):
@@ -53,6 +58,37 @@ def build_api_router(settings: Settings) -> APIRouter:
         finally:
             conn.close()
         return RedirectResponse(settings.presave_url, status_code=302)
+
+    @router.get("/presave/return")
+    def presave_return(
+        service: str = Query("unknown"),
+        sid: str = Query(""),
+        v: str = Query(...),
+    ):
+        if v not in ("A", "B"):
+            raise HTTPException(status_code=400, detail="bad variant")
+        if service not in PRESAVE_SERVICES:
+            service = "unknown"
+        conn = _conn()
+        try:
+            insert_event(conn, sid, v, "presave_done", {"service": service})
+        finally:
+            conn.close()
+        html = (
+            "<!doctype html><html lang=\"ru\"><head><meta charset=\"utf-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+            "<title>Сохранено</title></head>"
+            "<body style=\"font-family:sans-serif;text-align:center;padding:40px 16px;\">"
+            "<p>Сохранено! Возвращайся в игру.</p>"
+            "<script>"
+            "try{if(window.opener){window.opener.postMessage({dp:\"presave_done\",service:\""
+            + service +
+            "\"},\"*\")}}catch(e){};"
+            "setTimeout(function(){try{window.close()}catch(e){}},400)"
+            "</script>"
+            "</body></html>"
+        )
+        return HTMLResponse(html)
 
     @router.get("/qr")
     def qr(request: Request, v: str = Query(...), sid: str = Query("")):

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Дашборд — A/B пресейвы</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin">
+  <div class="admin-shell">
+    {% include "_admin_nav.html" %}
+
+    <main class="admin-main">
+      <h1 class="page-title">Дашборд A/B пресейвов</h1>
+
+      {% set A = d.variants.A %}{% set B = d.variants.B %}
+      <section class="cards-grid">
+        <div class="card stat-card">
+          <div class="stat-label">Показы CTA</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.cta_view_sessions }}</span>
+            <span class="pill pill-b">B {{ B.cta_view_sessions }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Открытия модалки</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.cta_click_sessions }}</span>
+            <span class="pill pill-b">B {{ B.cta_click_sessions }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Клики по стримингам</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.streaming_click_sessions }}</span>
+            <span class="pill pill-b">B {{ B.streaming_click_sessions }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card stat-card--hi">
+          <div class="stat-label">Пресейвы (сессии)</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.presave_done_sessions }}</span>
+            <span class="pill pill-b">B {{ B.presave_done_sessions }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card stat-card--hi">
+          <div class="stat-label">CVR (пресейвы / показы CTA)</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ '%.1f'|format(A.cvr*100) }}%</span>
+            <span class="pill pill-b">B {{ '%.1f'|format(B.cvr*100) }}%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Разбивка по сервисам</h2>
+        <div class="cards-grid">
+          <div>
+            <div class="stat-label">Вариант A</div>
+            {% if A.services %}
+              <ul>
+              {% for svc, n in A.services.items() %}
+                <li>{{ svc }}: {{ n }}</li>
+              {% endfor %}
+              </ul>
+            {% else %}
+              <p class="muted">Нет данных</p>
+            {% endif %}
+          </div>
+          <div>
+            <div class="stat-label">Вариант B</div>
+            {% if B.services %}
+              <ul>
+              {% for svc, n in B.services.items() %}
+                <li>{{ svc }}: {{ n }}</li>
+              {% endfor %}
+              </ul>
+            {% else %}
+              <p class="muted">Нет данных</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <section class="card confidence-card">
+        <h2 class="card-title">Достоверность (по пресейвам)</h2>
+        <p class="leader-line">
+          {% if d.leader %}Лидирует <b>Вариант {{ d.leader }}</b>{% else %}Пока паритет{% endif %}
+        </p>
+        {% if d.prob_b_beats_a is not none %}
+          <p>Вероятность, что B лучше A: <b>{{ '%.0f'|format(d.prob_b_beats_a * 100) }}%</b>
+             &middot; точный тест Фишера: p={{ '%.3f'|format(d.fisher_p) }}</p>
+          <p class="muted">При малом трафике выводы делайте осторожно.</p>
+        {% else %}
+          <p class="muted">Данных пока недостаточно для сравнения</p>
+        {% endif %}
+      </section>
+
+    </main>
+  </div>
+</body></html>
