@@ -37,7 +37,9 @@
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
-      html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+      /* Anchors land the section's top edge at y=0 (under the fixed nav), so a
+         100svh section fills the viewport exactly — true one-screen sections. */
+      html { scroll-behavior: smooth; }
       body {
         font-family: "Golos Text", system-ui, sans-serif;
         background: var(--kraft);
@@ -90,11 +92,16 @@
       .nav--open .nav__toggle span:nth-child(2) { opacity: 0; }
       .nav--open .nav__toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-      /* ---- Section shell: sized to its content with a comfortable rhythm (so a
-           short block never leaves an empty gap). Only the hero is a full screen,
-           because its photo fills it. ---- */
-      .screen { padding: clamp(52px, 8vh, 96px) 0 clamp(52px, 9vh, 100px); position: relative; }
-      .hero { min-height: 100svh; display: flex; flex-direction: column; padding-top: calc(var(--nav-h) + clamp(16px, 3vh, 36px)); }
+      /* ---- One section = one screen: each fills exactly 100svh (its background
+           runs to the bottom — nothing from the next section peeks in). Content
+           starts right under the fixed nav; leftover space stays as background.
+           On small screens content may exceed 100svh — the section then grows. ---- */
+      .screen {
+        min-height: 100svh;
+        display: flex; flex-direction: column;
+        padding: calc(var(--nav-h) + clamp(12px, 2.5vh, 28px)) 0 clamp(20px, 3.5vh, 40px);
+        position: relative;
+      }
       .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--muted); margin-bottom: clamp(22px, 4vw, 40px); }
       .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
 
@@ -138,7 +145,14 @@
       .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts ---- */
-      .poster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(20px, 3.5vw, 40px); }
+      /* Poster size is driven by the viewport HEIGHT so the poster + its ticket
+         row always fit inside the one-screen section (100svh minus nav/eyebrow/
+         meta/paddings ≈ 340px); on tall screens the wrap width is the cap. */
+      .poster-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(20px, 3.5vw, 40px);
+        width: 100%; margin: 0 auto;
+        max-width: min(100%, calc((100svh - 340px) * 1.5 + 40px));
+      }
       .poster { display: flex; flex-direction: column; background: var(--paper); padding: 12px 12px 0; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
       .poster:nth-child(even) { transform: rotate(1deg); }
@@ -180,7 +194,7 @@
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
         .single__cover-wrap { max-width: 300px; margin: 0 auto; }
-        .poster-grid { grid-template-columns: 1fr; }
+        .poster-grid { grid-template-columns: 1fr; max-width: none; } /* stacked posters scroll; height cap is a desktop concern */
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
         .hero__photo { min-height: 46vh; }
