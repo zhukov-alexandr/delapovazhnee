@@ -165,8 +165,12 @@ export class Game {
     this.buffer.width = this.bufW;
     this.buffer.height = this.bufH;
     this.bufferCtx = this.buffer.getContext("2d");
-    this.bufferCtx.imageSmoothingEnabled = false;
-    this.ctx.imageSmoothingEnabled = false;
+    this.bufferCtx.imageSmoothingEnabled = false; // scene is crisp in the buffer
+    // The buffer -> device upscale is SMOOTH (bilinear): a nearest upscale by a
+    // fractional factor makes sprite edges wobble ±1 device px as they scroll
+    // (residual shimmer); smoothing the single uniform upscale removes it.
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = "high";
   }
 
   // One discrete jump per input event while running. Single tap = one jump,
@@ -256,9 +260,11 @@ export class Game {
       drawRunner(bctx, this.game.runner, this.t, this.charIndex);
     }
 
-    // 2) Upscale the crisp buffer to the device canvas in one uniform blit —
-    // temporally stable, so moving pixels no longer shimmer.
+    // 2) Upscale the crisp buffer to the device canvas in one smooth (bilinear)
+    // blit — temporally stable, so moving pixels no longer shimmer.
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.drawImage(this.buffer, 0, 0, this.bufW, this.bufH, 0, 0, this.canvas.width, this.canvas.height);
   }
