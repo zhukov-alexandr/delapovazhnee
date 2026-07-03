@@ -142,10 +142,17 @@
       }
       .single .section__eyebrow { color: #b9a892; }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      .single__left { display: flex; flex-direction: column; align-items: center; }
+      .single__cover-wrap { position: relative; width: 100%; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      /* cue placements in the single block: static-flow button — desktop under the
+         cover (horizontal, not rotated), mobile in a row right of the release badge */
+      .cue--flow { position: static; }
+      .cue--desktop { margin-top: clamp(18px, 3vh, 30px); }
+      .cue--mobile { display: none; }
+      .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
       .single__cta { display: flex; flex-wrap: wrap; gap: 12px; }
-      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--crimson); background: rgba(179,42,56,0.14); border: 1px solid rgba(179,42,56,0.5); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); margin-bottom: 18px; }
+      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--crimson); background: rgba(179,42,56,0.14); border: 1px solid rgba(179,42,56,0.5); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
       .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
       .single__title em { font-style: normal; color: var(--crimson); }
       .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
@@ -200,6 +207,8 @@
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
         .single__cover-wrap { max-width: 300px; margin: 0 auto; }
+        .cue--desktop { display: none; }
+        .cue--mobile { display: inline-flex; }
         .poster-grid { grid-template-columns: 1fr; max-width: none; } /* stacked posters scroll; height cap is a desktop concern */
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
@@ -243,12 +252,17 @@
       <div class="wrap">
         <div class="section__eyebrow eyebrow">Пресейв</div>
         <div class="single__grid">
-          <div class="single__cover-wrap">
-            <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
-            <a class="cue" href="#concerts">Концерты <span class="arr">↓</span></a>
+          <div class="single__left">
+            <div class="single__cover-wrap">
+              <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
+            </div>
+            <a class="cue cue--flow cue--desktop" href="#concerts">Концерты <span class="arr">↓</span></a>
           </div>
           <div>
-            <span class="release-date">Релиз · 17 июля 2026</span>
+            <div class="release-row">
+              <span class="release-date">Релиз · 17 июля 2026</span>
+              <a class="cue cue--flow cue--mobile" href="#concerts">Концерты <span class="arr">↓</span></a>
+            </div>
             <h2 class="display single__title">Новый<br>сингл <em>«19»</em></h2>
             <p class="single__lead">Сохрани сингл заранее — как только он выйдет 17 июля, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.</p>
             <div class="single__cta">
