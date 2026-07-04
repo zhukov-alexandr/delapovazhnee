@@ -82,7 +82,8 @@
         border-bottom: 1px solid rgba(23,19,15,0.14);
       }
       .nav__inner { width: min(1120px, 92vw); margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
-      .nav__brand { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: 15px; letter-spacing: 0.01em; color: var(--ink); text-decoration: none; }
+      .nav__brand { display: flex; align-items: center; text-decoration: none; }
+      .nav__brand img { height: 24px; width: auto; display: block; }
       .nav__links { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 30px); }
       .nav__links a { font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--ink); text-decoration: none; padding-bottom: 3px; border-bottom: 2px solid transparent; }
       .nav__links a:hover { border-bottom-color: var(--crimson); }
@@ -190,6 +191,10 @@
       .listen .section__eyebrow { color: #b9a892; }
       .listen__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: clamp(28px, 5vw, 56px); align-items: start; }
       .listen__title { font-size: clamp(34px, 5vw, 64px); color: var(--paper); }
+      /* The band's squiggle mark. Ink-dark PNG: inverted to paper for the dark
+         footer; natural ink as a signature stamp on the hero photo. */
+      .listen__dog { width: clamp(110px, 12vw, 160px); margin-top: 18px; display: block; filter: brightness(0) invert(0.93); }
+      .hero__stamp { position: absolute; right: clamp(16px, 2.2vw, 30px); bottom: clamp(12px, 2vw, 22px); width: clamp(90px, 10vw, 150px); transform: rotate(-4deg); pointer-events: none; }
       .listen__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #b9a892; margin-bottom: 16px; }
       .link-list { display: flex; flex-direction: column; gap: 11px; }
       .link-list a { color: var(--paper); text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.8vw, 18px); width: fit-content; border-bottom: 1px solid transparent; }
@@ -228,7 +233,7 @@
 <body>
     <nav class="nav" id="nav">
       <div class="nav__inner">
-        <a class="nav__brand" href="#top">Дела поважнее</a>
+        <a class="nav__brand" href="#top"><img src="/static/home/logo.svg" alt="Дела поважнее"></a>
         <button class="nav__toggle" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
           <span></span><span></span><span></span>
         </button>
@@ -249,6 +254,7 @@
         </div>
         <div class="hero__photo" role="img" aria-label="Группа «Дела поважнее»">
           <a class="cue" href="#single">Новый сингл «19» <span class="arr">↓</span></a>
+          <img class="hero__stamp" src="/static/home/dog.png" alt="">
         </div>
       </div>
     </header>
@@ -310,7 +316,10 @@
       <div class="wrap">
         <div class="section__eyebrow eyebrow">Ссылки</div>
         <div class="listen__grid">
-          <h2 class="display listen__title">Найти<br>нас</h2>
+          <div>
+            <h2 class="display listen__title">Найти<br>нас</h2>
+            <img class="listen__dog" src="/static/home/dog.png" alt="">
+          </div>
           <div class="listen__col">
             <h4>Стриминги</h4>
             <div class="link-list">
