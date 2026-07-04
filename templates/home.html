@@ -194,7 +194,8 @@
       /* The band's squiggle mark. Ink-dark PNG: inverted to paper for the dark
          footer; natural ink as a signature stamp on the hero photo. */
       .listen__dog { width: clamp(110px, 12vw, 160px); margin-top: 18px; display: block; filter: brightness(0) invert(0.93); }
-      .hero__stamp { position: absolute; right: clamp(16px, 2.2vw, 30px); bottom: clamp(12px, 2vw, 22px); width: clamp(90px, 10vw, 150px); transform: rotate(-4deg); pointer-events: none; }
+      /* the squiggle dog in the void right of «ДЕЛА» — em-sized, scales with the title */
+      .title-dog { display: inline-block; height: 0.55em; width: auto; margin-left: 0.28em; vertical-align: 0.06em; transform: rotate(-4deg); }
       .listen__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #b9a892; margin-bottom: 16px; }
       .link-list { display: flex; flex-direction: column; gap: 11px; }
       .link-list a { color: var(--paper); text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.8vw, 18px); width: fit-content; border-bottom: 1px solid transparent; }
@@ -249,12 +250,11 @@
     <header id="top" class="screen hero">
       <div class="wrap" style="display:flex; flex-direction:column; flex:1; min-height:0;">
         <div class="hero__head">
-          <h1 class="display hero__title">Дела<br><span class="l2">поважнее</span></h1>
+          <h1 class="display hero__title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span></h1>
           <p class="hero__tag">новый сингл<b>«19»</b></p>
         </div>
         <div class="hero__photo" role="img" aria-label="Группа «Дела поважнее»">
           <a class="cue" href="#single">Новый сингл «19» <span class="arr">↓</span></a>
-          <img class="hero__stamp" src="/static/home/dog.png" alt="">
         </div>
       </div>
     </header>
