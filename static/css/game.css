@@ -132,6 +132,10 @@ p {
   margin: 0 0 clamp(6px, 1.5vh, 12px);
 }
 
+/* Keyboard-nav highlight (boot.js): the currently-selected overlay action. */
+.kbd-active { outline: 3px solid var(--sun); outline-offset: 3px; }
+.bl-row.kbd-active { outline-offset: -1px; }
+
 .hidden { display: none !important; }
 
 .mute {

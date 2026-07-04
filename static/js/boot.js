@@ -363,10 +363,12 @@ function boot() {
   function openPresaveModal() {
     for (const id of readPresaved(localStorage)) markRowSaved(id);
     presaveModal.classList.remove("hidden");
+    kbOpen(presaveModal, true);
   }
 
   presaveClose.addEventListener("click", () => {
     presaveModal.classList.add("hidden");
+    kbClose();
   });
 
   const PRESAVE_IDS = new Set(PRESAVE.SERVICES.map((s) => s.id));
@@ -427,11 +429,12 @@ function boot() {
       .then((d) => renderScores(d.scores || []))
       .catch(() => renderScores([]));
     leaderboardEl.classList.remove("hidden");
+    kbOpen(leaderboardEl, true);
   }
 
   showScoresStart.addEventListener("click", openLeaderboard);
   showScoresOver.addEventListener("click", openLeaderboard);
-  leaderboardClose.addEventListener("click", () => leaderboardEl.classList.add("hidden"));
+  leaderboardClose.addEventListener("click", () => { leaderboardEl.classList.add("hidden"); kbClose(); });
 
   saveScoreBtn.addEventListener("click", () => {
     const name = (nameInput.value || "").trim().slice(0, 24);
@@ -452,6 +455,53 @@ function boot() {
         saveScoreBtn.disabled = false;
         saveScoreBtn.textContent = "Сохранить результат";
       });
+  });
+
+  // --- Keyboard nav for overlays: arrows move a highlight over the buttons,
+  // Enter activates. The primary button (.btn.big) is highlighted by default.
+  // A stack lets a modal (leaderboard/presave) sit on top of a menu and restore
+  // it on close. Only active while an overlay is open — gameplay keys untouched. ---
+  const kbStack = [];
+  const kbTop = () => kbStack[kbStack.length - 1];
+  function kbPaint(idx) {
+    const m = kbTop();
+    if (!m || !m.items.length) return;
+    m.index = (idx + m.items.length) % m.items.length;
+    m.items.forEach((el, i) => el.classList.toggle("kbd-active", i === m.index));
+    m.items[m.index].focus({ preventScroll: true });
+  }
+  function kbItems(overlay) {
+    return Array.from(overlay.querySelectorAll(".btn, .bl-row, .presave-close"))
+      .filter((el) => el.offsetParent !== null && !el.disabled);
+  }
+  function kbOpen(overlay, push) {
+    if (push) { const t = kbTop(); if (t) t.items.forEach((el) => el.classList.remove("kbd-active")); }
+    else kbClear();
+    const items = kbItems(overlay);
+    if (!items.length) return;
+    kbStack.push({ items, index: 0 });
+    const big = items.findIndex((el) => el.classList.contains("big"));
+    const row = items.findIndex((el) => el.classList.contains("bl-row"));
+    kbPaint(big >= 0 ? big : row >= 0 ? row : 0);
+  }
+  function kbClose() {
+    const m = kbStack.pop();
+    if (m) m.items.forEach((el) => el.classList.remove("kbd-active"));
+    const t = kbTop();
+    if (t) kbPaint(t.index);
+  }
+  function kbClear() {
+    kbStack.forEach((m) => m.items.forEach((el) => el.classList.remove("kbd-active")));
+    kbStack.length = 0;
+  }
+  window.addEventListener("keydown", (e) => {
+    const m = kbTop();
+    if (!m) return;
+    const ae = document.activeElement; // let a focused text field type normally
+    if (ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA")) return;
+    if (e.key === "Enter") { e.preventDefault(); m.items[m.index].click(); }
+    else if (e.key === "ArrowDown" || e.key === "ArrowRight") { e.preventDefault(); kbPaint(m.index + 1); }
+    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); kbPaint(m.index - 1); }
   });
 
   // --- Game wiring ---
@@ -504,6 +554,7 @@ function boot() {
     livesEl.classList.add("hidden");
     overEl.classList.remove("hidden");
     if (!isVariantA) fireCtaView(); // becomes visible only now, for variant B
+    kbOpen(overEl);
   };
   // Non-fatal hit: game.js already paused + granted grace. Show the popup with
   // lives left, current score, Continue, and the presave CTA.
@@ -513,6 +564,7 @@ function boot() {
     livesLeftEl.textContent = livesLeftText(livesLeft);
     lifeLostScoreEl.textContent = String(score);
     lifeLostEl.classList.remove("hidden");
+    kbOpen(lifeLostEl);
   };
   // Lyric reveal (Task 23): game.js already paused gameplay before calling
   // this — just play the sting, pulse the score, and show the next line.
@@ -523,19 +575,23 @@ function boot() {
     scoreEl.classList.add("pulse");
     revealLineEl.textContent = LYRICS[i];
     revealPopup.classList.remove("hidden");
+    kbOpen(revealPopup);
   };
 
   revealNextBtn.addEventListener("click", () => {
+    kbClear();
     revealPopup.classList.add("hidden");
     game.resume();
   });
 
   continueBtn.addEventListener("click", () => {
+    kbClear();
     lifeLostEl.classList.add("hidden");
     game.resume(); // grace window was already armed in game.js on the hit
   });
 
   function startPlay() {
+    kbClear();
     startEl.classList.add("hidden");
     overEl.classList.add("hidden");
     lifeLostEl.classList.add("hidden");
@@ -553,12 +609,15 @@ function boot() {
     overEl.classList.add("hidden");
     leaderboardEl.classList.add("hidden");
     startEl.classList.remove("hidden");
+    kbOpen(startEl);
   });
 
   muteBtn.addEventListener("click", () => {
     const muted = audio.toggleMute();
     muteBtn.textContent = muted ? "🔇" : "🔊";
   });
+
+  kbOpen(startEl); // the start overlay is visible on load
 }
 
 if (typeof document !== "undefined") {
