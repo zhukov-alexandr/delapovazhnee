@@ -101,9 +101,20 @@ function sfxHit() {
   } catch (_) { /* WebAudio unavailable — ignore */ }
 }
 
+// Run-cycle frame manifest: char <n> (1-based file names, 0-based indices) with
+// <count> frames at /static/sprites/characters/char<n>_run_<f>.png.
+function runFramesManifest(n, count) {
+  const m = {};
+  for (let f = 0; f < count; f++) {
+    m[`char_${n - 1}_run_${f}`] = `/static/sprites/characters/char${n}_run_${f}.png`;
+  }
+  return m;
+}
+
 function boot() {
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
   loadSprites({
+    ...runFramesManifest(1, 8), // Кирилл — 8-frame run cycle
     char_0: "/static/sprites/characters/char1.png",
     char_1: "/static/sprites/characters/char2.png",
     char_2: "/static/sprites/characters/char3.png",

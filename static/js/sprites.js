@@ -193,14 +193,43 @@ const CHAR_VARIANTS = [
   { torso: PALETTE.sun, head: PALETTE.ink, trim: PALETTE.arcade },   // 3: sun/ink
 ];
 
-// Procedural pixel runner with a slight run bob driven by t. charIndex (0-3)
-// selects one of 4 visually distinct palette variants.
+// Run-cycle animation: boot.js loads per-frame PNGs as images["char_<i>_run_<f>"].
+// On the ground the cycle advances at RUN_FPS (driven by the game clock `t`,
+// which game.js freezes on pause — the animation freezes with it); airborne it
+// holds AIR_FRAME (the stride-apex pose reads as a jump).
+const RUN_FPS = 12;
+const AIR_FRAME = 0;
+
+function runnerFrames(charIndex) {
+  const frames = [];
+  for (let f = 0; images["char_" + charIndex + "_run_" + f]; f++) {
+    frames.push(images["char_" + charIndex + "_run_" + f]);
+  }
+  return frames;
+}
+
+// Runner: animated frames when loaded, else a single PNG, else the procedural
+// pixel figure with a slight run bob. charIndex (0-3) picks the character.
 export function drawRunner(ctx, runner, t, charIndex = 0) {
   ctx.imageSmoothingEnabled = false;
   const w = GAME.RUNNER_W;
   const h = GAME.RUNNER_H;
   const x = GAME.RUNNER_X;
   const y = runner.y - h;
+
+  // Frame animation (preferred): bottom-anchored, full box height, width from
+  // the frame's aspect (the art may overflow the 34px collision box a little —
+  // cosmetic only). No procedural bob: vertical motion is baked into frames.
+  const frames = runnerFrames(charIndex);
+  if (frames.length) {
+    const img = runner.onGround
+      ? frames[Math.floor(t * RUN_FPS) % frames.length]
+      : frames[Math.min(AIR_FRAME, frames.length - 1)];
+    const dw = h * (img.width / img.height);
+    ctx.drawImage(img, px(x + w / 2 - dw / 2), px(y), dw, h);
+    return;
+  }
+
   const bob = runner.onGround ? Math.round(Math.sin(t * 12) * 2) : 0;
 
   if (images["char_" + charIndex]) {
