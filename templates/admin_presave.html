@@ -92,12 +92,24 @@
           {% if d.leader %}Лидирует <b>Вариант {{ d.leader }}</b>{% else %}Пока паритет{% endif %}
         </p>
         {% if d.prob_b_beats_a is not none %}
-          <p>Вероятность, что B лучше A: <b>{{ '%.0f'|format(d.prob_b_beats_a * 100) }}%</b>
-             &middot; точный тест Фишера: p={{ '%.3f'|format(d.fisher_p) }}</p>
+          <p>Вероятность, что B лучше A: <b>{{ '%.0f'|format(d.prob_b_beats_a * 100) }}%</b></p>
+          <p>точный тест Фишера: p={{ '%.3f'|format(d.fisher_p) }}
+             {% if d.t_test %}&middot; t-тест (Уэлча): p={{ '%.3f'|format(d.t_test.p) }}{% else %}&middot; t-тест: —{% endif %}</p>
           <p class="muted">При малом трафике выводы делайте осторожно.</p>
         {% else %}
           <p class="muted">Данных пока недостаточно для сравнения</p>
         {% endif %}
+      </section>
+
+      <section class="card danger-card">
+        <h2 class="card-title">Управление тестом</h2>
+        {% if reset %}<div class="notice">Тест сброшен — все результаты обнулены</div>{% endif %}
+        <p class="muted">Удаляет все A/B-события (показы, клики, пресейвы, игры). Оба теста начнутся с нуля.</p>
+        <form method="post" action="/admin/events/reset"
+              onsubmit="return confirm('Начать тест заново? Все A/B-результаты будут удалены безвозвратно.');">
+          <input type="hidden" name="next" value="/admin/presave">
+          <button type="submit" class="btn btn-danger">Начать тест заново</button>
+        </form>
       </section>
 
     </main>

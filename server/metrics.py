@@ -51,6 +51,77 @@ def fisher_exact_two_sided(a: int, b: int, c: int, d: int) -> float:
     return min(1.0, total)
 
 
+def _betacf(a: float, b: float, x: float) -> float:
+    """Continued fraction for the incomplete beta (Numerical Recipes betacf)."""
+    MAXIT, EPS, FPMIN = 300, 1e-14, 1e-300
+    qab, qap, qam = a + b, a + 1.0, a - 1.0
+    c = 1.0
+    d = 1.0 - qab * x / qap
+    if abs(d) < FPMIN:
+        d = FPMIN
+    d = 1.0 / d
+    h = d
+    for m in range(1, MAXIT + 1):
+        m2 = 2 * m
+        aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+        d = 1.0 + aa * d
+        if abs(d) < FPMIN:
+            d = FPMIN
+        c = 1.0 + aa / c
+        if abs(c) < FPMIN:
+            c = FPMIN
+        d = 1.0 / d
+        h *= d * c
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+        d = 1.0 + aa * d
+        if abs(d) < FPMIN:
+            d = FPMIN
+        c = 1.0 + aa / c
+        if abs(c) < FPMIN:
+            c = FPMIN
+        d = 1.0 / d
+        de = d * c
+        h *= de
+        if abs(de - 1.0) < EPS:
+            break
+    return h
+
+
+def _betai(a: float, b: float, x: float) -> float:
+    """Regularized incomplete beta I_x(a, b) — stdlib-only, deterministic."""
+    if x <= 0.0:
+        return 0.0
+    if x >= 1.0:
+        return 1.0
+    front = exp(a * log(x) + b * log(1.0 - x) - _log_beta(a, b))
+    if x < (a + 1.0) / (a + b + 2.0):
+        return front * _betacf(a, b, x) / a
+    return 1.0 - front * _betacf(b, a, 1.0 - x) / b
+
+
+def welch_t_test(n_a: int, x_a: int, n_b: int, x_b: int):
+    """Welch's two-sample t-test on the per-session conversion (0/1) samples.
+
+    Each session is a Bernoulli trial (converted or not); the test compares the
+    two conversion means. Returns {"t", "df", "p"} (p two-sided) or None when it
+    can't be computed (a group has <2 sessions, or neither group has any variance).
+    """
+    if n_a < 2 or n_b < 2:
+        return None
+    pa, pb = x_a / n_a, x_b / n_b
+    va = pa * (1.0 - pa) * n_a / (n_a - 1)   # sample variance of a Bernoulli sample
+    vb = pb * (1.0 - pb) * n_b / (n_b - 1)
+    se2 = va / n_a + vb / n_b
+    if se2 <= 0.0:
+        return None
+    t = (pa - pb) / (se2 ** 0.5)
+    da = (va / n_a) ** 2 / (n_a - 1)
+    db = (vb / n_b) ** 2 / (n_b - 1)
+    df = se2 * se2 / (da + db) if (da + db) > 0 else float(n_a + n_b - 2)
+    p = _betai(df / 2.0, 0.5, df / (df + t * t))   # two-sided p for Student's t
+    return {"t": t, "df": df, "p": min(1.0, max(0.0, p))}
+
+
 def _variant_stats(conn, v: str) -> dict:
     row = conn.execute(
         """
@@ -122,6 +193,10 @@ def compute_presave_dashboard(conn) -> dict:
         nb = max(0, b["cta_view_sessions"] - b["presave_done_sessions"])
         fisher_p = fisher_exact_two_sided(a["presave_done_sessions"], na,
                                           b["presave_done_sessions"], nb)
+    t_test = None
+    if enough:
+        t_test = welch_t_test(a["cta_view_sessions"], a["presave_done_sessions"],
+                              b["cta_view_sessions"], b["presave_done_sessions"])
     leader = None
     if a["cvr"] != b["cvr"]:
         leader = "A" if a["cvr"] > b["cvr"] else "B"
@@ -130,6 +205,7 @@ def compute_presave_dashboard(conn) -> dict:
         "leader": leader,
         "prob_b_beats_a": prob_b,   # None until both variants have CTA views
         "fisher_p": fisher_p,
+        "t_test": t_test,
         "enough_data": enough,
     }
 
@@ -146,6 +222,10 @@ def compute_dashboard(conn) -> dict:
         nb = max(0, b["cta_view_sessions"] - b["cta_click_sessions"])
         fisher_p = fisher_exact_two_sided(a["cta_click_sessions"], na,
                                           b["cta_click_sessions"], nb)
+    t_test = None
+    if enough:
+        t_test = welch_t_test(a["cta_view_sessions"], a["cta_click_sessions"],
+                              b["cta_view_sessions"], b["cta_click_sessions"])
     leader = None
     if a["cvr"] != b["cvr"]:
         leader = "A" if a["cvr"] > b["cvr"] else "B"
@@ -155,5 +235,6 @@ def compute_dashboard(conn) -> dict:
         "leader": leader,
         "prob_b_beats_a": prob_b,   # None until both variants have CTA views
         "fisher_p": fisher_p,
+        "t_test": t_test,
         "enough_data": enough,
     }

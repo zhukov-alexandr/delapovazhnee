@@ -33,6 +33,16 @@
           <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
       </section>
+
+      <section class="card danger-card">
+        <h2 class="card-title">Таблица рекордов</h2>
+        {% if reset %}<div class="notice">Рекорды обнулены</div>{% endif %}
+        <p class="muted">Удаляет все сохранённые результаты из таблицы лидеров.</p>
+        <form method="post" action="/admin/scores/reset"
+              onsubmit="return confirm('Обнулить ВСЕ рекорды? Таблица лидеров будет очищена безвозвратно.');">
+          <button type="submit" class="btn btn-danger">Обнулить все рекорды</button>
+        </form>
+      </section>
     </main>
   </div>
 

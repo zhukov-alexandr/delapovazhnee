@@ -36,7 +36,8 @@ def create_app(settings: Settings) -> FastAPI:
     def game_page(request: Request):
         sid, variant, is_new = resolve(request)
         resp = templates.TemplateResponse(
-            request, "game.html", {"variant": variant, "sid": sid})
+            request, "game.html",
+            {"variant": variant, "sid": sid, "build": settings.app_version})
         if is_new:
             resp.set_cookie(SID_COOKIE, sid, max_age=COOKIE_MAX_AGE, samesite="lax")
             resp.set_cookie(VARIANT_COOKIE, variant, max_age=COOKIE_MAX_AGE, samesite="lax")

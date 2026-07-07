@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="build" content="{{ build }}">
   <title>Дела поважнее — беги по пляжу</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet:wght@400;700&family=VT323&display=swap">
-  <link rel="stylesheet" href="/static/css/game.css">
+  <!-- ?v={{ build }} busts the cache on every deploy (build = deploy tag) so a new
+       version loads without a hard refresh. -->
+  <link rel="stylesheet" href="/static/css/game.css?v={{ build }}">
 </head>
 <body>
   <div id="stage">
+    <span class="build-tag" aria-hidden="true">{{ build }}</span>
     <canvas id="game"></canvas>
 
     <div id="hud" class="hud hidden"><span id="score">0</span></div>
@@ -144,7 +148,7 @@
     </div>
   </div>
 
-  <script type="module" src="/static/js/selftest.js"></script>
-  <script type="module" src="/static/js/boot.js"></script>
+  <script type="module" src="/static/js/selftest.js?v={{ build }}"></script>
+  <script type="module" src="/static/js/boot.js?v={{ build }}"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@ from fastapi.responses import RedirectResponse, HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
 from server.config import Settings
-from server.db import get_conn, fetch_all_events
+from server.db import get_conn, fetch_all_events, clear_scores, clear_events
 from server.metrics import compute_dashboard, compute_presave_dashboard
 from server.settings import get_settings, set_settings
 
@@ -40,7 +40,7 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
         return RedirectResponse("/admin/login", status_code=303)
 
     @router.get("", response_class=HTMLResponse)
-    def dashboard(request: Request):
+    def dashboard(request: Request, reset: int = 0):
         if not is_admin(request):
             return RedirectResponse("/admin/login", status_code=302)
         conn = get_conn(settings.db_path)
@@ -49,10 +49,10 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
         finally:
             conn.close()
         return templates.TemplateResponse(
-            request, "admin.html", {"d": data, "active": "ab"})
+            request, "admin.html", {"d": data, "active": "ab", "reset": bool(reset)})
 
     @router.get("/presave", response_class=HTMLResponse)
-    def presave_dashboard(request: Request):
+    def presave_dashboard(request: Request, reset: int = 0):
         if not is_admin(request):
             return RedirectResponse("/admin/login", status_code=302)
         conn = get_conn(settings.db_path)
@@ -61,10 +61,36 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
         finally:
             conn.close()
         return templates.TemplateResponse(
-            request, "admin_presave.html", {"d": data, "active": "presave"})
+            request, "admin_presave.html",
+            {"d": data, "active": "presave", "reset": bool(reset)})
+
+    # Reset the A/B test: wipe all analytics events (both dashboards read them).
+    @router.post("/events/reset")
+    def events_reset(request: Request, next: str = Form(default="/admin")):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            clear_events(conn)
+        finally:
+            conn.close()
+        target = next if next in ("/admin", "/admin/presave") else "/admin"
+        return RedirectResponse(target + "?reset=1", status_code=303)
+
+    # Reset the leaderboard: wipe all saved scores.
+    @router.post("/scores/reset")
+    def scores_reset(request: Request):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            clear_scores(conn)
+        finally:
+            conn.close()
+        return RedirectResponse("/admin/settings?reset=1", status_code=303)
 
     @router.get("/settings", response_class=HTMLResponse)
-    def settings_form(request: Request, saved: int = 0):
+    def settings_form(request: Request, saved: int = 0, reset: int = 0):
         if not is_admin(request):
             return RedirectResponse("/admin/login", status_code=302)
         conn = get_conn(settings.db_path)
@@ -74,7 +100,7 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
             conn.close()
         return templates.TemplateResponse(
             request, "admin_settings.html",
-            {"cfg": cfg, "saved": bool(saved), "active": "settings"})
+            {"cfg": cfg, "saved": bool(saved), "reset": bool(reset), "active": "settings"})
 
     @router.post("/settings")
     def settings_save(

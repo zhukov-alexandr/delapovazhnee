@@ -53,6 +53,8 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            APP_VERSION=${{ github.ref_name }}
           tags: |
             ${{ steps.img.outputs.name }}:${{ github.ref_name }}
             ${{ steps.img.outputs.name }}:latest

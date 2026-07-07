@@ -153,6 +153,20 @@ p {
 
 .hidden { display: none !important; }
 
+/* Deploy tag, faint in the top-left corner (build = the v* tag baked at deploy). */
+.build-tag {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 4px);
+  left: calc(env(safe-area-inset-left) + 6px);
+  z-index: 30;
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1;
+  color: rgba(255, 244, 226, 0.28);
+  pointer-events: none;
+  user-select: none;
+}
+
 .mute {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 8px);

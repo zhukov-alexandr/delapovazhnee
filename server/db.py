@@ -84,3 +84,15 @@ def top_scores(conn, limit: int = 10) -> list:
         "SELECT name, score FROM scores ORDER BY score DESC, id ASC LIMIT ?",
         (limit,),
     ).fetchall()
+
+
+def clear_scores(conn) -> None:
+    """Wipe the leaderboard (admin: «обнулить все рекорды»)."""
+    conn.execute("DELETE FROM scores")
+    conn.commit()
+
+
+def clear_events(conn) -> None:
+    """Wipe all analytics events (admin «начать тест заново» — resets both A/B tests)."""
+    conn.execute("DELETE FROM events")
+    conn.commit()

@@ -13,6 +13,11 @@ RUN pip install -r requirements.txt
 # Код приложения (что НЕ копируется — см. .dockerignore: секреты, БД, тесты, ассеты-биннарники).
 COPY . .
 
+# Версия сборки = деплой-тег (build-arg из CI). Читается приложением (APP_VERSION):
+# служит cache-buster'ом (?v=) и показывается в углу страницы.
+ARG APP_VERSION=dev
+ENV APP_VERSION=$APP_VERSION
+
 # Непривилегированный пользователь; каталог БД под именованный volume.
 RUN useradd -m app && mkdir -p /app/db && chown -R app /app
 USER app

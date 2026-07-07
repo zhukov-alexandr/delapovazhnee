@@ -15,6 +15,7 @@ class Settings:
     admin_pass: str
     secret_key: str
     public_base_url: str | None = None
+    app_version: str = "dev"   # deploy tag (APP_VERSION, baked at build): cache-buster + shown in-page
 
 
 def load_settings() -> Settings:
@@ -27,4 +28,5 @@ def load_settings() -> Settings:
         admin_pass=os.getenv("ADMIN_PASS", ""),
         secret_key=os.getenv("SECRET_KEY", "dev-insecure-key"),
         public_base_url=os.getenv("PUBLIC_BASE_URL") or None,
+        app_version=os.getenv("APP_VERSION") or "dev",
     )

@@ -114,6 +114,17 @@ input:focus-visible {
 
 .btn-block { width: 100%; justify-content: center; }
 
+.btn-danger {
+  background: transparent;
+  border-color: #d9534f;
+  color: #e06a66;
+}
+.btn-danger:hover { background: #d9534f; border-color: #d9534f; color: #fff; }
+
+/* Destructive-action cards (reset test / reset scores). */
+.danger-card { border-color: rgba(217, 83, 79, 0.4); }
+.danger-card .card-title { color: #e06a66; }
+
 /* --- Page layout --- */
 .page-title {
   font-size: 22px;
