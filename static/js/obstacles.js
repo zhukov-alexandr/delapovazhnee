@@ -29,10 +29,12 @@ export function createGameState(speedMult = 1) {
   };
 }
 
-// Balanced randomized gap (seconds) that tightens slightly as speed grows.
+// Gap (seconds) to the next obstacle: a speed-dependent nominal spacing (tightens
+// as speed grows; nominal = the previous formula's average), randomized to
+// 70%–130% of that nominal so the distance between obstacles varies.
 function nextGap(speed) {
-  const base = Math.max(0.9, 1.8 - (speed - GAME.RUN_SPEED) / 500);
-  return base + Math.random() * 0.9;
+  const nominal = Math.max(1.35, 2.25 - (speed - GAME.RUN_SPEED) / 500);
+  return nominal * (0.7 + Math.random() * 0.6);
 }
 
 // Pick a random obstacle sprite from GAME.OBSTACLES and spawn it ground-anchored.

@@ -45,7 +45,13 @@ export const GAME = {
     { file: "char6.png", aspect: 0.78 }, // самокат
     { file: "char7.png", aspect: 1.28, scale: 1.5 }, // конная полиция — крупнее
     { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
-    { file: "char9.png", aspect: 0.96 }, // повар с пловом
+    { file: "char9.png", aspect: 0.96, scale: 1.15 }, // повар с пловом — чуть крупнее
+    { file: "char10.png", aspect: 2.25 }, // газель с арбузами
+    { file: "char11.png", aspect: 2.23, scale: 2.0 }, // пляжные зонты + афиша — крупная
+    { file: "char12.png", aspect: 1.00 }, // бочка кваса
+    { file: "char13.png", aspect: 1.05, scale: 1.8 }, // знак «купаться запрещено» — крупный
+    { file: "char14.png", aspect: 1.68 }, // мангал с шашлыком
+    { file: "char15.png", aspect: 0.76, scale: 1.8 }, // пляжная кабинка — крупная
   ],
 };
 
