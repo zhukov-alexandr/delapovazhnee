@@ -33,6 +33,19 @@ export const GAME = {
   MAX_LIVES: 3,          // hearts; each obstacle hit costs one life (game.js)
   INVULN_TIME: 1.4,      // seconds of pass-through grace after losing a life, so
                          // resuming doesn't instantly re-hit the same obstacle
+  OBSTACLE_H: 52,        // obstacle collision/draw height (single-jump clearable)
+  OBSTACLE_MAX_W: 60,    // width cap: wider sprites shrink to keep the widest fair
+  // Obstacle sprites (static/sprites/obstacles/), each drawn OBSTACLE_H tall with
+  // width from its aspect (capped by OBSTACLE_MAX_W). One is picked at random per
+  // spawn. TO ADD MORE: drop a processed PNG in obstacles/ and append an entry
+  // here — boot.js loads them as obs_0..N automatically from this list.
+  OBSTACLES: [
+    { file: "char5.png", aspect: 0.31 }, // моноциклист
+    { file: "char6.png", aspect: 0.78 }, // самокат
+    { file: "char7.png", aspect: 1.28 }, // конная полиция
+    { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
+    { file: "char9.png", aspect: 0.96 }, // повар с пловом
+  ],
 };
 
 // Presave modal (Task 26): band.link identifiers + the streaming services

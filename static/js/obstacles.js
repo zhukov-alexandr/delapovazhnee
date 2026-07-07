@@ -1,8 +1,18 @@
 // Pure obstacle system: spawning, scrolling, collision, scoring. No rendering.
 import { GAME } from "./config.js";
 
-const SINGLE = { w: 44, h: 26 };   // sunbather on a mat — clear with single jump
-const UMBRELLA = { w: 52, h: 78 };  // sunbather with umbrella — needs double jump
+// Collision box for an obstacle sprite of the given aspect: OBSTACLE_H tall with
+// width from the aspect, but if that width exceeds OBSTACLE_MAX_W the whole box
+// shrinks (keeping the aspect) so the widest sprites stay jumpable.
+function obstacleBox(aspect) {
+  let h = GAME.OBSTACLE_H;
+  let w = Math.round(h * aspect);
+  if (w > GAME.OBSTACLE_MAX_W) {
+    w = GAME.OBSTACLE_MAX_W;
+    h = Math.round(w / aspect);
+  }
+  return { w, h };
+}
 
 // speedMult scales both the starting speed and the ramp cap (server-tunable
 // via /api/config, Task 21/23). Defaults to 1 so existing callers/tests are
@@ -24,12 +34,15 @@ function nextGap(speed) {
   return base + Math.random() * 0.9;
 }
 
+// Pick a random obstacle sprite from GAME.OBSTACLES and spawn it ground-anchored.
+// `sprite` is the images[] key (obs_<index>) the renderer draws.
 function spawn(state, worldW) {
-  const umbrella = Math.random() < 0.35;
-  const dim = umbrella ? UMBRELLA : SINGLE;
+  const kinds = GAME.OBSTACLES;
+  const j = Math.floor(Math.random() * kinds.length);
+  const { w, h } = obstacleBox(kinds[j].aspect);
   state.obstacles.push({
-    x: worldW + 20, y: GAME.GROUND_Y - dim.h, w: dim.w, h: dim.h,
-    type: umbrella ? "umbrella" : "single", passed: false,
+    x: worldW + 20, y: GAME.GROUND_Y - h, w, h,
+    sprite: "obs_" + j, passed: false,
   });
 }
 

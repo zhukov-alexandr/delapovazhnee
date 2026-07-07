@@ -312,8 +312,16 @@ function drawUmbrellaObstacle(ctx, o) {
   ctx.restore();
 }
 
-// single = sunbather on a mat, umbrella = taller with parasol.
+// Obstacle sprite (o.sprite -> images["obs_<n>"]), bottom-anchored in its box.
+// The art is detailed (downscaled from high-res), so smoothing is ON for a clean
+// scale. Falls back to the procedural sunbather/umbrella if the image is missing.
 export function drawObstacle(ctx, o) {
+  const img = o.sprite && images[o.sprite];
+  if (img) {
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(img, px(o.x), px(o.y), o.w, o.h);
+    return;
+  }
   ctx.imageSmoothingEnabled = false;
   if (o.type === "umbrella") {
     drawUmbrellaObstacle(ctx, o);

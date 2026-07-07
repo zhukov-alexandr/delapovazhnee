@@ -89,6 +89,15 @@ function runFramesManifest(n, count) {
   return m;
 }
 
+// Obstacle sprites: obs_0..N from GAME.OBSTACLES (extensible — add a file there).
+function obstacleManifest() {
+  const m = {};
+  GAME.OBSTACLES.forEach((o, i) => {
+    m[`obs_${i}`] = `/static/sprites/obstacles/${o.file}`;
+  });
+  return m;
+}
+
 function boot() {
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
   loadSprites({
@@ -96,6 +105,7 @@ function boot() {
     ...runFramesManifest(2, 6), // Никита
     ...runFramesManifest(3, 6), // Саша
     ...runFramesManifest(4, 6), // Костя
+    ...obstacleManifest(),
     item_0: "/static/sprites/items/item1.png",
     item_1: "/static/sprites/items/item2.png",
     item_2: "/static/sprites/items/item3.png",
