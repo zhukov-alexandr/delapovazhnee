@@ -4,7 +4,7 @@ import { readSession, markVisited, createEmitter } from "./ab.js";
 import { Game } from "./game.js";
 import { createAudio } from "./audio.js";
 import { getBest, updateBest, getChar, setChar } from "./prefs.js";
-import { drawRunner, loadSprites } from "./sprites.js";
+import { loadSprites } from "./sprites.js";
 import { GAME, PRESAVE } from "./config.js";
 import { LYRICS } from "./lyrics.js";
 
@@ -30,28 +30,6 @@ function addPresaved(store, id) {
 
 // Server-tunable defaults (Task 21/23), used if GET /api/config fails.
 const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0 };
-
-// Placeholder tile art (before real PNGs exist): render the same procedural
-// runner sprites.drawRunner() draws in-game, scaled/centered into the tile's
-// small canvas. A fake "runner" (just {y, onGround}) is enough since
-// drawRunner only reads those two fields.
-function drawRunnerPreview(ctx, charIndex, w, h) {
-  ctx.clearRect(0, 0, w, h);
-  ctx.save();
-  // drawRunner always paints a GAME.RUNNER_W x GAME.RUNNER_H box with its
-  // top-left at (GAME.RUNNER_X, runner.y - RUNNER_H); undo that fixed
-  // position and re-center+scale the box into this small tile canvas.
-  const scale = (Math.min(w, h) * 0.85) / Math.max(GAME.RUNNER_W, GAME.RUNNER_H);
-  const boxLeft = GAME.RUNNER_X;
-  const boxTop = 0; // runner.y === RUNNER_H below puts the box top at y=0
-  ctx.translate(
-    w / 2 - scale * (boxLeft + GAME.RUNNER_W / 2),
-    h / 2 - scale * (boxTop + GAME.RUNNER_H / 2)
-  );
-  ctx.scale(scale, scale);
-  drawRunner(ctx, { y: GAME.RUNNER_H, onGround: true }, 0, charIndex);
-  ctx.restore();
-}
 
 // Short WebAudio blip on catching a collectible. Optional/best-effort: any
 // failure (no AudioContext, autoplay-blocked) is swallowed silently.
@@ -178,14 +156,6 @@ function boot() {
 
   for (const tile of charTiles) {
     const idx = Number(tile.dataset.char);
-    const canvas = tile.querySelector("canvas");
-    if (canvas) {
-      const tileCtx = canvas.getContext("2d");
-      tileCtx.imageSmoothingEnabled = false;
-      // Placeholder art before PNGs exist: draw the same procedural runner
-      // used in-game, centered in the tile.
-      drawRunnerPreview(tileCtx, idx, canvas.width, canvas.height);
-    }
     tile.addEventListener("click", () => {
       selectChar(idx);
       game.charIndex = idx;

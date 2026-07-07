@@ -245,26 +245,34 @@ p {
 }
 
 .char-tile {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+  width: clamp(52px, 15vw, 64px);
   min-height: 44px;
-  padding: 3px;
+  padding: 4px;
   border: 3px solid var(--grape);
   border-radius: 10px;
   background: var(--night);
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   transition: border-color 0.15s ease, transform 0.1s ease;
 }
 
-.char-tile canvas {
+.char-tile img {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
+}
+
+.char-tile-name {
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: clamp(9px, 2vw, 11px);
+  color: var(--foam);
+  line-height: 1;
 }
 
 .char-tile:hover { border-color: var(--sand); }
