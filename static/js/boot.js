@@ -457,8 +457,23 @@ function boot() {
   showScoresOver.addEventListener("click", openLeaderboard);
   leaderboardClose.addEventListener("click", () => { leaderboardEl.classList.add("hidden"); kbClose(); });
 
+  // Only letters/digits/_/- are allowed in a name — strip anything else as the
+  // player types (the server enforces this too; here it's just instant UX).
+  const nameError = document.getElementById("name-error");
+  function showNameError(msg) {
+    if (!nameError) return;
+    nameError.textContent = msg || "";
+    nameError.classList.toggle("hidden", !msg);
+  }
+  nameInput.addEventListener("input", () => {
+    const cleaned = nameInput.value.replace(/[^\p{L}\p{N}_-]/gu, "");
+    if (cleaned !== nameInput.value) nameInput.value = cleaned;
+    showNameError("");
+  });
+
   saveScoreBtn.addEventListener("click", () => {
     const name = (nameInput.value || "").trim().slice(0, 24);
+    showNameError("");
     saveScoreBtn.disabled = true;
     saveScoreBtn.textContent = "Сохранение…";
     fetch("/api/score", {
@@ -466,15 +481,21 @@ function boot() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, score: lastGameScore }),
     })
-      .then((r) => {
-        if (!r.ok) throw new Error("save failed");
+      .then(async (r) => {
+        if (r.status === 400) {
+          // Rejected name (bad chars / blocklist): show the server's reason.
+          const reason = await r.json().then((d) => d.detail).catch(() => "");
+          throw new Error(reason || "Недопустимое имя");
+        }
+        if (!r.ok) throw new Error("");
         localStorage.setItem(NAME_KEY, name);
         saveScoreBtn.textContent = "Сохранено ✓";
         openLeaderboard();
       })
-      .catch(() => {
+      .catch((e) => {
         saveScoreBtn.disabled = false;
         saveScoreBtn.textContent = "Сохранить результат";
+        if (e && e.message) showNameError(e.message);
       });
   });
 

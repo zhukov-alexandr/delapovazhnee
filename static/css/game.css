@@ -573,6 +573,12 @@ p {
 }
 .name-input::placeholder { color: rgba(255, 244, 226, 0.5); }
 .name-input:focus { outline: none; border-color: var(--arcade); }
+.name-error {
+  color: var(--flare);
+  font-size: clamp(12px, 2.6vw, 14px);
+  margin: 0 0 clamp(8px, 1.6vh, 12px);
+  max-width: 32ch;
+}
 .save-score .btn { flex: 1 1 auto; white-space: nowrap; }
 
 /* Leaderboard (top 10) modal — sunset-styled card. */

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from server.config import Settings
 from server.db import get_conn, insert_event, insert_score, top_scores
+from server.moderation import check_name
 from server.settings import get_settings
 
 Variant = Literal["A", "B"]
@@ -52,6 +53,9 @@ def build_api_router(settings: Settings) -> APIRouter:
     # redeploys via the dbdata volume, same as events). ---
     @router.post("/api/score")
     def post_score(s: ScoreIn):
+        ok, reason = check_name(s.name)
+        if not ok:
+            raise HTTPException(status_code=400, detail=reason)
         name = (s.name or "").strip()[:24] or "Аноним"
         conn = _conn()
         try:
