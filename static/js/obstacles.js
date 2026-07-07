@@ -3,15 +3,16 @@ import { GAME } from "./config.js";
 
 // Collision box for an obstacle sprite of the given aspect: OBSTACLE_H tall with
 // width from the aspect, but if that width exceeds OBSTACLE_MAX_W the whole box
-// shrinks (keeping the aspect) so the widest sprites stay jumpable.
-function obstacleBox(aspect) {
+// shrinks (keeping the aspect) so the widest sprites stay jumpable. `scale`
+// (default 1) multiplies the final box for deliberately bigger obstacles.
+function obstacleBox(aspect, scale = 1) {
   let h = GAME.OBSTACLE_H;
   let w = Math.round(h * aspect);
   if (w > GAME.OBSTACLE_MAX_W) {
     w = GAME.OBSTACLE_MAX_W;
     h = Math.round(w / aspect);
   }
-  return { w, h };
+  return { w: Math.round(w * scale), h: Math.round(h * scale) };
 }
 
 // speedMult scales both the starting speed and the ramp cap (server-tunable
@@ -39,7 +40,7 @@ function nextGap(speed) {
 function spawn(state, worldW) {
   const kinds = GAME.OBSTACLES;
   const j = Math.floor(Math.random() * kinds.length);
-  const { w, h } = obstacleBox(kinds[j].aspect);
+  const { w, h } = obstacleBox(kinds[j].aspect, kinds[j].scale);
   state.obstacles.push({
     x: worldW + 20, y: GAME.GROUND_Y - h, w, h,
     sprite: "obs_" + j, passed: false,

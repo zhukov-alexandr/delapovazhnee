@@ -39,10 +39,11 @@ export const GAME = {
   // width from its aspect (capped by OBSTACLE_MAX_W). One is picked at random per
   // spawn. TO ADD MORE: drop a processed PNG in obstacles/ and append an entry
   // here — boot.js loads them as obs_0..N automatically from this list.
+  // `scale` (optional, default 1) multiplies the final box for that obstacle.
   OBSTACLES: [
     { file: "char5.png", aspect: 0.31 }, // моноциклист
     { file: "char6.png", aspect: 0.78 }, // самокат
-    { file: "char7.png", aspect: 1.28 }, // конная полиция
+    { file: "char7.png", aspect: 1.28, scale: 1.5 }, // конная полиция — крупнее
     { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
     { file: "char9.png", aspect: 0.96 }, // повар с пловом
   ],

@@ -153,16 +153,21 @@ function drawSea(ctx, cam, w) {
     ctx.drawImage(images.sea, 0, SEA_Y, w, SEA_H);
     return;
   }
-  const offset = ((cam.x % 40) + 40) % 40;
+  const offset = ((cam.x % 64) + 64) % 64;
   ctx.fillStyle = PALETTE.grape;
   ctx.fillRect(0, px(SEA_Y), w, SEA_H);
-  // Road dashes: locked to the full cam.x rate so they scroll in step with the
-  // runner, the obstacles and the sand (this band is the ground the player runs
-  // on — a slower parallax factor made it crawl out of sync with everything).
+  // Road dashes, scrolled at the full cam.x rate but at SUB-PIXEL x (no px snap):
+  // snapping made the whole dash row jump a pixel at once, which read as a harsh
+  // strobe at speed. Sub-pixel edges anti-alias into a smooth slide instead.
+  // Fewer, softer dashes (wider gap, slight transparency) further calm it.
+  ctx.save();
   ctx.fillStyle = PALETTE.foam;
-  for (let x = -offset; x < w; x += 40) {
-    ctx.fillRect(px(x), px(SEA_Y + 6), 16, 2);
+  ctx.globalAlpha = 0.8;
+  const dashY = px(SEA_Y + 6);
+  for (let x = -offset; x < w; x += 64) {
+    ctx.fillRect(x, dashY, 22, 3);
   }
+  ctx.restore();
 }
 
 function drawSand(ctx, cam, w, h) {
@@ -173,13 +178,16 @@ function drawSand(ctx, cam, w, h) {
   const y = SEA_Y + SEA_H;
   ctx.fillStyle = PALETTE.sand;
   ctx.fillRect(0, px(y), w, px(h - y));
-  // Fastest parallax layer: sand speckle scrolls at full cam.x rate.
-  const offset = ((cam.x % 24) + 24) % 24;
-  ctx.fillStyle = PALETTE.ink;
+  // Sand speckle: sparse + faint + sub-pixel x. The old dense (24px) grid at 0.15
+  // alpha, snapped to whole pixels, was the worst of the shimmer — a fine
+  // high-contrast field strobing as it scrolled. This is barely-there texture.
+  const offset = ((cam.x % 64) + 64) % 64;
   ctx.save();
-  ctx.globalAlpha = 0.15;
-  for (let x = -offset; x < w; x += 24) {
-    ctx.fillRect(px(x), px(y + 10), 4, 4);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.globalAlpha = 0.07;
+  const dotY = px(y + 10);
+  for (let x = -offset; x < w; x += 64) {
+    ctx.fillRect(x, dotY, 5, 5);
   }
   ctx.restore();
 }
