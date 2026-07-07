@@ -197,7 +197,7 @@ const CHAR_VARIANTS = [
 // On the ground the cycle advances at RUN_FPS (driven by the game clock `t`,
 // which game.js freezes on pause — the animation freezes with it); airborne it
 // holds AIR_FRAME (the stride-apex pose reads as a jump).
-const RUN_FPS = 12;
+const RUN_FPS = 8;
 const AIR_FRAME = 0;
 
 function runnerFrames(charIndex) {

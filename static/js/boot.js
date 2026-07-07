@@ -114,7 +114,7 @@ function runFramesManifest(n, count) {
 function boot() {
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
   loadSprites({
-    ...runFramesManifest(1, 8), // Кирилл — 8-frame run cycle
+    ...runFramesManifest(1, 6), // Кирилл — 6-frame run cycle
     char_0: "/static/sprites/characters/char1.png",
     char_1: "/static/sprites/characters/char2.png",
     char_2: "/static/sprites/characters/char3.png",
