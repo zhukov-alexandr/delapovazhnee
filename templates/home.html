@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дела поважнее — новый сингл «19»</title>
-    <meta name="description" content="Дела поважнее — новый сингл «19», релиз 17 июля 2026. Сделай пресейв, слушай в стримингах, приходи на концерты.">
+    <title>Дела поважнее – Официальный сайт</title>
+    <meta name="description" content="Дела поважнее – новый сингл «19», релиз 17 июля 2026. Сделай пресейв, слушай в стримингах, приходи на концерты.">
     <link rel="icon" href="/static/home/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png">
     <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
@@ -90,6 +90,11 @@
       .nav__links a { font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--ink); text-decoration: none; padding-bottom: 3px; border-bottom: 2px solid transparent; }
       .nav__links a:hover { border-bottom-color: var(--crimson); }
       .nav__links a.is-play { color: var(--crimson); border-bottom-color: var(--crimson); }
+      .nav__right { display: flex; align-items: center; gap: clamp(12px, 2vw, 22px); }
+      .lang-switch { display: flex; align-items: center; gap: 2px; }
+      .lang-btn { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.03em; color: var(--muted); background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
+      .lang-btn:hover { color: var(--ink); }
+      .lang-btn.is-active { color: var(--crimson); background: rgba(179, 42, 56, 0.10); }
       .nav__toggle { display: none; width: 42px; height: 42px; border: none; background: transparent; cursor: pointer; flex-direction: column; justify-content: center; gap: 5px; align-items: flex-end; }
       .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--ink); transition: transform .2s ease, opacity .2s ease; }
       .nav--open .nav__toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -236,15 +241,22 @@
 <body>
     <nav class="nav" id="nav">
       <div class="nav__inner">
-        <a class="nav__brand" href="#top"><img src="/static/home/logo.svg" alt="Дела поважнее"></a>
-        <button class="nav__toggle" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="nav__links" id="nav-links">
-          <a href="#single">Сингл «19»</a>
-          <a href="#concerts">Концерты</a>
-          <a href="#listen">Слушать</a>
-          <a class="is-play" href="/">Играть →</a>
+        <a class="nav__brand" href="#top"><img src="/static/home/logo.svg" data-i18n-attr="alt:logo_alt" alt="Дела поважнее"></a>
+        <div class="nav__right">
+          <div class="nav__links" id="nav-links">
+            <a href="#single" data-i18n="nav_single">Сингл «19»</a>
+            <a href="#concerts" data-i18n="nav_concerts">Концерты</a>
+            <a href="#listen" data-i18n="nav_listen">Слушать</a>
+            <a class="is-play" href="/" data-i18n="nav_play">Играть →</a>
+          </div>
+          <div class="lang-switch" role="group" aria-label="Язык / Language / 语言">
+            <button type="button" class="lang-btn" data-lang="ru">RU</button>
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="zh">中文</button>
+          </div>
+          <button class="nav__toggle" data-i18n-attr="aria-label:nav_menu" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </div>
     </nav>
@@ -252,62 +264,62 @@
     <header id="top" class="screen hero">
       <div class="wrap" style="display:flex; flex-direction:column; flex:1; min-height:0;">
         <div class="hero__head">
-          <h1 class="display hero__title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span></h1>
-          <p class="hero__tag">новый сингл<b>«19»</b></p>
+          <h1 class="display hero__title" data-i18n-html="hero_title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span></h1>
+          <p class="hero__tag" data-i18n-html="hero_tag">новый сингл<b>«19»</b></p>
         </div>
-        <div class="hero__photo" role="img" aria-label="Группа «Дела поважнее»">
-          <a class="cue" href="#single">Новый сингл «19» <span class="arr">↓</span></a>
+        <div class="hero__photo" role="img" data-i18n-attr="aria-label:hero_photo_aria" aria-label="Группа «Дела поважнее»">
+          <a class="cue" href="#single" data-i18n-html="hero_cue">Новый сингл «19» <span class="arr">↓</span></a>
         </div>
       </div>
     </header>
 
     <section id="single" class="screen single">
       <div class="wrap">
-        <div class="section__eyebrow eyebrow">Пресейв</div>
+        <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Пресейв</div>
         <div class="single__grid">
           <div class="single__cover-wrap">
-            <img class="single__cover" src="/static/sprites/19_2.jpg" alt="Обложка сингла «19»">
+            <img class="single__cover" src="/static/sprites/19_2.jpg" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «19»">
           </div>
           <div>
             <div class="release-row">
-              <span class="release-date">Релиз · 17 июля 2026</span>
-              <a class="cue cue--flow cue--mobile" href="#concerts">Концерты <span class="arr">↓</span></a>
+              <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span>
+              <a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
             </div>
-            <h2 class="display single__title">Новый<br>сингл <em>«19»</em></h2>
-            <p class="single__lead">Сохрани сингл заранее — как только он выйдет 17 июля, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.</p>
+            <h2 class="display single__title" data-i18n-html="single_title">Новый<br>сингл <em>«19»</em></h2>
+            <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее — как только он выйдет 17 июля, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.</p>
             <div class="single__cta">
-              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener">Сделать пресейв</a>
-              <a class="btn btn--paper" href="/">…или сыграй и сохрани</a>
+              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener" data-i18n="btn_presave">Сделать пресейв</a>
+              <a class="btn btn--paper" href="/" data-i18n="btn_play">…или сыграй и сохрани</a>
             </div>
           </div>
         </div>
         <!-- desktop: same on-screen spot as the hero's cue (bottom-left of the screen) -->
-        <a class="cue cue--desktop" href="#concerts">Концерты <span class="arr">↓</span></a>
+        <a class="cue cue--desktop" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
       </div>
     </section>
 
     <section id="concerts" class="screen concerts">
       <div class="wrap">
-        <div class="section__eyebrow eyebrow">Концерты · презентация альбома</div>
+        <div class="section__eyebrow eyebrow" data-i18n="concerts_eyebrow">Концерты · презентация альбома</div>
         <div class="poster-grid">
           <article class="poster">
-            <img src="/static/home/poster-msk.jpg" alt="Афиша концерта в Москве, 18 ноября, Урбан">
+            <img src="/static/home/poster-msk.jpg" data-i18n-attr="alt:poster_msk_alt" alt="Афиша концерта в Москве, 18 ноября, Урбан">
             <div class="poster__meta">
               <div>
-                <div class="poster__when">18 ноября · Москва</div>
-                <div class="poster__where">Урбан · Большая Новодмитровская, 36с24</div>
+                <div class="poster__when" data-i18n="msk_when">18 ноября · Москва</div>
+                <div class="poster__where" data-i18n="msk_where">Урбан · Большая Новодмитровская, 36с24</div>
               </div>
-              <a class="poster__tix" href="https://msk.ticketscloud.org/?utm_source=website" target="_blank" rel="noopener">Билеты</a>
+              <a class="poster__tix" href="https://msk.ticketscloud.org/?utm_source=website" target="_blank" rel="noopener" data-i18n="tickets">Билеты</a>
             </div>
           </article>
           <article class="poster">
-            <img src="/static/home/poster-spb.jpg" alt="Афиша концерта в Санкт-Петербурге, 21 ноября, Севкабель Порт">
+            <img src="/static/home/poster-spb.jpg" data-i18n-attr="alt:poster_spb_alt" alt="Афиша концерта в Санкт-Петербурге, 21 ноября, Севкабель Порт">
             <div class="poster__meta">
               <div>
-                <div class="poster__when">21 ноября · Санкт-Петербург</div>
-                <div class="poster__where">Севкабель Порт · Кожевенная линия, 34</div>
+                <div class="poster__when" data-i18n="spb_when">21 ноября · Санкт-Петербург</div>
+                <div class="poster__where" data-i18n="spb_where">Севкабель Порт · Кожевенная линия, 34</div>
               </div>
-              <a class="poster__tix" href="https://spb.ticketscloud.org/?utm_source=website" target="_blank" rel="noopener">Билеты</a>
+              <a class="poster__tix" href="https://spb.ticketscloud.org/?utm_source=website" target="_blank" rel="noopener" data-i18n="tickets">Билеты</a>
             </div>
           </article>
         </div>
@@ -316,39 +328,143 @@
 
     <section id="listen" class="screen listen">
       <div class="wrap">
-        <div class="section__eyebrow eyebrow">Ссылки</div>
+        <div class="section__eyebrow eyebrow" data-i18n="listen_eyebrow">Ссылки</div>
         <div class="listen__grid">
           <div>
-            <h2 class="display listen__title">Найти<br>нас</h2>
+            <h2 class="display listen__title" data-i18n-html="listen_title">Найти<br>нас</h2>
             <img class="listen__dog" src="/static/home/dog.png" alt="">
           </div>
           <div class="listen__col">
-            <h4>Стриминги</h4>
+            <h4 data-i18n="streamings">Стриминги</h4>
             <div class="link-list">
-              <a href="https://music.yandex.ru/artist/7399424" target="_blank" rel="noopener">Яндекс Музыка</a>
+              <a href="https://music.yandex.ru/artist/7399424" target="_blank" rel="noopener" data-i18n="yandex">Яндекс Музыка</a>
               <a href="https://open.spotify.com/artist/6b5IAViTxRk32le09AIlrd" target="_blank" rel="noopener">Spotify</a>
               <a href="https://music.apple.com/ru/artist/%D0%B4%D0%B5%D0%BB%D0%B0-%D0%BF%D0%BE%D0%B2%D0%B0%D0%B6%D0%BD%D0%B5%D0%B5/1463743651" target="_blank" rel="noopener">Apple Music</a>
-              <a href="https://vk.com/artist/delapovazhnee" target="_blank" rel="noopener">VK Музыка</a>
+              <a href="https://vk.com/artist/delapovazhnee" target="_blank" rel="noopener" data-i18n="vkmusic">VK Музыка</a>
             </div>
           </div>
           <div class="listen__col">
-            <h4>Соцсети</h4>
+            <h4 data-i18n="socials">Соцсети</h4>
             <div class="link-list">
               <a href="https://t.me/delapovazhnee" target="_blank" rel="noopener">Telegram</a>
-              <a href="https://vk.com/delapovazhnee" target="_blank" rel="noopener">ВКонтакте</a>
-              <a href="https://instagram.com/delapovazhnee" target="_blank" rel="noopener">Запретграм</a>
+              <a href="https://vk.com/delapovazhnee" target="_blank" rel="noopener" data-i18n="vk">ВКонтакте</a>
+              <a href="https://instagram.com/delapovazhnee" target="_blank" rel="noopener" data-i18n="instagram">Запретграм</a>
               <a href="mailto:contact@delapovazhnee.ru">contact@delapovazhnee.ru</a>
             </div>
           </div>
         </div>
         <div class="listen__foot">
-          <span>© Дела поважнее, 2026</span>
-          <a href="/">Играть в раннер →</a>
+          <span data-i18n="footer_copy">© Дела поважнее, 2026</span>
+          <a href="/" data-i18n="footer_play">Играть в раннер →</a>
         </div>
       </div>
     </section>
 
     <script>
+      // --- i18n: RU (default) / EN / 中文. Names are transliterated (Dela
+      // povazhnee, Urban, Sevkabel Port…), not translated. Default RU content is
+      // inline in the HTML; the switcher swaps text + persists the choice. ---
+      (function () {
+        var I18N = {
+          ru: {
+            title: "Дела поважнее – Официальный сайт",
+            meta_desc: "Дела поважнее – новый сингл «19», релиз 17 июля 2026. Сделай пресейв, слушай в стримингах, приходи на концерты.",
+            logo_alt: "Дела поважнее", nav_menu: "Меню",
+            nav_single: "Сингл «19»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
+            hero_title: 'Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span>',
+            hero_tag: 'новый сингл<b>«19»</b>', hero_photo_aria: "Группа «Дела поважнее»",
+            hero_cue: 'Новый сингл «19» <span class="arr">↓</span>',
+            single_eyebrow: "Пресейв", single_cover_alt: "Обложка сингла «19»", release_date: "Релиз · 17 июля 2026",
+            cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: 'Новый<br>сингл <em>«19»</em>',
+            single_lead: "Сохрани сингл заранее — как только он выйдет 17 июля, он сам окажется в твоей медиатеке. Один тап в любимом стриминге.",
+            btn_presave: "Сделать пресейв", btn_play: "…или сыграй и сохрани",
+            concerts_eyebrow: "Концерты · презентация альбома",
+            poster_msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
+            msk_when: "18 ноября · Москва", msk_where: "Урбан · Большая Новодмитровская, 36с24",
+            poster_spb_alt: "Афиша концерта в Санкт-Петербурге, 21 ноября, Севкабель Порт",
+            spb_when: "21 ноября · Санкт-Петербург", spb_where: "Севкабель Порт · Кожевенная линия, 34",
+            tickets: "Билеты", listen_eyebrow: "Ссылки", listen_title: 'Найти<br>нас',
+            streamings: "Стриминги", yandex: "Яндекс Музыка", vkmusic: "VK Музыка",
+            socials: "Соцсети", vk: "ВКонтакте", instagram: "Запретграм",
+            footer_copy: "© Дела поважнее, 2026", footer_play: "Играть в раннер →"
+          },
+          en: {
+            title: "Dela povazhnee – Official site",
+            meta_desc: "Dela povazhnee – new single «19», out July 17, 2026. Pre-save it, listen on streaming, come to the shows.",
+            logo_alt: "Dela povazhnee", nav_menu: "Menu",
+            nav_single: "Single «19»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
+            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
+            hero_tag: 'new single<b>«19»</b>', hero_photo_aria: "Dela povazhnee band",
+            hero_cue: 'New single «19» <span class="arr">↓</span>',
+            single_eyebrow: "Pre-save", single_cover_alt: "«19» single cover", release_date: "Out · July 17, 2026",
+            cue_concerts: 'Shows <span class="arr">↓</span>', single_title: 'New<br>single <em>«19»</em>',
+            single_lead: "Save the single now — the second it drops on July 17 it lands straight in your library. One tap in your favourite streaming app.",
+            btn_presave: "Pre-save now", btn_play: "…or play & save",
+            concerts_eyebrow: "Shows · album presentation",
+            poster_msk_alt: "Moscow show poster, November 18, Urban",
+            msk_when: "November 18 · Moscow", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
+            poster_spb_alt: "Saint Petersburg show poster, November 21, Sevkabel Port",
+            spb_when: "November 21 · Saint Petersburg", spb_where: "Sevkabel Port · Kozhevennaya liniya 34",
+            tickets: "Tickets", listen_eyebrow: "Links", listen_title: 'Find<br>us',
+            streamings: "Streaming", yandex: "Yandex Music", vkmusic: "VK Music",
+            socials: "Social", vk: "VKontakte", instagram: "Instagram",
+            footer_copy: "© Dela povazhnee, 2026", footer_play: "Play the runner →"
+          },
+          zh: {
+            title: "Dela povazhnee – 官方网站",
+            meta_desc: "Dela povazhnee 全新单曲《19》，2026年7月17日发行。预存单曲、在流媒体收听、来看现场演出。",
+            logo_alt: "Dela povazhnee", nav_menu: "菜单",
+            nav_single: "单曲《19》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
+            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
+            hero_tag: '全新单曲<b>《19》</b>', hero_photo_aria: "Dela povazhnee 乐队",
+            hero_cue: '全新单曲《19》<span class="arr">↓</span>',
+            single_eyebrow: "预存", single_cover_alt: "《19》单曲封面", release_date: "发行 · 2026年7月17日",
+            cue_concerts: '演出 <span class="arr">↓</span>', single_title: '全新<br>单曲 <em>《19》</em>',
+            single_lead: "现在就预存单曲——7月17日一上线，它就会自动进入你的音乐库。在你常用的流媒体里一键完成。",
+            btn_presave: "立即预存", btn_play: "……或边玩边预存",
+            concerts_eyebrow: "演出 · 专辑首演",
+            poster_msk_alt: "莫斯科演出海报，11月18日，Urban",
+            msk_when: "11月18日 · 莫斯科", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
+            poster_spb_alt: "圣彼得堡演出海报，11月21日，Sevkabel Port",
+            spb_when: "11月21日 · 圣彼得堡", spb_where: "Sevkabel Port · Kozhevennaya liniya 34",
+            tickets: "购票", listen_eyebrow: "链接", listen_title: '找到<br>我们',
+            streamings: "流媒体", yandex: "Yandex Music", vkmusic: "VK Music",
+            socials: "社交媒体", vk: "VKontakte", instagram: "Instagram",
+            footer_copy: "© Dela povazhnee, 2026", footer_play: "开始跑酷游戏 →"
+          }
+        };
+        var htmlLang = { ru: "ru", en: "en", zh: "zh-CN" };
+        function apply(lang) {
+          var t = I18N[lang] || I18N.ru;
+          document.documentElement.lang = htmlLang[lang] || "ru";
+          if (t.title) document.title = t.title;
+          var md = document.querySelector('meta[name="description"]');
+          if (md && t.meta_desc) md.setAttribute("content", t.meta_desc);
+          document.querySelectorAll("[data-i18n]").forEach(function (el) {
+            var k = el.getAttribute("data-i18n"); if (t[k] != null) el.textContent = t[k];
+          });
+          document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
+            var k = el.getAttribute("data-i18n-html"); if (t[k] != null) el.innerHTML = t[k];
+          });
+          document.querySelectorAll("[data-i18n-attr]").forEach(function (el) {
+            el.getAttribute("data-i18n-attr").split(";").forEach(function (pair) {
+              var i = pair.indexOf(":"), attr = pair.slice(0, i), k = pair.slice(i + 1);
+              if (t[k] != null) el.setAttribute(attr, t[k]);
+            });
+          });
+          document.querySelectorAll(".lang-btn").forEach(function (b) {
+            b.classList.toggle("is-active", b.getAttribute("data-lang") === lang);
+          });
+          try { localStorage.setItem("dp_lang", lang); } catch (e) {}
+        }
+        var saved = null;
+        try { saved = localStorage.getItem("dp_lang"); } catch (e) {}
+        apply(saved && I18N[saved] ? saved : "ru");
+        document.querySelectorAll(".lang-btn").forEach(function (b) {
+          b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
+        });
+      })();
+
       // Mobile nav toggle.
       (function () {
         var nav = document.getElementById("nav");
