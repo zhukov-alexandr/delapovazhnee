@@ -6,13 +6,14 @@ export function createRunner() {
 }
 
 // Trigger a jump: first from ground, second (higher) allowed mid-air, max 2.
-export function jump(runner) {
+// vMult scales the launch velocity (used to jump higher while grown).
+export function jump(runner, vMult = 1) {
   if (runner.jumps === 0) {
-    runner.vy = GAME.JUMP_V;
+    runner.vy = GAME.JUMP_V * vMult;
     runner.onGround = false;
     runner.jumps = 1;
   } else if (runner.jumps === 1) {
-    runner.vy = GAME.DOUBLE_JUMP_V;
+    runner.vy = GAME.DOUBLE_JUMP_V * vMult;
     runner.jumps = 2;
   }
 }

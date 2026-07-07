@@ -163,7 +163,12 @@ export class Game {
   // One discrete jump per input event while running. Single tap = one jump,
   // double tap = double jump — that comes for free from physics.jump()'s max-2.
   handleJump() {
-    if (this.game.state === "running") jump(this.game.runner);
+    if (this.game.state !== "running") return;
+    // While grown (Плов power-up) jump GROW_JUMP_MULT× higher. Peak height goes
+    // with velocity², so the velocity boost is sqrt of the height multiplier.
+    const grown = this.t < this.growUntil;
+    const vMult = grown ? Math.sqrt(GAME.GROW_JUMP_MULT) : 1;
+    jump(this.game.runner, vMult);
   }
 
   __keydown(e) {
