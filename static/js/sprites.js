@@ -213,12 +213,17 @@ function runnerFrames(charIndex) {
 
 // Runner: animated frames when loaded, else a single PNG, else the procedural
 // pixel figure with a slight run bob. charIndex (0-3) picks the character.
-export function drawRunner(ctx, runner, t, charIndex = 0) {
+export function drawRunner(ctx, runner, t, charIndex = 0, scale = 1) {
   ctx.imageSmoothingEnabled = false;
   const w = GAME.RUNNER_W;
   const h = GAME.RUNNER_H;
   const x = GAME.RUNNER_X;
   const y = runner.y - h;
+  // Grown draw is bottom-anchored (feet stay on the ground) and centered on the
+  // collision box, which itself never scales — the bonus size is purely cosmetic.
+  const dh = h * scale;
+  const cx = x + w / 2;
+  const feet = runner.y;
 
   // Frame animation (preferred): bottom-anchored, full box height, width from
   // the frame's aspect (the art may overflow the 34px collision box a little —
@@ -228,15 +233,16 @@ export function drawRunner(ctx, runner, t, charIndex = 0) {
     const img = runner.onGround
       ? frames[Math.floor(t * RUN_FPS) % frames.length]
       : frames[Math.min(AIR_FRAME, frames.length - 1)];
-    const dw = h * (img.width / img.height);
-    ctx.drawImage(img, px(x + w / 2 - dw / 2), px(y), dw, h);
+    const dw = dh * (img.width / img.height);
+    ctx.drawImage(img, px(cx - dw / 2), px(feet - dh), dw, dh);
     return;
   }
 
   const bob = runner.onGround ? Math.round(Math.sin(t * 12) * 2) : 0;
 
   if (images["char_" + charIndex]) {
-    ctx.drawImage(images["char_" + charIndex], px(x), px(y + bob), w, h);
+    const dw = w * scale;
+    ctx.drawImage(images["char_" + charIndex], px(cx - dw / 2), px(feet - dh + bob), dw, dh);
     return;
   }
 

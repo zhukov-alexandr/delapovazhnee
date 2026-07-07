@@ -32,14 +32,14 @@ export function stepGame(g, dt, worldW, invulnerable = false) {
   const obstacleDelta = g.obs.score - before;
   stepCollectibles(g.col, dt, worldW, g.obs.speed);
   const box = runnerBox(g.runner);
-  const caught = catchCollectibles(box, g.col);
-  g.caught += caught;
+  const { points, special } = catchCollectibles(box, g.col);
+  g.caught += points;
   g.score = g.obs.score + g.caught;
-  const scoreDelta = obstacleDelta + caught;
+  const scoreDelta = obstacleDelta + points;
   if (!invulnerable) {
     for (const o of g.obs.obstacles) {
-      if (collides(box, o)) { g.state = "over"; return { over: true, scoreDelta }; }
+      if (collides(box, o)) { g.state = "over"; return { over: true, scoreDelta, grew: special }; }
     }
   }
-  return { over: false, scoreDelta };
+  return { over: false, scoreDelta, grew: special };
 }

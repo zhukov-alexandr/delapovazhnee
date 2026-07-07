@@ -100,6 +100,7 @@ function boot() {
     item_1: "/static/sprites/items/item2.png",
     item_2: "/static/sprites/items/item3.png",
     item_3: "/static/sprites/items/item4.png",
+    item_4: "/static/sprites/items/item5.png", // rare bonus item (+5 & grow)
   });
 
   const root = document.documentElement;

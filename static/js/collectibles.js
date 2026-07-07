@@ -11,8 +11,21 @@ function nextGap() {
   return GAME.ITEM_MIN_GAP + Math.random() * (GAME.ITEM_MAX_GAP - GAME.ITEM_MIN_GAP);
 }
 
+// Weighted kind pick: each of the (ITEM_KINDS-1) normal kinds has weight
+// ITEM_SPECIAL_RARITY; the special kind has weight 1, so it spawns that many
+// times less often than any single normal kind.
+function pickKind() {
+  const normals = GAME.ITEM_KINDS - 1;
+  const total = normals * GAME.ITEM_SPECIAL_RARITY + 1;
+  const r = Math.random() * total;
+  if (r < normals * GAME.ITEM_SPECIAL_RARITY) {
+    return Math.floor(r / GAME.ITEM_SPECIAL_RARITY);
+  }
+  return GAME.ITEM_SPECIAL_KIND;
+}
+
 function spawn(state, worldW) {
-  const kind = Math.floor(Math.random() * GAME.ITEM_KINDS);
+  const kind = pickKind();
   const y = GAME.ITEM_Y_MIN + Math.random() * (GAME.ITEM_Y_MAX - GAME.ITEM_Y_MIN);
   state.items.push({
     x: worldW + 20,
@@ -44,18 +57,27 @@ export function stepCollectibles(state, dt, worldW = 640, speed = GAME.RUN_SPEED
   state.items = state.items.filter((item) => item.x + item.w > -40);
 }
 
-// Check runner box against all items. Mark caught, remove them, return count.
+// Check runner box against all items. Mark caught, remove them, and return
+// { points, special }: points sums the value of everything caught this frame
+// (+1 per normal kind, +ITEM_SPECIAL_POINTS for the bonus item); special is
+// true if the bonus item was among them (game.js uses it to start the grow).
 export function catchCollectibles(runnerBox, state) {
-  let count = 0;
+  let points = 0;
+  let special = false;
   const uncaught = [];
   for (const item of state.items) {
     if (collides(runnerBox, item)) {
       item.caught = true;
-      count += 1;
+      if (item.kind === GAME.ITEM_SPECIAL_KIND) {
+        points += GAME.ITEM_SPECIAL_POINTS;
+        special = true;
+      } else {
+        points += 1;
+      }
     } else {
       uncaught.push(item);
     }
   }
   state.items = uncaught;
-  return count;
+  return { points, special };
 }

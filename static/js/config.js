@@ -19,7 +19,12 @@ export const GAME = {
   RUNNER_X: 90,          // fixed horizontal position of the runner
   ITEM_W: 60,
   ITEM_H: 60,
-  ITEM_KINDS: 4,
+  ITEM_KINDS: 5,         // kinds 0..3 are normal (+1); kind 4 is the rare bonus item
+  ITEM_SPECIAL_KIND: 4,  // the 5th item: +5 points and a timed "grow" power-up
+  ITEM_SPECIAL_POINTS: 5,
+  ITEM_SPECIAL_RARITY: 3, // the special is 3x less likely to spawn than each normal kind
+  GROW_TIME: 10,         // seconds the runner stays 2x-size after the bonus item
+  GROW_SCALE: 2,         // how much bigger the runner draws while grown (Mario-style)
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays

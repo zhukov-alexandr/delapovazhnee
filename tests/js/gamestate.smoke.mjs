@@ -36,5 +36,14 @@ g3.col.items.push({ x: GAME.RUNNER_X, y: 150, w: GAME.ITEM_W, h: GAME.ITEM_H, ki
 const r3 = stepGame(g3, 1 / 60, 640);
 ok(r3.scoreDelta >= 1 && g3.score >= 1 && r3.over === false, "catching an item raises score without ending game");
 
+// Catching the special (5th) item scores +ITEM_SPECIAL_POINTS and flags grew.
+const g4 = createGame(); startGame(g4);
+g4.runner.y = 170; // airborne
+const before4 = g4.score;
+g4.col.items.push({ x: GAME.RUNNER_X, y: 150, w: GAME.ITEM_W, h: GAME.ITEM_H, kind: GAME.ITEM_SPECIAL_KIND, caught: false });
+const r4 = stepGame(g4, 1 / 60, 640);
+ok(r4.grew === true && (g4.score - before4) >= GAME.ITEM_SPECIAL_POINTS && r4.over === false,
+   "special item: +5 score and grew flag, no game over");
+
 if (failed) { console.error(`GAMESTATE SMOKE: ${failed} FAILED`); process.exit(1); }
 console.log("GAMESTATE SMOKE: ALL PASS");

@@ -33,6 +33,8 @@ export class Game {
     this.lives = GAME.MAX_LIVES;
     this.invulnUntil = 0;     // this.t value until which collisions are ignored
                               // (pass-through grace after losing a life)
+    this.growUntil = 0;       // this.t value until which the runner draws 2x-size
+                              // (bonus-item power-up; see the special collectible)
 
     // Shell hooks — settable by Task 14. Kept simple and always callable.
     this.onStart = noop;
@@ -70,6 +72,7 @@ export class Game {
     this.revealed = 0;
     this.lives = GAME.MAX_LIVES;
     this.invulnUntil = 0;
+    this.growUntil = 0;
     this.t = 0;
     this.cam.x = 0;
     this.onStart();
@@ -184,7 +187,10 @@ export class Game {
     this.last = now;
 
     const invulnerable = this.t < this.invulnUntil;
-    const { over, scoreDelta } = stepGame(this.game, dt, this.worldW, invulnerable);
+    const { over, scoreDelta, grew } = stepGame(this.game, dt, this.worldW, invulnerable);
+    // Bonus item caught: (re)start the 2x-size window. Uses game-time `t`, which
+    // freezes on pause, so the power-up freezes with everything else.
+    if (grew) this.growUntil = this.t + GAME.GROW_TIME;
 
     // Only advance time/camera/reveal-checks while actually running — this is
     // what makes a lyric-reveal pause read as a genuinely frozen scene rather
@@ -240,8 +246,9 @@ export class Game {
     for (const item of this.game.col.items) drawCollectible(ctx, item);
     // Blink the runner while invulnerable (post-life-loss grace) as feedback.
     const invulnerable = this.t < this.invulnUntil;
+    const grow = this.t < this.growUntil ? GAME.GROW_SCALE : 1;
     if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
-      drawRunner(ctx, this.game.runner, this.t, this.charIndex);
+      drawRunner(ctx, this.game.runner, this.t, this.charIndex, grow);
     }
   }
 }
