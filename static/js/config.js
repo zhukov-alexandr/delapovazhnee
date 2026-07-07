@@ -25,8 +25,8 @@ export const GAME = {
   ITEM_SPECIAL_RARITY: 3, // the special is 3x less likely to spawn than each normal kind
   BASE_SCALE: 1.2,       // normal runner draw size (1.2 = 20% bigger than the sprite box)
   GROW_TIME: 10,         // seconds the runner stays big after the bonus item
-  GROW_SCALE: 2,         // grown draw size (absolute 2x of the box, unchanged by BASE_SCALE)
-  GROW_JUMP_MULT: 1.3,   // while grown, the runner jumps this much HIGHER (peak-height ×) — edit freely
+  GROW_SCALE: 1.7,       // grown draw size after Плов (× the sprite box; independent of BASE_SCALE) — edit freely
+  GROW_JUMP_MULT: 1.25,   // while grown, the runner jumps this much HIGHER (peak-height ×) — edit freely
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays
@@ -47,7 +47,7 @@ export const GAME = {
     { file: "char7.png", aspect: 1.28, scale: 1.5 }, // конная полиция — крупнее
     { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
     { file: "char9.png", aspect: 0.93, scale: 1.15 }, // повар с пловом — чуть крупнее
-    { file: "char10.png", aspect: 2.25, scale: 2.3 }, // газель с арбузами — крупная
+    { file: "char10.png", aspect: 2.25, scale: 2.5 }, // газель с арбузами — крупная
     { file: "char11.png", aspect: 2.23, scale: 2.5 }, // пляжные зонты + афиша — крупная
     { file: "char12.png", aspect: 1.00, scale: 1.3 }, // бочка кваса
     { file: "char13.png", aspect: 1.05, scale: 1.6 }, // знак «купаться запрещено» — крупный
