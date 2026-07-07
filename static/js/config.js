@@ -41,15 +41,15 @@ export const GAME = {
   // here — boot.js loads them as obs_0..N automatically from this list.
   // `scale` (optional, default 1) multiplies the final box for that obstacle.
   OBSTACLES: [
-    { file: "char5.png", aspect: 0.31 }, // моноциклист
+    { file: "char5.png", aspect: 0.31, scale: 1.15 }, // моноциклист
     { file: "char6.png", aspect: 0.78 }, // самокат
     { file: "char7.png", aspect: 1.28, scale: 1.5 }, // конная полиция — крупнее
     { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
-    { file: "char9.png", aspect: 0.96, scale: 1.15 }, // повар с пловом — чуть крупнее
-    { file: "char10.png", aspect: 2.25 }, // газель с арбузами
+    { file: "char9.png", aspect: 0.93, scale: 1.15 }, // повар с пловом — чуть крупнее
+    { file: "char10.png", aspect: 2.25, scale: 3.0 }, // газель с арбузами — крупная
     { file: "char11.png", aspect: 2.23, scale: 2.0 }, // пляжные зонты + афиша — крупная
-    { file: "char12.png", aspect: 1.00 }, // бочка кваса
-    { file: "char13.png", aspect: 1.05, scale: 1.8 }, // знак «купаться запрещено» — крупный
+    { file: "char12.png", aspect: 1.00, scale: 1.3 }, // бочка кваса
+    { file: "char13.png", aspect: 1.05, scale: 1.6 }, // знак «купаться запрещено» — крупный
     { file: "char14.png", aspect: 1.68 }, // мангал с шашлыком
     { file: "char15.png", aspect: 0.76, scale: 1.8 }, // пляжная кабинка — крупная
   ],
