@@ -393,23 +393,10 @@ p {
 }
 .presave-close:hover { color: #333; }
 
-/* Variant-A start popup: wraps the CTA (cover + button) with a close-X badge
-   straddling the top-right corner so it never covers the cover art. */
+/* Variant-A start popup: wraps the CTA (cover + button); the close X is the same
+   as the presave modal's (default .presave-close, anchored to this card's corner). */
 .start-presave-card { position: relative; display: inline-block; }
 .start-presave-card .cta { margin: 0; }
-#start-presave-close {
-  top: -12px;
-  right: -12px;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-  border-radius: 50%;
-  background: rgba(20, 12, 30, 0.9);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-#start-presave-close:hover { background: var(--flare); color: var(--foam); }
 
 .presave-cover {
   display: block;

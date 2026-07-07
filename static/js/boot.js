@@ -599,14 +599,18 @@ function boot() {
   playBtn.addEventListener("click", startPlay);
   retryBtn.addEventListener("click", startPlay);
 
-  // Game over -> back to the start screen (re-pick a character, etc.).
-  toMenuBtn.addEventListener("click", () => {
+  // Back to the start screen (re-pick a character, etc.) — from game over, or
+  // from the life-lost popup (abandons the current run; Играть resets it).
+  function goToMenu() {
     overEl.classList.add("hidden");
+    lifeLostEl.classList.add("hidden");
     leaderboardEl.classList.add("hidden");
     startEl.classList.remove("hidden");
     kbOpen(startEl);
     if (isVariantA) openStartPresave(); // greet the start screen with the popup again
-  });
+  }
+  toMenuBtn.addEventListener("click", goToMenu);
+  document.getElementById("life-lost-menu").addEventListener("click", goToMenu);
 
   muteBtn.addEventListener("click", () => {
     const muted = audio.toggleMute();

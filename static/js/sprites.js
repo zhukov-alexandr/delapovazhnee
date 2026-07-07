@@ -144,10 +144,12 @@ function drawSea(ctx, cam, w) {
     ctx.drawImage(images.sea, 0, SEA_Y, w, SEA_H);
     return;
   }
-  const offset = ((cam.x * 0.4) % 40 + 40) % 40;
+  const offset = ((cam.x % 40) + 40) % 40;
   ctx.fillStyle = PALETTE.grape;
   ctx.fillRect(0, px(SEA_Y), w, SEA_H);
-  // Parallax "wave" ticks scrolling with a medium factor of cam.x.
+  // Road dashes: locked to the full cam.x rate so they scroll in step with the
+  // runner, the obstacles and the sand (this band is the ground the player runs
+  // on — a slower parallax factor made it crawl out of sync with everything).
   ctx.fillStyle = PALETTE.foam;
   for (let x = -offset; x < w; x += 40) {
     ctx.fillRect(px(x), px(SEA_Y + 6), 16, 2);
@@ -173,8 +175,9 @@ function drawSand(ctx, cam, w, h) {
   ctx.restore();
 }
 
-// Layer order: sky gradient -> sun -> sea band -> sand (each with its own
-// parallax factor driven by cam.x: sky+sun slowest, sea medium, sand fastest).
+// Layer order: sky gradient -> sun -> sea/road band -> sand. Parallax by depth:
+// sky is static and the sun barely drifts (0.08); the ground plane (road band +
+// sand) is locked to the full cam.x rate so it tracks the runner 1:1.
 export function drawBackground(ctx, cam, worldW, viewTop = 0) {
   ctx.imageSmoothingEnabled = false;
   const h = GAME.WORLD_H;
