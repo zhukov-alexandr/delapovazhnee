@@ -113,8 +113,16 @@ function drawSky(ctx, w, viewTop, horizon) {
 }
 
 function drawSun(ctx, cam, w) {
-  const cx = px(w * 0.68 - cam.x * 0.08);
-  const cy = px(SEA_Y - 78);
+  // The sun holds its horizontal spot and instead SINKS behind the horizon,
+  // 3x slower than it used to drift left (0.08/3 * cam.x). It's drawn before the
+  // sea/sand bands, so as its centre passes the sea line it's occluded by them
+  // — a natural "setting behind the horizon".
+  // cy is kept as a float (NOT snapped with px()): the descent is slow, so
+  // rounding it to whole pixels made the sun hold still for several frames then
+  // jump 1px — a visibly jerky drop. The disc is an anti-aliased circle, so the
+  // sub-pixel position costs no crispness and the motion reads smooth.
+  const cx = px(w * 0.68);
+  const cy = SEA_Y - 78 + cam.x * (0.08 / 3);
   const r = 66;
   if (images.sun) {
     ctx.drawImage(images.sun, cx - r, cy - r, r * 2, r * 2);
@@ -131,11 +139,11 @@ function drawSun(ctx, cam, w) {
   ctx.save();
   ctx.fillStyle = PALETTE.flare;
   for (let dy = 0; dy < r; dy += 4) {
-    const rowY = cy + dy;
+    const rowY = cy + dy; // float, tracks the smooth disc (no px snap → no swim)
     const half = Math.sqrt(Math.max(0, r * r - dy * dy));
     const rowW = px(half * 2);
     ctx.globalAlpha = 0.35;
-    ctx.fillRect(px(cx - half), px(rowY), rowW, 2);
+    ctx.fillRect(px(cx - half), rowY, rowW, 2);
   }
   ctx.restore();
 }
@@ -177,8 +185,9 @@ function drawSand(ctx, cam, w, h) {
 }
 
 // Layer order: sky gradient -> sun -> sea/road band -> sand. Parallax by depth:
-// sky is static and the sun barely drifts (0.08); the ground plane (road band +
-// sand) is locked to the full cam.x rate so it tracks the runner 1:1.
+// sky is static, the sun sinks behind the horizon (drawn before sea/sand so they
+// occlude it), and the ground plane (road band + sand) is locked to the full
+// cam.x rate so it tracks the runner 1:1.
 export function drawBackground(ctx, cam, worldW, viewTop = 0) {
   ctx.imageSmoothingEnabled = false;
   const h = GAME.WORLD_H;
