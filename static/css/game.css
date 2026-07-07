@@ -19,8 +19,8 @@
   --night: #241539;
   --grape: #6D2E8B;
   --flare: #FF5D73;
-  --sun: #FFD35C;
-  --sand: #F2C078;
+  --sun: #E7BC63;
+  --sand: #E4B884;
   --foam: #FFF4E2;
   --arcade: #2FE6D6;
   --ink: #2A1533;
@@ -394,13 +394,20 @@ p {
   text-align: center;
   margin: 0;
 }
+/* Release-date line — highlighted as a glowing teal badge so it stands out from
+   the title and the lyrics. */
 .song-complete-sub {
-  font-family: "ProgressPixel", sans-serif;
-  color: var(--foam);
-  font-size: clamp(13px, 2.6vw, 15px);
-  line-height: 1.35;
-  margin: 0;
+  align-self: center;
+  font-family: "ProgressPixelPab", "ProgressPixel", sans-serif;
+  color: var(--ink);
+  background: var(--arcade);
+  font-size: clamp(13px, 2.8vw, 16px);
+  line-height: 1.25;
+  margin: 2px 0 4px;
   max-width: none;
+  padding: 7px 16px;
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(47, 230, 214, 0.45);
 }
 .song-complete-lyrics {
   list-style: none;

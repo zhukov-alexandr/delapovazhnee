@@ -9,8 +9,9 @@ export const PALETTE = {
   night: "#241539",
   grape: "#6D2E8B",
   flare: "#FF5D73",
-  sun: "#FFD35C",
-  sand: "#F2C078",
+  sun: "#E7BC63",     // muted warm gold (was #FFD35C — toned down, less acidic)
+  sunDisc: "#D65A44", // the sun DISC itself: a soft sunset red over the sea
+  sand: "#E4B884",    // softer sand (was #F2C078)
   foam: "#FFF4E2",
   arcade: "#2FE6D6",
   ink: "#2A1533",
@@ -120,7 +121,7 @@ function drawSun(ctx, cam, w) {
     return;
   }
   ctx.save();
-  ctx.fillStyle = PALETTE.sun;
+  ctx.fillStyle = PALETTE.sunDisc;
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();

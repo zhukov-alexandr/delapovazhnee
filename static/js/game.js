@@ -42,6 +42,7 @@ export class Game {
     this.onGameOver = noop; // (score)
     this.onReveal = noop;  // (lyricIndex) — fired when a new line is revealed; game is already paused
     this.onLifeLost = noop; // (livesLeft, score) — fired on a non-fatal hit; game is already paused
+    this.onLifeGain = noop; // (lives) — fired when the Плов bonus item restores a life
 
     // Runtime handles created lazily in start(); null until then.
     this.canvas = null;
@@ -188,9 +189,15 @@ export class Game {
 
     const invulnerable = this.t < this.invulnUntil;
     const { over, scoreDelta, grew } = stepGame(this.game, dt, this.worldW, invulnerable);
-    // Bonus item caught: (re)start the 2x-size window. Uses game-time `t`, which
-    // freezes on pause, so the power-up freezes with everything else.
-    if (grew) this.growUntil = this.t + GAME.GROW_TIME;
+    // Bonus item (Плов) caught: (re)start the 2x-size window (game-time `t`, so
+    // it freezes on pause) and restore one life, capped at MAX_LIVES.
+    if (grew) {
+      this.growUntil = this.t + GAME.GROW_TIME;
+      if (this.lives < GAME.MAX_LIVES) {
+        this.lives += 1;
+        this.onLifeGain(this.lives);
+      }
+    }
 
     // Only advance time/camera/reveal-checks while actually running — this is
     // what makes a lyric-reveal pause read as a genuinely frozen scene rather

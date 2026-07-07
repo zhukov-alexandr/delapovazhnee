@@ -578,6 +578,10 @@ function boot() {
     lifeLostEl.classList.remove("hidden");
     kbOpen(lifeLostEl);
   };
+  // Плов bonus item restored a life — refresh the hearts HUD to the new count.
+  game.onLifeGain = (lives) => {
+    renderLives(lives);
+  };
   // Lyric reveal (Task 23): game.js already paused gameplay before calling
   // this — just play the sting, pulse the score, and show the next line.
   game.onReveal = (i) => {
