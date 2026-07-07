@@ -9,10 +9,9 @@ services:
       - .env                       # секреты приложения (PRESAVE_URL, ADMIN_*, SECRET_KEY, ...)
     volumes:
       - dbdata:/app/db             # sqlite переживает пересоздание контейнера
-      # Бинарные ассеты кладутся на VDS в эти каталоги и монтируются read-only.
-      # (items запекаются в образ — см. .dockerignore; здесь только music + characters.)
+      # Музыка кладётся на VDS и монтируется read-only (не пекётся в образ).
+      # (items и характеры/спрайты персонажей запекаются в образ — см. .dockerignore.)
       - ./static/assets:/app/static/assets:ro
-      - ./static/sprites/characters:/app/static/sprites/characters:ro
     expose:
       - "8000"                     # только внутри docker-сети; наружу — через Caddy
 

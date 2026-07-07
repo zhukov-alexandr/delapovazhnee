@@ -55,9 +55,8 @@ ssh root@IP 'bash /root/bootstrap-vds.sh'            # не под root? → ssh
 Большие бинарники кладутся **на сервер** в смонтированные каталоги (в образ не пекутся, обновление их не трёт):
 
 - `/opt/delapovazhnee/static/assets/music.mp3`
-- `/opt/delapovazhnee/static/sprites/characters/char1.png … char4.png`
 
-(Айтемы `item1…item4.png` теперь запекаются в образ из git — заливать на VDS не нужно.)
+(Спрайты персонажей и айтемы запекаются в образ из git — заливать их на VDS не нужно.)
 
 БД (`sqlite`) живёт в docker-volume `dbdata` и тоже переживает пересоздание контейнера.
 

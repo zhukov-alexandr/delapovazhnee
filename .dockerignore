@@ -18,5 +18,4 @@ __pycache__
 deploy
 *.md
 static/assets
-static/sprites/characters
 static/home/cover.*
