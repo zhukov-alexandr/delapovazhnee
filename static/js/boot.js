@@ -92,11 +92,10 @@ function runFramesManifest(n, count) {
 function boot() {
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
   loadSprites({
-    ...runFramesManifest(1, 6), // Кирилл — 6-frame run cycle
-    char_0: "/static/sprites/characters/char1.png",
-    char_1: "/static/sprites/characters/char2.png",
-    char_2: "/static/sprites/characters/char3.png",
-    char_3: "/static/sprites/characters/char4.png",
+    ...runFramesManifest(1, 6), // Кирилл
+    ...runFramesManifest(2, 6), // Никита
+    ...runFramesManifest(3, 6), // Саша
+    ...runFramesManifest(4, 6), // Костя
     item_0: "/static/sprites/items/item1.png",
     item_1: "/static/sprites/items/item2.png",
     item_2: "/static/sprites/items/item3.png",
@@ -214,7 +213,21 @@ function boot() {
     ctaViewFired = true;
     emit("cta_view", {});
   }
-  if (isVariantA) fireCtaView(); // visible immediately on the start overlay
+
+  // Variant A shows the CTA as a popup over the start screen (#start-presave)
+  // instead of a static block under the menu. cta_view fires when it opens (a
+  // real view), and the "Сделать пресейв" button inside keeps the same
+  // cta_click -> presave-modal funnel as variant B.
+  const startPresaveEl = document.getElementById("start-presave");
+  function openStartPresave() {
+    startPresaveEl.classList.remove("hidden");
+    fireCtaView();
+    kbOpen(startPresaveEl, true);
+  }
+  document.getElementById("start-presave-close").addEventListener("click", () => {
+    startPresaveEl.classList.add("hidden");
+    kbClose();
+  });
 
   // --- Presave modal (Task 26): white "bandlink-style" card with one row per
   // streaming service. Shared between variants A/B — mounted once in the DOM. ---
@@ -463,7 +476,8 @@ function boot() {
     kbStack.push({ items, index: 0 });
     const big = items.findIndex((el) => el.classList.contains("big"));
     const row = items.findIndex((el) => el.classList.contains("bl-row"));
-    kbPaint(big >= 0 ? big : row >= 0 ? row : 0);
+    const pre = items.findIndex((el) => el.classList.contains("presave"));
+    kbPaint(big >= 0 ? big : row >= 0 ? row : pre >= 0 ? pre : 0);
   }
   function kbClose() {
     const m = kbStack.pop();
@@ -591,6 +605,7 @@ function boot() {
     leaderboardEl.classList.add("hidden");
     startEl.classList.remove("hidden");
     kbOpen(startEl);
+    if (isVariantA) openStartPresave(); // greet the start screen with the popup again
   });
 
   muteBtn.addEventListener("click", () => {
@@ -599,6 +614,7 @@ function boot() {
   });
 
   kbOpen(startEl); // the start overlay is visible on load
+  if (isVariantA) openStartPresave(); // variant A: greet with the presave popup
 }
 
 if (typeof document !== "undefined") {

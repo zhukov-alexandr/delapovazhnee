@@ -58,7 +58,6 @@
         <button id="show-scores-start" class="btn ghost">Рекорды</button>
         <a class="btn ghost" href="/home">На сайт</a>
       </div>
-      <div id="start-cta"></div>
     </div>
 
     <div id="over" class="overlay hidden">
@@ -104,6 +103,16 @@
       <p class="reveal-label">Ура, вы открыли новую строчку из песни:</p>
       <p id="reveal-line" class="reveal-line"></p>
       <button id="reveal-next" class="btn big">Дальше</button>
+    </div>
+
+    <!-- Variant A: the presave CTA is shown as a popup over the start screen
+         (not a static block under the menu); closes with the X. boot.js injects
+         the CTA (cover + button) into #start-cta and auto-opens this on load. -->
+    <div id="start-presave" class="overlay presave-overlay hidden">
+      <div class="start-presave-card">
+        <button type="button" id="start-presave-close" class="presave-close" aria-label="Закрыть">×</button>
+        <div id="start-cta"></div>
+      </div>
     </div>
 
     <!-- Presave modal (Task 26): opened by the CTA button (both variants).
