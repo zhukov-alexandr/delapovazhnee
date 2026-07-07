@@ -153,6 +153,18 @@ p {
 
 .hidden { display: none !important; }
 
+/* Credits at the bottom of the main menu — same faint monospace as the build
+   tag, but a bit more visible, sitting just below the menu content. */
+.menu-credits {
+  margin-top: clamp(18px, 4vh, 34px);
+  font-family: monospace;
+  font-size: clamp(11px, 2.4vw, 13px);
+  line-height: 1.55;
+  color: rgba(255, 244, 226, 0.5);
+  text-align: center;
+}
+.menu-credits span { display: block; }
+
 /* Deploy tag, faint in the top-left corner (build = the v* tag baked at deploy). */
 .build-tag {
   position: fixed;
