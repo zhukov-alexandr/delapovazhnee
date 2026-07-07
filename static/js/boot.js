@@ -123,6 +123,22 @@ function boot() {
   const revealPopup = document.getElementById("reveal-popup");
   const revealLineEl = document.getElementById("reveal-line");
   const revealNextBtn = document.getElementById("reveal-next");
+  const songCompleteEl = document.getElementById("song-complete");
+  const songCompleteNext = document.getElementById("song-complete-next");
+  const songCompleteLyricsEl = document.getElementById("song-complete-lyrics");
+  // Fill the song-complete popup once with the full lyrics (blank row between
+  // stanzas of 4). Shown when the final line is revealed.
+  LYRICS.forEach((line, idx) => {
+    if (idx > 0 && idx % 4 === 0) {
+      const gap = document.createElement("li");
+      gap.className = "stanza-gap";
+      gap.setAttribute("aria-hidden", "true");
+      songCompleteLyricsEl.appendChild(gap);
+    }
+    const li = document.createElement("li");
+    li.textContent = line;
+    songCompleteLyricsEl.appendChild(li);
+  });
   const livesEl = document.getElementById("lives");
   const lifeLostEl = document.getElementById("life-lost");
   const livesLeftEl = document.getElementById("lives-left");
@@ -569,6 +585,12 @@ function boot() {
     scoreEl.classList.remove("pulse");
     void scoreEl.offsetWidth; // force reflow so the animation can retrigger
     scoreEl.classList.add("pulse");
+    if (i >= LYRICS.length - 1) {
+      // Final line unlocked → celebrate with the whole song instead of one line.
+      songCompleteEl.classList.remove("hidden");
+      kbOpen(songCompleteEl);
+      return;
+    }
     revealLineEl.textContent = LYRICS[i];
     revealPopup.classList.remove("hidden");
     kbOpen(revealPopup);
@@ -577,6 +599,12 @@ function boot() {
   revealNextBtn.addEventListener("click", () => {
     kbClear();
     revealPopup.classList.add("hidden");
+    game.resume();
+  });
+
+  songCompleteNext.addEventListener("click", () => {
+    kbClear();
+    songCompleteEl.classList.add("hidden");
     game.resume();
   });
 

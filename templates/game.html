@@ -6,7 +6,7 @@
   <title>Дела поважнее — беги по пляжу</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet:wght@400;700&family=Pixelify+Sans:wght@400;500;600;700&family=VT323&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet:wght@400;700&family=VT323&display=swap">
   <link rel="stylesheet" href="/static/css/game.css">
 </head>
 <body>
@@ -106,6 +106,17 @@
       <p class="reveal-label">Ура, вы открыли новую строчку из песни:</p>
       <p id="reveal-line" class="reveal-line"></p>
       <button id="reveal-next" class="btn big">Дальше</button>
+    </div>
+
+    <!-- Song-complete popup: shown once the final lyric line is revealed. Full
+         song text + "Играть дальше" (resumes the run). boot.js fills the lyrics. -->
+    <div id="song-complete" class="overlay reveal-overlay hidden">
+      <div class="song-complete-card">
+        <h2 class="song-complete-title">Ура, ты открыл все возможные строчки песни!</h2>
+        <p class="song-complete-sub">Песня «19» выйдет 17 июля 2026</p>
+        <ul id="song-complete-lyrics" class="song-complete-lyrics"></ul>
+        <button id="song-complete-next" class="btn big">Играть дальше</button>
+      </div>
     </div>
 
     <!-- Variant A: the presave CTA is shown as a popup over the start screen

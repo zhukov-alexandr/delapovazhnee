@@ -246,7 +246,7 @@ export class Game {
     for (const item of this.game.col.items) drawCollectible(ctx, item);
     // Blink the runner while invulnerable (post-life-loss grace) as feedback.
     const invulnerable = this.t < this.invulnUntil;
-    const grow = this.t < this.growUntil ? GAME.GROW_SCALE : 1;
+    const grow = this.t < this.growUntil ? GAME.GROW_SCALE : GAME.BASE_SCALE;
     if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
       drawRunner(ctx, this.game.runner, this.t, this.charIndex, grow);
     }

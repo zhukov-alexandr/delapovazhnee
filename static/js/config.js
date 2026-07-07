@@ -23,8 +23,9 @@ export const GAME = {
   ITEM_SPECIAL_KIND: 4,  // the 5th item: +5 points and a timed "grow" power-up
   ITEM_SPECIAL_POINTS: 5,
   ITEM_SPECIAL_RARITY: 3, // the special is 3x less likely to spawn than each normal kind
-  GROW_TIME: 10,         // seconds the runner stays 2x-size after the bonus item
-  GROW_SCALE: 2,         // how much bigger the runner draws while grown (Mario-style)
+  BASE_SCALE: 1.2,       // normal runner draw size (1.2 = 20% bigger than the sprite box)
+  GROW_TIME: 10,         // seconds the runner stays big after the bonus item
+  GROW_SCALE: 2,         // grown draw size (absolute 2x of the box, unchanged by BASE_SCALE)
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays

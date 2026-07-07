@@ -5,7 +5,7 @@ let failed = 0;
 const ok = (c, m) => { if (c) console.log("PASS " + m); else { failed++; console.error("FAIL " + m); } };
 
 const n = 5;
-const total = 24;
+const total = 12; // song «19» has 12 lines (see lyrics.js)
 
 ok(nextRevealIndex(n, n, 0, total) === 0, "score==n, revealed=0 -> reveals index 0");
 ok(nextRevealIndex(2 * n, n, 1, total) === 1, "score==2n, revealed=1 -> reveals index 1");
