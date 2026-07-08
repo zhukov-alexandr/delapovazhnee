@@ -1,11 +1,17 @@
 // Shared game constants. Units: logical world pixels; y grows downward.
 export const GAME = {
   WORLD_H: 360,          // fixed logical height; width comes from viewport
-  MIN_VIEW_W: 360,       // camera (game.js resize()): minimum visible world width in
-                         // logical px — on narrow/tall mobile this caps zoom-in so the
-                         // runner (RUNNER_X=90) keeps track ahead instead of sitting
-                         // centered. Tuning value; adjust to taste, does not affect
-                         // obstacle/collision logic.
+  MIN_VIEW_W: 300,       // camera (game.js resize()): minimum visible world width in
+                         // logical px. On narrow/tall mobile the scale is capped by
+                         // cssW/MIN_VIEW_W, so LOWERING this zooms the whole gameplay
+                         // in (runner, obstacles, road, sea — all at once). Mobile-only:
+                         // desktop/landscape is height-limited (cssH/WORLD_H), untouched.
+                         // NB: device scale is snapped to a whole integer for crisp
+                         // pixels, so this zooms in WHOLE STEPS — the on-screen size
+                         // jumps at thresholds and the amount varies by phone dpr (no
+                         // smooth %). Trade-off: more zoom = less track ahead. Was 360;
+                         // 300 bumps most modern phones up one step. Tune to taste;
+                         // does not affect obstacle/collision logic.
   GROUND_Y: 300,         // runner baseline (top of feet band)
   GRAVITY: 2600,         // px/s^2
   JUMP_V: -760,          // px/s initial velocity, single jump
