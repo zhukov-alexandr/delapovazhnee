@@ -25,7 +25,7 @@ export const GAME = {
   ITEM_SPECIAL_RARITY: 3, // the special is 3x less likely to spawn than each normal kind
   BASE_SCALE: 1.2,       // normal runner draw size (1.2 = 20% bigger than the sprite box)
   GROW_TIME: 10,         // seconds the runner stays big after the bonus item
-  GROW_SCALE: 1.7,       // grown draw size after Плов (× the sprite box; independent of BASE_SCALE) — edit freely
+  GROW_SCALE: 1.9,       // grown draw size after Плов (× the sprite box; independent of BASE_SCALE) — edit freely
   GROW_JUMP_MULT: 1.25,   // while grown, the runner jumps this much HIGHER (peak-height ×) — edit freely
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
