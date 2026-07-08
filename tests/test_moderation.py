@@ -21,14 +21,36 @@ def test_profanity_rejected():
         assert not _ok(n), n
 
 
+def test_derivatives_rejected():
+    # stems must catch derivatives, not just exact base words
+    for n in ["zalupka", "залупка", "хуйло", "пиздец", "распиздяй", "ебанат",
+              "долбоеб", "охуенно", "хуесос", "заебись", "пиздатый", "выебон"]:
+        assert not _ok(n), n
+
+
 def test_obscene_rejected():
     for n in ["сиськи", "письки", "penis", "sex", "порно", "вагина"]:
         assert not _ok(n), n
 
 
 def test_war_terms_rejected():
-    for n in ["война", "Украина", "путин", "зеленский", "азов", "ukraina"]:
+    for n in ["война", "путин", "зеленский", "азов", "ukraina", "гитлер"]:
         assert not _ok(n), n
+
+
+def test_war_slurs_rejected():
+    for n in ["СВО", "сво", "ZOV", "zov", "зов", "зига", "кацап", "хохол",
+              "хохлы", "хохлушка", "москаль", "ватник", "колорад", "рашка",
+              "укроп", "kacap", "hohol"]:
+        assert not _ok(n), n
+
+
+def test_legit_names_not_falsely_flagged():
+    # words that contain a swear-adjacent substring but are innocent
+    for n in ["команда", "свобода", "свой", "рубля", "хлеб", "требовать",
+              "хулиган", "Аманда", "Хуан", "зовите", "Кирилл", "Никита",
+              "Саша", "Костя", "Максим"]:
+        assert _ok(n), n
 
 
 def test_evasion_rejected():
