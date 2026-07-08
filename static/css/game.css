@@ -59,6 +59,13 @@ p {
   max-width: 32ch;
 }
 
+/* Main-menu welcome line — bolder + a faint glow so it doesn't fade into the
+   background scrim next to the loud title above it. */
+.welcome-text {
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 244, 226, 0.35);
+}
+
 #stage {
   position: fixed;
   inset: 0;
@@ -635,6 +642,10 @@ p {
   margin-top: 8px;
 }
 .btn.ghost:hover { border-color: var(--sand); }
+
+/* Life-lost popup has just one secondary action — size it like the primary
+   "Продолжить" button so it doesn't read as an afterthought. */
+#life-lost-menu { font-size: clamp(18px, 3.6vw, 24px); padding: 14px 34px; }
 
 /* Save-score row on the game-over overlay: name field + save button. */
 .save-score {
