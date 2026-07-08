@@ -153,6 +153,45 @@ p {
 
 .hidden { display: none !important; }
 
+/* Loading screen: on top of everything until sprites finish loading. The
+   compound selector outranks `.overlay` (declared later) so its solid bg + high
+   z-index win regardless of source order. */
+.overlay.loading-overlay {
+  z-index: 40; /* above every overlay + the mute button + build tag */
+  background: var(--night);
+  gap: clamp(14px, 3vh, 22px);
+  transition: opacity 0.35s ease;
+}
+.loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+.loading-title {
+  font-family: "Handjet", sans-serif;
+  font-weight: 700;
+  color: var(--sun);
+  text-shadow: 0 0 12px rgba(255, 211, 92, 0.5);
+  font-size: clamp(24px, 6vw, 40px);
+}
+.loading-bar {
+  width: min(320px, 78vw);
+  height: 14px;
+  border: 2px solid var(--grape);
+  border-radius: 999px;
+  background: rgba(109, 46, 139, 0.3);
+  overflow: hidden;
+}
+.loading-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--arcade);
+  transition: width 0.2s ease;
+}
+.loading-pct {
+  font-family: monospace;
+  color: var(--foam);
+  font-size: clamp(14px, 3vw, 18px);
+  margin: 0;
+}
+
 /* Credits at the bottom of the main menu — same faint monospace as the build
    tag, but a bit more visible, sitting just below the menu content. */
 .menu-credits {

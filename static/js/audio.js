@@ -13,7 +13,7 @@ export function createAudio() {
     if (!music) {
       music = new Audio("/static/assets/music.mp3");
       music.loop = true;
-      music.volume = 0.35; // 30% quieter than the previous 0.5
+      music.volume = 0.28; // another 20% quieter (0.35 -> 0.28)
     }
     return music;
   }

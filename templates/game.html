@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="build" content="{{ build }}">
-  <title>Дела поважнее – Игра «Беги по пляжу»</title>
+  <title>Дела поважнее – Игра «19»</title>
   <link rel="icon" href="/static/home/favicon.ico?v={{ build }}" sizes="any">
   <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png?v={{ build }}">
   <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png?v={{ build }}">
@@ -25,6 +25,14 @@
     <div id="lives" class="lives hidden" aria-label="Жизни"></div>
     <button id="mute" class="mute" aria-label="Звук">🔊</button>
 
+    <!-- Loading screen: covers everything until all in-game sprites are loaded,
+         so you never start the game on placeholder art. boot.js drives the bar. -->
+    <div id="loading" class="overlay loading-overlay">
+      <h1 class="loading-title">Загрузка игры</h1>
+      <div class="loading-bar"><div id="loading-fill" class="loading-fill"></div></div>
+      <p id="loading-pct" class="loading-pct">0%</p>
+    </div>
+
     <!-- CTA block (moved into #start for variant A, into #over for variant B by boot.js) -->
     <template id="cta-tpl">
       <div class="cta">
@@ -34,7 +42,7 @@
     </template>
 
     <div id="start" class="overlay">
-      <h1>ДЕЛА ПОВАЖНЕЕ</h1>
+      <h1>ДЕЛА ПОВАЖНЕЕ – 19</h1>
       <p>Прыгай через отдыхающих, собирай предметы. Пробел или тап.</p>
       <div id="char-picker" class="char-picker" role="group" aria-label="Выбор персонажа">
         <button type="button" class="char-tile" data-char="0" aria-label="Кирилл">

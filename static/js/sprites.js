@@ -22,18 +22,19 @@ export const images = {};
 
 // Populate images from a manifest: { name: url, ... }. Returns a Promise that
 // resolves once every image has attempted to load (errors are swallowed so a
-// missing PNG just leaves the procedural fallback in place).
-export function loadSprites(manifest) {
+// missing PNG just leaves the procedural fallback in place). onProgress(loaded,
+// total) is called after each image settles — used to drive the loading bar.
+export function loadSprites(manifest, onProgress) {
   const entries = Object.entries(manifest || {});
+  const total = entries.length;
+  let done = 0;
+  const tick = () => { done += 1; if (onProgress) onProgress(done, total); };
   return Promise.all(
     entries.map(([name, src]) =>
       new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => {
-          images[name] = img;
-          resolve();
-        };
-        img.onerror = () => resolve();
+        img.onload = () => { images[name] = img; tick(); resolve(); };
+        img.onerror = () => { tick(); resolve(); };
         img.src = src;
       })
     )

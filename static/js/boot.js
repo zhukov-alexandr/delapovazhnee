@@ -99,8 +99,13 @@ function obstacleManifest() {
 }
 
 function boot() {
+  // Loading screen: drive its bar as sprites load; the start screen is gated on
+  // completion (see boot end) so you never play on placeholder art.
+  const loadingEl = document.getElementById("loading");
+  const loadingFill = document.getElementById("loading-fill");
+  const loadingPct = document.getElementById("loading-pct");
   // Drop-in PNGs auto-swap on reload; missing files silently keep procedural art.
-  loadSprites({
+  const spritesReady = loadSprites({
     ...runFramesManifest(1, 6), // Кирилл
     ...runFramesManifest(2, 6), // Никита
     ...runFramesManifest(3, 6), // Саша
@@ -111,6 +116,10 @@ function boot() {
     item_2: "/static/sprites/items/item3.png",
     item_3: "/static/sprites/items/item4.png",
     item_4: "/static/sprites/items/item5.png", // rare bonus item (+5 & grow)
+  }, (loaded, total) => {
+    const pct = total ? Math.round((loaded / total) * 100) : 100;
+    if (loadingFill) loadingFill.style.width = pct + "%";
+    if (loadingPct) loadingPct.textContent = pct + "%";
   });
 
   const root = document.documentElement;
@@ -681,8 +690,16 @@ function boot() {
     muteBtn.textContent = muted ? "🔇" : "🔊";
   });
 
-  kbOpen(startEl); // the start overlay is visible on load
-  if (isVariantA) openStartPresave(); // variant A: greet with the presave popup
+  // Reveal the menu only once all sprites are loaded: fade out the loading
+  // screen, then activate the start overlay (keyboard nav + variant-A popup).
+  spritesReady.then(() => {
+    if (loadingEl) {
+      loadingEl.classList.add("fade-out");
+      setTimeout(() => loadingEl.classList.add("hidden"), 400);
+    }
+    kbOpen(startEl); // the start overlay is visible on load
+    if (isVariantA) openStartPresave(); // variant A: greet with the presave popup
+  });
 }
 
 if (typeof document !== "undefined") {
