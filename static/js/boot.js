@@ -31,28 +31,34 @@ function addPresaved(store, id) {
 // Server-tunable defaults (Task 21/23), used if GET /api/config fails.
 const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0 };
 
-// Short WebAudio blip on catching a collectible. Optional/best-effort: any
-// failure (no AudioContext, autoplay-blocked) is swallowed silently.
+// Quiet WebAudio "coin" ding on a score gain (catch/obstacle pass). Two quick
+// ascending notes; the special (Плов) gain adds a higher third note. Optional/
+// best-effort: any failure (no AudioContext, autoplay-blocked) is swallowed.
 let catchAudioCtx = null;
-function sfxCatch() {
+function sfxGain(special) {
   try {
     if (!catchAudioCtx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       catchAudioCtx = new AC();
     }
     const c = catchAudioCtx;
-    const osc = c.createOscillator();
-    const gain = c.createGain();
-    osc.type = "square";
-    osc.frequency.value = 880;
-    gain.gain.value = 0.12;
-    osc.connect(gain);
-    gain.connect(c.destination);
     const now = c.currentTime;
-    osc.start(now);
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
-    osc.stop(now + 0.06);
+    // base coin: two notes; Плов: a brighter arpeggio.
+    const notes = special ? [784, 1047, 1319] : [988, 1319];
+    const vol = special ? 0.09 : 0.06;
+    notes.forEach((f, i) => {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = f;
+      osc.connect(gain);
+      gain.connect(c.destination);
+      const t = now + i * 0.05;
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      osc.start(t);
+      osc.stop(t + 0.09);
+    });
   } catch (_) { /* WebAudio unavailable — ignore */ }
 }
 
@@ -171,6 +177,27 @@ function boot() {
   const nameInput = document.getElementById("name-input");
   const saveScoreBtn = document.getElementById("save-score");
   const toMenuBtn = document.getElementById("to-menu");
+  const timerEl = document.getElementById("timer");
+  const finalTimeEl = document.getElementById("final-time");
+  const pauseBtn = document.getElementById("pause-btn");
+  const pauseEl = document.getElementById("pause");
+  const pauseResumeBtn = document.getElementById("pause-resume");
+  const pauseMenuBtn = document.getElementById("pause-menu");
+  const lbTabs = Array.from(document.querySelectorAll(".lb-tab"));
+
+  // Avatar per character index (matches the picker order Кирилл/Никита/Саша/Костя).
+  const AVATARS = [
+    "/static/sprites/characters/avatar1.png",
+    "/static/sprites/characters/avatar2.png",
+    "/static/sprites/characters/avatar3.png",
+    "/static/sprites/characters/avatar4.png",
+  ];
+  // Seconds -> "m:ss" for the play-time readout.
+  function fmtTime(sec) {
+    const s = Math.max(0, Math.floor(sec));
+    const m = Math.floor(s / 60);
+    return m + ":" + String(s % 60).padStart(2, "0");
+  }
 
   const audio = createAudio();
 
@@ -426,8 +453,11 @@ function boot() {
   // server-side (POST /api/score, GET /api/scores). ---
   const NAME_KEY = "dp_name";
   let lastGameScore = 0;
+  let lastGameChar = 0;
+  let lastGameTimeMs = 0;
 
-  function renderScores(list) {
+  // isAll: the overall tab shows a per-row character avatar column.
+  function renderScores(list, isAll) {
     leaderboardList.innerHTML = "";
     if (!list.length) {
       const li = document.createElement("li");
@@ -442,22 +472,50 @@ function boot() {
       const rank = document.createElement("span");
       rank.className = "lb-rank";
       rank.textContent = String(i + 1);
+      li.appendChild(rank);
+      if (isAll) {
+        const av = document.createElement("span");
+        av.className = "lb-char";
+        if (AVATARS[s.character]) {
+          const img = document.createElement("img");
+          img.src = AVATARS[s.character];
+          img.alt = "";
+          av.appendChild(img);
+        }
+        li.appendChild(av);
+      }
       const nm = document.createElement("span");
       nm.className = "lb-name";
       nm.textContent = s.name; // textContent -> no HTML injection from stored names
+      li.appendChild(nm);
+      const tm = document.createElement("span");
+      tm.className = "lb-time";
+      tm.textContent = s.time_ms ? fmtTime(s.time_ms / 1000) : "—";
+      li.appendChild(tm);
       const sc = document.createElement("span");
       sc.className = "lb-score";
       sc.textContent = String(s.score);
-      li.append(rank, nm, sc);
+      li.appendChild(sc);
       leaderboardList.appendChild(li);
     });
   }
 
-  function openLeaderboard() {
-    fetch("/api/scores")
+  function fetchLeaderboard(char) {
+    const url = char === "all" ? "/api/scores" : "/api/scores?character=" + char;
+    fetch(url)
       .then((r) => r.json())
-      .then((d) => renderScores(d.scores || []))
-      .catch(() => renderScores([]));
+      .then((d) => renderScores(d.scores || [], char === "all"))
+      .catch(() => renderScores([], char === "all"));
+  }
+
+  function setLbTab(char) {
+    lbTabs.forEach((t) => t.classList.toggle("is-active", t.dataset.char === char));
+    fetchLeaderboard(char);
+  }
+  lbTabs.forEach((t) => t.addEventListener("click", () => setLbTab(t.dataset.char)));
+
+  function openLeaderboard() {
+    setLbTab("all");
     leaderboardEl.classList.remove("hidden");
     kbOpen(leaderboardEl, true);
   }
@@ -488,7 +546,7 @@ function boot() {
     fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, score: lastGameScore }),
+      body: JSON.stringify({ name, score: lastGameScore, character: lastGameChar, time_ms: lastGameTimeMs }),
     })
       .then(async (r) => {
         if (r.status === 400) {
@@ -574,26 +632,23 @@ function boot() {
     .then(applyConfig)
     .catch(() => applyConfig(CONFIG_FALLBACK));
 
-  // Tracks g.caught (item catches only, not obstacle passes) so onScore can
-  // tell a catch apart from a normal obstacle-passed point and play a blip.
-  let lastCaught = 0;
-
   game.onStart = () => {
     emit("game_start", {});
     audio.startMusic();
-    lastCaught = 0;
     renderLives(GAME.MAX_LIVES);
   };
-  game.onScore = (s) => {
-    scoreEl.textContent = String(s);
-    const caughtNow = game.game.caught;
-    if (caughtNow > lastCaught) sfxCatch();
-    lastCaught = caughtNow;
-  };
+  game.onScore = (s) => { scoreEl.textContent = String(s); };
+  // Reward feedback: quiet coin/note on every catch or obstacle pass.
+  game.onGain = (_amount, special) => sfxGain(special);
+  // Play-time clock (excludes menus/popups — game.t only advances while running).
+  game.onTime = (seconds) => { if (timerEl) timerEl.textContent = fmtTime(seconds); };
   game.onGameOver = (s) => {
-    emit("game_over", { score: s });
+    lastGameChar = game.charIndex;
+    lastGameTimeMs = Math.round(game.t * 1000);
+    emit("game_over", { score: s, time_ms: lastGameTimeMs });
     audio.sfxGameOver();
     finalScoreEl.textContent = String(s);
+    if (finalTimeEl) finalTimeEl.textContent = fmtTime(game.t);
     updateBest(localStorage, s);
     renderBest();
     renderLives(0);
@@ -604,6 +659,8 @@ function boot() {
     nameInput.value = localStorage.getItem(NAME_KEY) || "";
     hud.classList.add("hidden");
     livesEl.classList.add("hidden");
+    timerEl.classList.add("hidden");
+    pauseBtn.classList.add("hidden");
     overEl.classList.remove("hidden");
     if (!isVariantA) fireCtaView(); // becomes visible only now, for variant B
     kbOpen(overEl);
@@ -663,8 +720,12 @@ function boot() {
     startEl.classList.add("hidden");
     overEl.classList.add("hidden");
     lifeLostEl.classList.add("hidden");
+    pauseEl.classList.add("hidden");
     hud.classList.remove("hidden");
     livesEl.classList.remove("hidden");
+    timerEl.classList.remove("hidden");
+    timerEl.textContent = "0:00";
+    pauseBtn.classList.remove("hidden");
     scoreEl.textContent = "0";
     game.start();
   }
@@ -672,18 +733,37 @@ function boot() {
   playBtn.addEventListener("click", startPlay);
   retryBtn.addEventListener("click", startPlay);
 
-  // Back to the start screen (re-pick a character, etc.) — from game over, or
-  // from the life-lost popup (abandons the current run; Играть resets it).
+  // Back to the start screen (re-pick a character, etc.) — from game over, the
+  // pause menu, or the life-lost popup (abandons the run; Играть resets it).
   function goToMenu() {
     overEl.classList.add("hidden");
     lifeLostEl.classList.add("hidden");
+    pauseEl.classList.add("hidden");
     leaderboardEl.classList.add("hidden");
+    hud.classList.add("hidden");
+    livesEl.classList.add("hidden");
+    timerEl.classList.add("hidden");
+    pauseBtn.classList.add("hidden");
     startEl.classList.remove("hidden");
     kbOpen(startEl);
     if (isVariantA) openStartPresave(); // greet the start screen with the popup again
   }
   toMenuBtn.addEventListener("click", goToMenu);
   document.getElementById("life-lost-menu").addEventListener("click", goToMenu);
+
+  // Pause button → freeze the game + show the pause menu.
+  pauseBtn.addEventListener("click", () => {
+    if (game.game.state !== "running") return;
+    game.pause();
+    pauseEl.classList.remove("hidden");
+    kbOpen(pauseEl);
+  });
+  pauseResumeBtn.addEventListener("click", () => {
+    pauseEl.classList.add("hidden");
+    kbClear();
+    game.resume();
+  });
+  pauseMenuBtn.addEventListener("click", goToMenu);
 
   muteBtn.addEventListener("click", () => {
     const muted = audio.toggleMute();

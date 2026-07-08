@@ -29,3 +29,25 @@ def test_name_trimmed(client, settings):
 
 def test_scores_empty_initially(client):
     assert client.get("/api/scores").json() == {"scores": []}
+
+
+def test_score_stores_character_and_time(client):
+    client.post("/api/score", json={"name": "Kir", "score": 20, "character": 0, "time_ms": 45000})
+    s = client.get("/api/scores").json()["scores"][0]
+    assert s["character"] == 0 and s["time_ms"] == 45000
+
+
+def test_scores_filter_by_character(client):
+    client.post("/api/score", json={"name": "A", "score": 50, "character": 0, "time_ms": 1000})
+    client.post("/api/score", json={"name": "B", "score": 40, "character": 1, "time_ms": 1000})
+    client.post("/api/score", json={"name": "C", "score": 30, "character": 0, "time_ms": 1000})
+    overall = client.get("/api/scores").json()["scores"]
+    assert [s["name"] for s in overall] == ["A", "B", "C"]          # all, by score
+    only0 = client.get("/api/scores?character=0").json()["scores"]
+    assert [s["name"] for s in only0] == ["A", "C"]                 # character 0 only
+    only1 = client.get("/api/scores?character=1").json()["scores"]
+    assert [s["name"] for s in only1] == ["B"]
+
+
+def test_scores_reject_bad_character_filter(client):
+    assert client.get("/api/scores?character=9").status_code == 422

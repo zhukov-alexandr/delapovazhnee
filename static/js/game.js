@@ -43,6 +43,11 @@ export class Game {
     this.onReveal = noop;  // (lyricIndex) — fired when a new line is revealed; game is already paused
     this.onLifeLost = noop; // (livesLeft, score) — fired on a non-fatal hit; game is already paused
     this.onLifeGain = noop; // (lives) — fired when the Плов bonus item restores a life
+    this.onGain = noop;     // (amount, special) — a score gain (catch/pass); shell plays a blip
+    this.onTime = noop;     // (seconds) — in-game play time; only advances while running
+
+    // Floating "+N" reward popups above the runner: {text, x, y, t0, color}.
+    this.popups = [];
 
     // Runtime handles created lazily in start(); null until then.
     this.canvas = null;
@@ -76,6 +81,7 @@ export class Game {
     this.growUntil = 0;
     this.t = 0;
     this.cam.x = 0;
+    this.popups.length = 0;
     this.onStart();
     this._resize();
     if (!this.running) {
@@ -96,6 +102,12 @@ export class Game {
   resume() {
     this.game.state = "running";
     this.last = performance.now();
+  }
+
+  // Manual pause (pause button). Freezes gameplay + the play-time clock (t/cam
+  // only advance while running); the RAF keeps rendering the frozen scene.
+  pause() {
+    if (this.game.state === "running") this.game.state = "paused";
   }
 
   // Resolve the canvas element + 2D context and attach listeners. Idempotent.
@@ -193,7 +205,8 @@ export class Game {
     this.last = now;
 
     const invulnerable = this.t < this.invulnUntil;
-    const { over, scoreDelta, grew } = stepGame(this.game, dt, this.worldW, invulnerable);
+    const { over, scoreDelta, grew, obstacleDelta, caughtPoints } =
+      stepGame(this.game, dt, this.worldW, invulnerable);
     // Bonus item (Плов) caught: (re)start the 2x-size window (game-time `t`, so
     // it freezes on pause) and restore one life, capped at MAX_LIVES.
     if (grew) {
@@ -204,12 +217,24 @@ export class Game {
       }
     }
 
+    // Reward feedback: a floating "+N" above the runner + a blip (onGain), for
+    // both catching an item and clearing an obstacle.
+    if (caughtPoints > 0) {
+      this._addPopup("+" + caughtPoints, grew ? PALETTE.sun : PALETTE.arcade);
+      this.onGain(caughtPoints, grew);
+    }
+    if (obstacleDelta > 0) {
+      this._addPopup("+" + obstacleDelta, PALETTE.foam);
+      this.onGain(obstacleDelta, false);
+    }
+
     // Only advance time/camera/reveal-checks while actually running — this is
     // what makes a lyric-reveal pause read as a genuinely frozen scene rather
     // than just obstacles halting while everything else keeps moving.
     if (this.game.state === "running") {
       this.t += dt;
       this.cam.x += this.game.obs.speed * dt;
+      this.onTime(this.t);
 
       const idx = nextRevealIndex(this.game.score, this.pointsPerLine, this.revealed, this.lyricsCount);
       if (idx !== null) {
@@ -239,6 +264,38 @@ export class Game {
     this.raf = requestAnimationFrame(this._frame);
   }
 
+  // Queue a floating "+N" above the runner's current head position.
+  _addPopup(text, color) {
+    this.popups.push({
+      text,
+      x: GAME.RUNNER_X + GAME.RUNNER_W / 2,
+      y: this.game.runner.y - GAME.RUNNER_H * GAME.BASE_SCALE - 8,
+      t0: this.t,
+      color,
+    });
+    if (this.popups.length > 12) this.popups.shift();
+  }
+
+  // Draw + age the reward popups: rise ~26px and fade over POPUP_LIFE seconds.
+  _drawPopups(ctx) {
+    const LIFE = 0.9;
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = '700 15px "ProgressPixelPab", monospace';
+    for (let i = this.popups.length - 1; i >= 0; i--) {
+      const p = this.popups[i];
+      const age = this.t - p.t0;
+      if (age >= LIFE || age < 0) { this.popups.splice(i, 1); continue; }
+      const k = age / LIFE;
+      ctx.globalAlpha = 1 - k * k;
+      ctx.fillStyle = p.color;
+      const y = p.y - k * 26;
+      ctx.fillText(p.text, p.x, y);
+    }
+    ctx.restore();
+  }
+
   _render() {
     const ctx = this.ctx;
     if (!ctx) return;
@@ -262,5 +319,6 @@ export class Game {
     if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
       drawRunner(ctx, this.game.runner, this.t, this.charIndex, grow);
     }
+    this._drawPopups(ctx);
   }
 }

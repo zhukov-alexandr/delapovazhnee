@@ -38,8 +38,11 @@ export function stepGame(g, dt, worldW, invulnerable = false) {
   const scoreDelta = obstacleDelta + points;
   if (!invulnerable) {
     for (const o of g.obs.obstacles) {
-      if (collides(box, o)) { g.state = "over"; return { over: true, scoreDelta, grew: special }; }
+      if (collides(box, o)) {
+        g.state = "over";
+        return { over: true, scoreDelta, grew: special, obstacleDelta, caughtPoints: points };
+      }
     }
   }
-  return { over: false, scoreDelta, grew: special };
+  return { over: false, scoreDelta, grew: special, obstacleDelta, caughtPoints: points };
 }

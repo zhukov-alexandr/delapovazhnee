@@ -49,6 +49,12 @@ def get_conn(db_path: str) -> sqlite3.Connection:
 
 def init_db(conn: sqlite3.Connection) -> None:
     conn.executescript(SCHEMA)
+    # Migrations: older DBs have a scores table without these columns.
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(scores)").fetchall()}
+    if "character" not in cols:
+        conn.execute("ALTER TABLE scores ADD COLUMN character INTEGER NOT NULL DEFAULT -1")
+    if "time_ms" not in cols:
+        conn.execute("ALTER TABLE scores ADD COLUMN time_ms INTEGER NOT NULL DEFAULT 0")
     conn.commit()
 
 
@@ -69,20 +75,28 @@ def fetch_all_events(conn) -> list:
     return conn.execute("SELECT * FROM events ORDER BY id").fetchall()
 
 
-def insert_score(conn, name: str, score: int) -> int:
+def insert_score(conn, name: str, score: int, character: int = -1, time_ms: int = 0) -> int:
     cur = conn.execute(
-        "INSERT INTO scores (ts, name, score) VALUES (?, ?, ?)",
-        (_now_iso(), name, score),
+        "INSERT INTO scores (ts, name, score, character, time_ms) VALUES (?, ?, ?, ?, ?)",
+        (_now_iso(), name, score, character, time_ms),
     )
     conn.commit()
     return cur.lastrowid
 
 
-def top_scores(conn, limit: int = 10) -> list:
-    # Highest score first; earlier submissions (lower id) win ties.
+def top_scores(conn, limit: int = 10, character: int | None = None) -> list:
+    # Highest score first; earlier submissions (lower id) win ties. Filter by
+    # character (0-3) for the per-character leaderboard tabs; None = overall.
+    if character is None:
+        return conn.execute(
+            "SELECT name, score, character, time_ms FROM scores "
+            "ORDER BY score DESC, id ASC LIMIT ?",
+            (limit,),
+        ).fetchall()
     return conn.execute(
-        "SELECT name, score FROM scores ORDER BY score DESC, id ASC LIMIT ?",
-        (limit,),
+        "SELECT name, score, character, time_ms FROM scores WHERE character = ? "
+        "ORDER BY score DESC, id ASC LIMIT ?",
+        (character, limit),
     ).fetchall()
 
 

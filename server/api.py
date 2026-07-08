@@ -32,6 +32,8 @@ class EventIn(BaseModel):
 class ScoreIn(BaseModel):
     name: str = Field(default="", max_length=24)
     score: int = Field(ge=0, le=1_000_000)
+    character: int = Field(default=-1, ge=-1, le=3)
+    time_ms: int = Field(default=0, ge=0, le=86_400_000)  # in-game play time (anti-cheat)
 
 
 def build_api_router(settings: Settings) -> APIRouter:
@@ -59,19 +61,23 @@ def build_api_router(settings: Settings) -> APIRouter:
         name = (s.name or "").strip()[:24] or "Аноним"
         conn = _conn()
         try:
-            insert_score(conn, name, s.score)
+            insert_score(conn, name, s.score, s.character, s.time_ms)
         finally:
             conn.close()
         return {"ok": True}
 
     @router.get("/api/scores")
-    def get_scores():
+    def get_scores(character: int | None = Query(default=None, ge=0, le=3)):
         conn = _conn()
         try:
-            rows = top_scores(conn, 10)
+            rows = top_scores(conn, 10, character)
         finally:
             conn.close()
-        return {"scores": [{"name": r["name"], "score": r["score"]} for r in rows]}
+        return {"scores": [
+            {"name": r["name"], "score": r["score"],
+             "character": r["character"], "time_ms": r["time_ms"]}
+            for r in rows
+        ]}
 
     @router.get("/go/presave")
     def go_presave(
