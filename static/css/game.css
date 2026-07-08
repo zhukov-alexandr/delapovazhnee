@@ -331,7 +331,7 @@ p {
 .char-tile {
   width: clamp(64px, 18vw, 82px);
   min-height: 44px;
-  padding: 4px;
+  padding: 4px 4px 0;
   border: 3px solid var(--grape);
   border-radius: 10px;
   background: var(--night);
