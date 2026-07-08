@@ -335,6 +335,13 @@ p {
   color: var(--ink);
 }
 
+.cta-caption {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(13px, 3vw, 15px);
+  color: var(--ink);
+}
+
 .cta .cover {
   width: clamp(140px, 42vw, 200px);
   height: auto;
@@ -583,12 +590,13 @@ p {
   text-align: left;
 }
 
-/* Release name under the «Пресейв» heading (Дела поважнее — 19). */
+/* Release caption above the cover (Дела поважнее – 19). */
 .presave-release {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   font-size: clamp(13px, 3.2vw, 15px);
+  font-weight: 700;
   color: #666;
-  text-align: left;
+  text-align: center;
 }
 
 .presave-services {
@@ -782,38 +790,38 @@ p {
 .over-footer { margin-top: clamp(14px, 3vh, 22px); opacity: 0.62; }
 .over-footer .btn.ghost { font-size: clamp(12px, 2.2vw, 14px); padding: 7px 14px; }
 
-/* Mobile: everything ~1.15x larger (portrait phones). Sizes below are the
-   desktop clamps multiplied by 1.15 so text/buttons/tiles read bigger on phones. */
+/* Mobile: everything ~1.32x larger (portrait phones) — two successive +15%
+   passes over the desktop clamps so text/buttons/tiles read bigger on phones. */
 @media (max-width: 767px) {
-  h1 { font-size: clamp(32px, 9.2vw, 64px); }
-  p { font-size: clamp(16px, 2.8vw, 21px); }
-  .hud { font-size: clamp(23px, 4.6vw, 34px); }
-  .lives { font-size: clamp(17px, 3.9vw, 23px); }
-  .timer { font-size: clamp(16px, 3.5vw, 21px); }
-  .lives-left { font-size: clamp(21px, 4.8vw, 30px); }
-  .btn { font-size: clamp(17px, 3vw, 21px); padding: 12px 25px; }
-  .btn.big { font-size: clamp(21px, 4.1vw, 28px); padding: 16px 39px; }
-  .btn.ghost { font-size: clamp(15px, 2.8vw, 18px); padding: 10px 20px; }
-  .char-tile { width: clamp(74px, 20.7vw, 94px); }
-  .char-tile-name { font-size: clamp(10px, 2.3vw, 13px); }
-  .best { font-size: clamp(20px, 3.9vw, 25px); }
-  .manual li { font-size: clamp(15px, 2.5vw, 18px); }
-  .manual-icon { font-size: clamp(18px, 3.5vw, 23px); }
-  .menu-credits { font-size: clamp(13px, 2.8vw, 15px); }
-  .reveal-line { font-size: clamp(25px, 6.3vw, 41px); }
-  .reveal-label { font-size: clamp(18px, 3.9vw, 25px); }
-  .name-input { font-size: clamp(16px, 3.5vw, 18px); }
-  .lb-row { font-size: clamp(17px, 4.1vw, 21px); }
-  .lb-tab { font-size: clamp(13px, 3vw, 15px); }
-  .lb-time { font-size: clamp(13px, 3.2vw, 16px); }
-  .leaderboard-title { font-size: clamp(28px, 6.9vw, 39px); }
-  .presave-title { font-size: clamp(21px, 4.6vw, 25px); }
-  .bl-name { font-size: clamp(16px, 4.1vw, 18px); }
-  .el-link__action { font-size: clamp(15px, 3.9vw, 17px); }
-  .song-complete-title { font-size: clamp(18px, 3.9vw, 24px); }
-  .song-complete-sub { font-size: clamp(15px, 3.2vw, 18px); }
-  .song-complete-lyrics li { font-size: clamp(14px, 3vw, 17px); }
-  .loading-title { font-size: clamp(28px, 6.9vw, 46px); }
+  h1 { font-size: clamp(37px, 10.6vw, 74px); }
+  p { font-size: clamp(18px, 3.2vw, 24px); }
+  .hud { font-size: clamp(26px, 5.3vw, 39px); }
+  .lives { font-size: clamp(20px, 4.5vw, 26px); }
+  .timer { font-size: clamp(18px, 4vw, 24px); }
+  .lives-left { font-size: clamp(24px, 5.5vw, 35px); }
+  .btn { font-size: clamp(20px, 3.5vw, 24px); padding: 14px 29px; }
+  .btn.big { font-size: clamp(24px, 4.7vw, 32px); padding: 18px 45px; }
+  .btn.ghost { font-size: clamp(17px, 3.2vw, 21px); padding: 12px 23px; }
+  .char-tile { width: clamp(85px, 23.8vw, 108px); }
+  .char-tile-name { font-size: clamp(12px, 2.6vw, 15px); }
+  .best { font-size: clamp(23px, 4.5vw, 29px); }
+  .manual li { font-size: clamp(17px, 2.9vw, 21px); }
+  .manual-icon { font-size: clamp(21px, 4vw, 26px); }
+  .menu-credits { font-size: clamp(15px, 3.2vw, 17px); }
+  .reveal-line { font-size: clamp(29px, 7.2vw, 47px); }
+  .reveal-label { font-size: clamp(21px, 4.5vw, 29px); }
+  .name-input { font-size: clamp(18px, 4vw, 21px); }
+  .lb-row { font-size: clamp(20px, 4.7vw, 24px); }
+  .lb-tab { font-size: clamp(15px, 3.5vw, 17px); }
+  .lb-time { font-size: clamp(15px, 3.7vw, 18px); }
+  .leaderboard-title { font-size: clamp(32px, 7.9vw, 45px); }
+  .presave-title { font-size: clamp(24px, 5.3vw, 29px); }
+  .bl-name { font-size: clamp(18px, 4.7vw, 21px); }
+  .el-link__action { font-size: clamp(17px, 4.5vw, 20px); }
+  .song-complete-title { font-size: clamp(21px, 4.5vw, 28px); }
+  .song-complete-sub { font-size: clamp(17px, 3.7vw, 21px); }
+  .song-complete-lyrics li { font-size: clamp(16px, 3.5vw, 20px); }
+  .loading-title { font-size: clamp(32px, 7.9vw, 53px); }
 }
 
 /* Landscape: keep overlays from feeling cramped in short viewports */
