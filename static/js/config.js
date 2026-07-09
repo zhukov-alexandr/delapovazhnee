@@ -22,8 +22,8 @@ export const GAME = {
   MAX_SPEED: 560,        // speed cap
   RUNNER_W: 34,
   RUNNER_H: 48,
-  RUNNER_X: 60,          // fixed horizontal position of the runner. Moved left
-                         // (was 90) so the zoomed-in mobile view (MIN_VIEW_W) still
+  RUNNER_X: 48,          // fixed horizontal position of the runner. Moved left
+                         // (90 -> 60 -> 48) so the zoomed-in mobile view (MIN_VIEW_W)
                          // leaves enough track ahead to react to obstacles. Draw and
                          // collision share this, so lowering it just shifts the runner
                          // left everywhere (desktop has ample width, unaffected in feel).
@@ -36,7 +36,10 @@ export const GAME = {
   BASE_SCALE: 1.2,       // normal runner draw size (1.2 = 20% bigger than the sprite box)
   GROW_TIME: 10,         // seconds the runner stays big after the bonus item
   GROW_SCALE: 1.8,       // grown draw size after Плов (× the sprite box; independent of BASE_SCALE) — edit freely
+  GROW_ANIM_TIME: 1,     // seconds to ease from normal to full size after Плов (Mario-style grow ramp) — edit freely
+  GROW_BLINK_TIME: 2,    // seconds the runner blinks after Плов (covers the grow second + 1 more) — edit freely
   GROW_JUMP_MULT: 1.25,   // while grown, the runner jumps this much HIGHER (peak-height ×) — edit freely
+  REVEAL_SHOW_TIME: 7,   // seconds a revealed lyric line floats in the sky "cloud" before fading — edit freely
   ITEM_MIN_GAP: 1.6,
   ITEM_MAX_GAP: 3.2,
   ITEM_Y_MIN: 120,       // top-y band; kept high enough that a 60px item's bottom stays
@@ -51,18 +54,21 @@ export const GAME = {
   // spawn. TO ADD MORE: drop a processed PNG in obstacles/ and append an entry
   // here — boot.js loads them as obs_0..N automatically from this list.
   // `scale` (optional, default 1) multiplies the final box for that obstacle.
+  // `big: true` marks an obstacle as too large for a cold start — those are
+  // excluded from the first EARLY_SAFE_SPAWNS spawns (see obstacles.js).
+  EARLY_SAFE_SPAWNS: 3,  // first N obstacles avoid the `big` ones — edit freely
   OBSTACLES: [
     { file: "char5.png", aspect: 0.31, scale: 1.15 }, // моноциклист
     { file: "char6.png", aspect: 0.78 }, // самокат
-    { file: "char7.png", aspect: 1.28, scale: 1.5 }, // конная полиция — крупнее
+    { file: "char7.png", aspect: 1.28, scale: 1.5, big: true }, // конная полиция — крупнее
     { file: "char8.png", aspect: 1.13 }, // загорающий с мопсом
     { file: "char9.png", aspect: 0.93, scale: 1.2 }, // повар с пловом — чуть крупнее
-    { file: "char10.png", aspect: 2.25, scale: 2.5 }, // газель с арбузами — крупная
-    { file: "char11.png", aspect: 2.23, scale: 2.5 }, // пляжные зонты + афиша — крупная
+    { file: "char10.png", aspect: 2.25, scale: 2.5, big: true }, // газель с арбузами — крупная
+    { file: "char11.png", aspect: 2.23, scale: 2.5, big: true }, // пляжные зонты + афиша — крупная
     { file: "char12.png", aspect: 1.00, scale: 1.25 }, // бочка кваса
-    { file: "char13.png", aspect: 1.05, scale: 1.6 }, // знак «купаться запрещено» — крупный
+    { file: "char13.png", aspect: 1.05, scale: 1.6, big: true }, // знак «купаться запрещено» — крупный
     { file: "char14.png", aspect: 1.68 }, // мангал с шашлыком
-    { file: "char15.png", aspect: 0.707, scale: 1.8 }, // пальма — высокая
+    { file: "char15.png", aspect: 0.707, scale: 1.8, big: true }, // пальма — высокая
   ],
 };
 

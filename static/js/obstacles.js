@@ -26,6 +26,7 @@ export function createGameState(speedMult = 1) {
     elapsed: 0,
     score: 0,
     speedMult,
+    spawnCount: 0, // how many obstacles have spawned — gates the early "no big ones" window
   };
 }
 
@@ -38,15 +39,20 @@ function nextGap(speed) {
 }
 
 // Pick a random obstacle sprite from GAME.OBSTACLES and spawn it ground-anchored.
-// `sprite` is the images[] key (obs_<index>) the renderer draws.
+// `sprite` is the images[] key (obs_<index>) the renderer draws. The first
+// EARLY_SAFE_SPAWNS obstacles skip the `big` ones (too hard to clear cold).
 function spawn(state, worldW) {
   const kinds = GAME.OBSTACLES;
-  const j = Math.floor(Math.random() * kinds.length);
-  const { w, h } = obstacleBox(kinds[j].aspect, kinds[j].scale);
+  const early = state.spawnCount < (GAME.EARLY_SAFE_SPAWNS || 0);
+  const pool = early ? kinds.filter((k) => !k.big) : kinds;
+  const pick = (pool.length ? pool : kinds)[Math.floor(Math.random() * (pool.length ? pool.length : kinds.length))];
+  const j = kinds.indexOf(pick); // full-list index so the sprite key (obs_j) matches
+  const { w, h } = obstacleBox(pick.aspect, pick.scale);
   state.obstacles.push({
     x: worldW + 20, y: GAME.GROUND_Y - h, w, h,
     sprite: "obs_" + j, passed: false,
   });
+  state.spawnCount += 1;
 }
 
 // worldW defaults large so the pure self-test (no canvas) still spawns/moves sanely.

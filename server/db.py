@@ -43,7 +43,18 @@ def get_conn(db_path: str) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     if db_path != ":memory:":
+        # WAL: concurrent readers don't block the single writer.
         conn.execute("PRAGMA journal_mode=WAL")
+        # busy_timeout: when the write lock is held, wait up to 5s for it instead
+        # of failing the request immediately with "database is locked". This is
+        # what lets bursty concurrent writes (score saves + A/B events) queue
+        # rather than 500 under a traffic spike.
+        conn.execute("PRAGMA busy_timeout=5000")
+        # synchronous=NORMAL is safe under WAL (a crash can only lose the last
+        # commits, never corrupt the DB) and drops an fsync per commit, which is
+        # the main per-write cost — big throughput win for our commit-per-request
+        # pattern.
+        conn.execute("PRAGMA synchronous=NORMAL")
     return conn
 
 

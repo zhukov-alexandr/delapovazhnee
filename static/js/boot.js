@@ -145,9 +145,9 @@ function boot() {
   const bestScoreEl = document.getElementById("best-score");
   const bestScoreOverEl = document.getElementById("best-score-over");
   const charTiles = Array.from(document.querySelectorAll(".char-tile"));
-  const revealPopup = document.getElementById("reveal-popup");
-  const revealLineEl = document.getElementById("reveal-line");
-  const revealNextBtn = document.getElementById("reveal-next");
+  const openedLinesEl = document.getElementById("opened-lines");
+  const openedLinesListEl = document.getElementById("opened-lines-list");
+  const openedLinesClose = document.getElementById("opened-lines-close");
   const songCompleteEl = document.getElementById("song-complete");
   const songCompleteNext = document.getElementById("song-complete-next");
   const songCompleteLyricsEl = document.getElementById("song-complete-lyrics");
@@ -161,7 +161,7 @@ function boot() {
       songCompleteLyricsEl.appendChild(gap);
     }
     const li = document.createElement("li");
-    li.textContent = line;
+    li.textContent = line.replace("\n", " "); // one display line per lyric here
     songCompleteLyricsEl.appendChild(li);
   });
   const livesEl = document.getElementById("lives");
@@ -183,6 +183,9 @@ function boot() {
   const pauseEl = document.getElementById("pause");
   const pauseResumeBtn = document.getElementById("pause-resume");
   const pauseMenuBtn = document.getElementById("pause-menu");
+  const pauseLinesBtn = document.getElementById("pause-lines");
+  const lifeLostLinesBtn = document.getElementById("life-lost-lines");
+  const overLinesBtn = document.getElementById("over-lines");
   const lbTabs = Array.from(document.querySelectorAll(".lb-tab"));
 
   // Avatar per character index (matches the picker order Кирилл/Никита/Саша/Костя).
@@ -624,6 +627,10 @@ function boot() {
   game.charIndex = getChar(localStorage);
   selectChar(game.charIndex);
 
+  // Debug/testing handle — only when the URL carries ?debug, so normal play is
+  // unaffected. Exposes the controller for manual poking / automated checks.
+  if (new URLSearchParams(location.search).has("debug")) window.__game = game;
+
   // --- Server config (Task 21/23): N points per revealed lyric line + the
   // world scroll-speed multiplier, tunable from /admin/settings. Fetch
   // failure falls back to sane defaults so the game is always playable. ---
@@ -631,6 +638,7 @@ function boot() {
     game.pointsPerLine = cfg.points_per_line;
     game.speedMult = cfg.speed_mult;
     game.lyricsCount = LYRICS.length;
+    game.lyrics = LYRICS; // game.js draws the revealed line in the sky cloud
     // Music loudness is admin-tunable; SFX stay at their fixed level.
     if (cfg.music_volume != null) audio.setMusicVolume(cfg.music_volume);
   }
@@ -686,35 +694,70 @@ function boot() {
   game.onLifeGain = (lives) => {
     renderLives(lives);
   };
-  // Lyric reveal (Task 23): game.js already paused gameplay before calling
-  // this — just play the sting, pulse the score, and show the next line.
+  // Big (Плов) runner absorbed a hit: it just shrinks, no life lost — but still
+  // play the hit sound so the collision is felt.
+  game.onShrink = () => {
+    sfxHit();
+  };
+  // Lyric reveal: the line itself is drawn as a non-blocking sky "cloud" by
+  // game.js (no pause). Here we just play the sting + pulse the score. The FINAL
+  // line is the exception — game.js paused for the whole-song celebration, which
+  // we show now.
   game.onReveal = (i) => {
     audio.sfxReveal();
     scoreEl.classList.remove("pulse");
     void scoreEl.offsetWidth; // force reflow so the animation can retrigger
     scoreEl.classList.add("pulse");
     if (i >= LYRICS.length - 1) {
-      // Final line unlocked → celebrate with the whole song instead of one line.
       songCompleteEl.classList.remove("hidden");
       kbOpen(songCompleteEl);
-      return;
     }
-    revealLineEl.textContent = LYRICS[i];
-    revealPopup.classList.remove("hidden");
-    kbOpen(revealPopup);
   };
-
-  revealNextBtn.addEventListener("click", () => {
-    kbClear();
-    revealPopup.classList.add("hidden");
-    game.resume();
-  });
 
   songCompleteNext.addEventListener("click", () => {
     kbClear();
     songCompleteEl.classList.add("hidden");
     game.resume();
   });
+
+  // "Открытые строки": a read-only viewer of the lines unlocked so far this run,
+  // opened from the pause + life-lost menus (which keep the game paused behind it).
+  function renderOpenedLines() {
+    openedLinesListEl.innerHTML = "";
+    const n = Math.min(game.revealed || 0, LYRICS.length);
+    if (!n) {
+      const li = document.createElement("li");
+      li.textContent = "Пока ничего не открыто — набирай очки!";
+      openedLinesListEl.appendChild(li);
+      return;
+    }
+    for (let idx = 0; idx < n; idx++) {
+      if (idx > 0 && idx % 4 === 0) {
+        const gap = document.createElement("li");
+        gap.className = "stanza-gap";
+        gap.setAttribute("aria-hidden", "true");
+        openedLinesListEl.appendChild(gap);
+      }
+      const li = document.createElement("li");
+      // One display line per lyric here (the fixed "\n" is for the sky cloud
+      // and the song-complete popup, not this compact list).
+      li.textContent = LYRICS[idx].replace("\n", " ");
+      openedLinesListEl.appendChild(li);
+    }
+  }
+  function openOpenedLines() {
+    renderOpenedLines();
+    openedLinesEl.classList.remove("hidden");
+    kbOpen(openedLinesEl, true); // push over the pause/life-lost menu
+  }
+  function closeOpenedLines() {
+    openedLinesEl.classList.add("hidden");
+    kbClose(); // restore the pause/life-lost menu's highlight
+  }
+  pauseLinesBtn.addEventListener("click", openOpenedLines);
+  lifeLostLinesBtn.addEventListener("click", openOpenedLines);
+  overLinesBtn.addEventListener("click", openOpenedLines);
+  openedLinesClose.addEventListener("click", closeOpenedLines);
 
   continueBtn.addEventListener("click", () => {
     kbClear();

@@ -1,8 +1,28 @@
 import { GAME } from "../../static/js/config.js";
 import { createGame, startGame, stepGame } from "../../static/js/gamestate.js";
+import { createGameState, stepObstacles } from "../../static/js/obstacles.js";
 
 let failed = 0;
 const ok = (c, m) => { if (c) console.log("PASS " + m); else { failed++; console.error("FAIL " + m); } };
+
+// Early-safe spawns: the first EARLY_SAFE_SPAWNS obstacles never use a `big` one.
+{
+  const bigSprites = new Set(GAME.OBSTACLES.map((k, i) => (k.big ? "obs_" + i : null)).filter(Boolean));
+  let bad = 0;
+  for (let t = 0; t < 500; t++) {
+    const st = createGameState(1);
+    const seen = new Set();
+    const order = [];
+    let guard = 0;
+    while (order.length < GAME.EARLY_SAFE_SPAWNS && guard < 200000) {
+      stepObstacles(st, 1 / 60, 640);
+      for (const o of st.obstacles) if (!seen.has(o)) { seen.add(o); order.push(o.sprite); }
+      guard++;
+    }
+    if (order.slice(0, GAME.EARLY_SAFE_SPAWNS).some((s) => bigSprites.has(s))) bad++;
+  }
+  ok(bigSprites.size > 0 && bad === 0, `first ${GAME.EARLY_SAFE_SPAWNS} obstacles are never "big" (500 runs)`);
+}
 
 // Not running -> no-op.
 const g0 = createGame();

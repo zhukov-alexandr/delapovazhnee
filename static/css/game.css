@@ -111,17 +111,16 @@ p {
   display: inline-block;
 }
 
-/* Score pulse (Task 23): brief scale-up beat when a lyric line is revealed.
-   boot.js adds this class on reveal and removes it on `animationend` so the
-   same beat can retrigger on the next reveal. */
+/* Score pulse: a clear triple blink (scale + fade) when a lyric line is
+   revealed, so it reads as "your points just unlocked a line". boot.js adds this
+   class on reveal and removes it on `animationend` so it can retrigger. */
 #score.pulse {
-  animation: score-pulse 450ms ease-in-out;
+  animation: score-pulse 900ms ease-in-out;
 }
 
 @keyframes score-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1); }
+  0%, 33%, 66%, 100% { transform: scale(1); opacity: 1; }
+  16%, 50%, 83% { transform: scale(1.55); opacity: 0.25; }
 }
 
 /* Lives (hearts): a small row just under the score pill. boot.js fills it with
@@ -276,6 +275,12 @@ p {
   margin-top: 8px;
 }
 .menu-actions .btn { flex: 1 1 auto; margin-top: 0; }
+/* Stacked variant: buttons in a full-width vertical column (pause + life-lost
+   menus, where «Открытые строки» sits between «Продолжить» and «Главное меню»). */
+.menu-actions--stack { flex-direction: column; }
+
+/* Opened-lines viewer sits above the pause overlay (z 21) it can be opened from. */
+#opened-lines { z-index: 26; }
 
 /* Overlays */
 .overlay {
@@ -453,30 +458,10 @@ p {
 }
 .manual li.manual-hl b { color: var(--arcade); }
 
-/* Lyric-reveal popup (Task 23): sunset-styled overlay shown every N points,
-   gameplay is paused (frozen scene) behind it until "Дальше" is tapped. */
+/* Overlay backdrop shared by the song-complete + opened-lines viewers. */
 .reveal-overlay {
   z-index: 20; /* above the HUD/mute button while it's up */
   background: rgba(36, 21, 57, 0.86);
-}
-
-.reveal-label {
-  font-family: "ProgressPixel", monospace;
-  color: var(--sun);
-  font-size: clamp(16px, 3.4vw, 22px);
-  line-height: 1.4;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-}
-
-.reveal-line {
-  font-family: "ProgressPixelPab", "Handjet", sans-serif;
-  font-weight: 700;
-  color: var(--foam);
-  text-shadow: 0 0 14px rgba(255, 93, 115, 0.5);
-  font-size: clamp(22px, 5.5vw, 36px);
-  line-height: 1.25;
-  max-width: 30ch;
-  margin: 0 0 clamp(18px, 3.5vh, 28px);
 }
 
 /* Song-complete popup: the full-song celebration shown when every lyric line
@@ -665,9 +650,10 @@ p {
 }
 .btn.ghost:hover { border-color: var(--sand); }
 
-/* Life-lost popup has just one secondary action — size it like the primary
-   "Продолжить" button so it doesn't read as an afterthought. */
-#life-lost-menu { font-size: clamp(18px, 3.6vw, 24px); padding: 14px 34px; }
+/* Life-lost popup secondary actions («Открытые строки» + «Главное меню») —
+   sized like the primary "Продолжить" so they don't read as an afterthought;
+   both look identical, per spec. */
+#life-lost-menu, #life-lost-lines { font-size: clamp(18px, 3.6vw, 24px); padding: 14px 34px; }
 
 /* Save-score row on the game-over overlay: name field + save button. */
 .save-score {
@@ -798,8 +784,16 @@ p {
    attention stays on «Ещё раз» and the presave CTA. */
 .over-stats { color: var(--foam); }
 .over-stats b { color: var(--sun); font-weight: 700; }
-.over-footer { margin-top: clamp(14px, 3vh, 22px); opacity: 0.9; }
-.over-footer .btn.ghost { font-size: clamp(12px, 2.2vw, 14px); padding: 7px 14px; }
+/* Game-over footer: a clean 2×2 grid of EQUAL-width buttons (flex sized them to
+   text length, which looked lopsided — «Открытые строки» wider than «Рекорды»). */
+.over-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: clamp(14px, 3vh, 22px);
+  opacity: 0.9;
+}
+.over-footer .btn.ghost { width: 100%; font-size: clamp(12px, 2.2vw, 14px); padding: 7px 14px; }
 
 /* Mobile: everything ~1.15x larger (portrait phones). Sizes below are the
    desktop clamps multiplied by 1.15 so text/buttons/tiles read bigger on phones. */
@@ -819,8 +813,6 @@ p {
   .manual li { font-size: clamp(15px, 2.5vw, 18px); }
   .manual-icon { font-size: clamp(18px, 3.5vw, 23px); }
   .menu-credits { font-size: clamp(13px, 2.8vw, 15px); }
-  .reveal-line { font-size: clamp(25px, 6.3vw, 41px); }
-  .reveal-label { font-size: clamp(18px, 3.9vw, 25px); }
   .name-input { font-size: clamp(16px, 3.5vw, 18px); }
   .lb-row { font-size: clamp(15px, 3.7vw, 18px); }
   .lb-tab { font-size: clamp(13px, 3vw, 15px); }
@@ -842,7 +834,6 @@ p {
   .cta { margin-top: 8px; padding: 8px; flex-direction: row; gap: 12px; }
   .char-picker { margin-bottom: 6px; }
   .best { margin-bottom: 6px; }
-  .reveal-line { font-size: clamp(18px, 4vw, 26px); margin-bottom: 10px; }
   .manual { padding: 6px 10px; gap: 3px; margin-bottom: 6px; }
   .manual li { font-size: clamp(11px, 2vw, 13px); }
 }

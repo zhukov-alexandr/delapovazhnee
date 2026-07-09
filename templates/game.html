@@ -102,6 +102,7 @@
            dimmed footer below so it doesn't compete for attention. -->
       <div id="over-cta"></div>
       <div class="menu-actions over-footer">
+        <button id="over-lines" class="btn ghost">Открытые строки</button>
         <button id="show-scores-over" class="btn ghost">Рекорды</button>
         <button id="to-menu" class="btn ghost">Главное меню</button>
         <a class="btn ghost" href="/home">На сайт</a>
@@ -115,7 +116,8 @@
       <p id="lives-left" class="lives-left"></p>
       <p class="best">Очки: <span id="life-lost-score">0</span></p>
       <button id="continue" class="btn big">Продолжить</button>
-      <div class="menu-actions">
+      <div class="menu-actions menu-actions--stack">
+        <button id="life-lost-lines" class="btn ghost">Открытые строки</button>
         <button id="life-lost-menu" class="btn ghost">Главное меню</button>
       </div>
       <div id="life-lost-cta"></div>
@@ -141,16 +143,20 @@
     <div id="pause" class="overlay pause-overlay hidden">
       <h1>Пауза</h1>
       <button id="pause-resume" class="btn big">Продолжить</button>
-      <div class="menu-actions">
+      <div class="menu-actions menu-actions--stack">
+        <button id="pause-lines" class="btn ghost">Открытые строки</button>
         <button id="pause-menu" class="btn ghost">Главное меню</button>
       </div>
     </div>
 
-    <!-- Lyric-reveal popup (Task 23): shown + gameplay paused every N points. -->
-    <div id="reveal-popup" class="overlay reveal-overlay hidden">
-      <p class="reveal-label">Ура, вы открыли новую строчку из песни:</p>
-      <p id="reveal-line" class="reveal-line"></p>
-      <button id="reveal-next" class="btn big">Дальше</button>
+    <!-- Opened-lines viewer: opened from the pause + life-lost menus. Lists the
+         lyric lines unlocked so far this run (boot.js fills it). -->
+    <div id="opened-lines" class="overlay reveal-overlay hidden">
+      <div class="song-complete-card">
+        <h2 class="song-complete-title">Открытые строки</h2>
+        <ul id="opened-lines-list" class="song-complete-lyrics"></ul>
+        <button id="opened-lines-close" class="btn big">Назад</button>
+      </div>
     </div>
 
     <!-- Song-complete popup: shown once the final lyric line is revealed. Full

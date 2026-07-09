@@ -27,6 +27,8 @@ export class Game {
     this.pointsPerLine = 5;   // N: score points per revealed lyric line
     this.speedMult = 1;       // scales RUN_SPEED/MAX_SPEED (obstacles.js)
     this.lyricsCount = 0;     // total lines available to reveal (LYRICS.length)
+    this.lyrics = [];         // the actual line strings (set by boot.js) — drawn in
+                              // the sky "cloud" on reveal
     this.revealed = 0;        // how many lines have been revealed so far
 
     // Lives (hearts): each obstacle hit costs one; the last hit is game over.
@@ -35,6 +37,8 @@ export class Game {
                               // (pass-through grace after losing a life)
     this.growUntil = 0;       // this.t value until which the runner draws 2x-size
                               // (bonus-item power-up; see the special collectible)
+    this.growStart = 0;       // this.t value when the grow began — drives the
+                              // Mario-style grow ramp + blink (see _render)
 
     // Shell hooks — settable by Task 14. Kept simple and always callable.
     this.onStart = noop;
@@ -43,11 +47,16 @@ export class Game {
     this.onReveal = noop;  // (lyricIndex) — fired when a new line is revealed; game is already paused
     this.onLifeLost = noop; // (livesLeft, score) — fired on a non-fatal hit; game is already paused
     this.onLifeGain = noop; // (lives) — fired when the Плов bonus item restores a life
+    this.onShrink = noop;   // () — fired when a big (Плов) runner absorbs a hit instead
+                            // of losing a life; shell plays the hit sound
     this.onGain = noop;     // (amount, special) — a score gain (catch/pass); shell plays a blip
     this.onTime = noop;     // (seconds) — in-game play time; only advances while running
 
     // Floating "+N" reward popups above the runner: {text, x, y, t0, color}.
     this.popups = [];
+    // Active lyric "cloud" in the sky: {text, t0} or null. Non-blocking — the game
+    // keeps running while it shows (REVEAL_SHOW_TIME) then fades.
+    this.reveal = null;
 
     // Runtime handles created lazily in start(); null until then.
     this.canvas = null;
@@ -79,9 +88,11 @@ export class Game {
     this.lives = GAME.MAX_LIVES;
     this.invulnUntil = 0;
     this.growUntil = 0;
+    this.growStart = 0;
     this.t = 0;
     this.cam.x = 0;
     this.popups.length = 0;
+    this.reveal = null;
     this.onStart();
     this._resize();
     if (!this.running) {
@@ -210,6 +221,7 @@ export class Game {
     // Bonus item (Плов) caught: (re)start the 2x-size window (game-time `t`, so
     // it freezes on pause) and restore one life, capped at MAX_LIVES.
     if (grew) {
+      this.growStart = this.t;
       this.growUntil = this.t + GAME.GROW_TIME;
       if (this.lives < GAME.MAX_LIVES) {
         this.lives += 1;
@@ -236,31 +248,44 @@ export class Game {
       this.cam.x += this.game.obs.speed * dt;
       this.onTime(this.t);
 
-      // Defer the lyric-reveal popup until the runner is back on the ground: if
-      // the threshold is crossed mid-jump, freezing the scene in the air looks
-      // broken. nextRevealIndex is score/`revealed`-driven (not time), so it keeps
-      // returning the same index every frame until we finally reveal on landing.
+      // Reveal the next lyric line as a non-blocking "cloud" in the sky — the game
+      // keeps running. The final line is the exception: it pauses for the
+      // whole-song celebration (the shell shows it). nextRevealIndex is score-driven.
       const idx = nextRevealIndex(this.game.score, this.pointsPerLine, this.revealed, this.lyricsCount);
-      if (idx !== null && this.game.runner.onGround) {
-        this.game.state = "paused";
-        this.onReveal(idx);
+      if (idx !== null) {
         this.revealed++;
+        if (this.revealed >= this.lyricsCount) {
+          this.game.state = "paused"; // final line: celebrate the whole song
+        } else {
+          this.reveal = { text: this.lyrics[idx] || "", t0: this.t };
+        }
+        this.onReveal(idx);
       }
     }
 
     if (scoreDelta) this.onScore(this.game.score);
 
-    // A hit costs a life. With lives left: pause + grant pass-through grace so
-    // resuming doesn't re-hit the same obstacle, and let the shell show the
-    // "life lost" popup. Out of lives: the existing game-over flow.
+    // A hit while BIG (Плов power-up) costs no life: the runner just shrinks back
+    // to normal and keeps running (Mario-style). Still plays the hit sound + grants
+    // the usual pass-through grace so it doesn't instantly re-hit. Otherwise a hit
+    // costs a life: with lives left, pause + grace + "life lost" popup; out of
+    // lives, the game-over flow.
     if (over) {
-      this.lives -= 1;
-      if (this.lives > 0) {
-        this.game.state = "paused";
+      if (this.t < this.growUntil) {
+        this.growUntil = 0;
+        this.growStart = 0;
         this.invulnUntil = this.t + GAME.INVULN_TIME;
-        this.onLifeLost(this.lives, this.game.score);
+        this.game.state = "running"; // stepGame set it to "over"; keep playing
+        this.onShrink();
       } else {
-        this.onGameOver(this.game.score);
+        this.lives -= 1;
+        if (this.lives > 0) {
+          this.game.state = "paused";
+          this.invulnUntil = this.t + GAME.INVULN_TIME;
+          this.onLifeLost(this.lives, this.game.score);
+        } else {
+          this.onGameOver(this.game.score);
+        }
       }
     }
 
@@ -278,6 +303,103 @@ export class Game {
       color,
     });
     if (this.popups.length > 12) this.popups.shift();
+  }
+
+  // Wrap `text` into lines no wider than maxW (in the current ctx font). Greedy
+  // word-wrap; a single over-long word is left on its own line.
+  _wrapText(ctx, text, maxW) {
+    const words = String(text).split(" ");
+    const lines = [];
+    let cur = "";
+    for (const w of words) {
+      const test = cur ? cur + " " + w : w;
+      if (cur && ctx.measureText(test).width > maxW) { lines.push(cur); cur = w; }
+      else cur = test;
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  _roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // Lyric "cloud": a soft cream bubble holding the revealed line, with a small
+  // caption above it. Non-blocking; shows for GAME.REVEAL_SHOW_TIME then fades.
+  // Drawn in SCREEN space (device px) at a fixed spot just below the HUD/timer so
+  // it never collides with the timer regardless of the device's world→screen
+  // mapping. Drawn before the runner + "+N" popups so those always sit on top.
+  _drawRevealCloud(ctx) {
+    const r = this.reveal;
+    if (!r || !r.text) return;
+    const age = this.t - r.t0;
+    const LIFE = GAME.REVEAL_SHOW_TIME;
+    if (age < 0 || age >= LIFE) { this.reveal = null; return; }
+    const FADE = 0.9;
+    const alpha = age > LIFE - FADE ? Math.max(0, (LIFE - age) / FADE) : 1;
+
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const W = this.canvas.width; // device px
+    // Size the cloud in the GAME's scale (device px per world px) so it reads the
+    // same relative to the runner/road — NOT raw CSS px, which renders tiny on a
+    // big low-dpr desktop canvas. But CAP that scale: on desktop the world scale
+    // is high (~3 at 1080p) which ballooned the cloud; clamping keeps it modest
+    // there while leaving phones (scale ~1.3) untouched. Its vertical position is
+    // anchored to the CSS-positioned HUD (dpr px from the top), not the game scale.
+    const cs = Math.min(this.scale || 1, 1.5);
+    const u = (v) => Math.round(v * cs * dpr); // world px (game-scaled, capped) -> device px
+    const cssPx = (v) => Math.round(v * dpr);  // CSS px -> device px
+    const label = "Открыта новая строка песни:";
+    const labelFont = `${u(12)}px "ProgressPixel", monospace`;
+    const lineFont = `700 ${u(17)}px "ProgressPixelPab", monospace`;
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // screen/device space
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const padX = u(15);
+    ctx.font = lineFont;
+    // Lyrics carry a fixed "\n" break (always exactly two display lines);
+    // word-wrap stays as a fallback for any text without one.
+    const maxTextW = Math.min(W * 0.92, u(310)) - padX * 2;
+    const lines = r.text.includes("\n")
+      ? r.text.split("\n")
+      : this._wrapText(ctx, r.text, maxTextW);
+    const lineH = u(22);
+    const labelH = u(18);
+    let boxW = padX * 2;
+    for (const ln of lines) boxW = Math.max(boxW, ctx.measureText(ln).width + padX * 2);
+    ctx.font = labelFont;
+    boxW = Math.max(boxW, ctx.measureText(label).width + padX * 2);
+    const boxH = u(9) + labelH + lines.length * lineH + u(9);
+    const cx = W / 2;
+    const x = Math.round(cx - boxW / 2);
+    const y = cssPx(128); // just under the HUD/timer band (CSS-positioned)
+
+    ctx.globalAlpha = alpha;
+    this._roundRectPath(ctx, x, y, boxW, boxH, u(11));
+    ctx.fillStyle = "rgba(255, 244, 226, 0.94)"; // foam-cream cloud
+    ctx.fill();
+    ctx.lineWidth = u(2);
+    ctx.strokeStyle = "rgba(109, 46, 139, 0.55)"; // grape edge
+    ctx.stroke();
+    // Caption (smaller, muted).
+    ctx.fillStyle = "rgba(42, 21, 51, 0.68)";
+    ctx.font = labelFont;
+    ctx.fillText(label, cx, y + u(9) + labelH / 2);
+    // Lyric line(s).
+    ctx.fillStyle = PALETTE.ink;
+    ctx.font = lineFont;
+    const textTop = y + u(9) + labelH;
+    lines.forEach((ln, i) => ctx.fillText(ln, cx, textTop + lineH / 2 + i * lineH));
+    ctx.restore();
   }
 
   // Draw + age the reward popups: rise ~26px and fade over POPUP_LIFE seconds.
@@ -317,10 +439,26 @@ export class Game {
     drawBackground(ctx, this.cam, this.worldW, viewTop);
     for (const o of this.game.obs.obstacles) drawObstacle(ctx, o);
     for (const item of this.game.col.items) drawCollectible(ctx, item);
-    // Blink the runner while invulnerable (post-life-loss grace) as feedback.
+    // Lyric "cloud" in the sky — drawn BEFORE the runner + "+N" popups so those
+    // always sit on top of it (per the design).
+    this._drawRevealCloud(ctx);
+    // Runner draw size + blink. Two things can make the runner blink: post-hit
+    // invulnerability grace, and the Mario-style grow after eating Плов.
     const invulnerable = this.t < this.invulnUntil;
-    const grow = this.t < this.growUntil ? GAME.GROW_SCALE : GAME.BASE_SCALE;
-    if (!invulnerable || Math.floor(this.t * 10) % 2 === 0) {
+    const grown = this.t < this.growUntil;
+    const growAge = this.t - this.growStart;
+    // Grow ramp: scale eases BASE_SCALE -> GROW_SCALE over GROW_ANIM_TIME so the
+    // runner passes through an intermediate size instead of popping to full size.
+    let grow = GAME.BASE_SCALE;
+    if (grown) {
+      const k = Math.min(1, growAge / GAME.GROW_ANIM_TIME);
+      grow = GAME.BASE_SCALE + (GAME.GROW_SCALE - GAME.BASE_SCALE) * k;
+    }
+    // Blink for GROW_BLINK_TIME after eating Плов (covers the grow second + one
+    // more), on top of the post-hit invuln blink.
+    const growBlinking = grown && growAge < GAME.GROW_BLINK_TIME;
+    const blinking = invulnerable || growBlinking;
+    if (!blinking || Math.floor(this.t * 10) % 2 === 0) {
       drawRunner(ctx, this.game.runner, this.t, this.charIndex, grow);
     }
     this._drawPopups(ctx);
