@@ -30,6 +30,14 @@
                    min="0.6" max="1.2" step="0.05" value="{{ cfg.speed_mult }}">
           </div>
 
+          <div class="field">
+            <label for="music_volume">Громкость музыки
+              <span class="value-badge" id="music_volume_val">{{ (cfg.music_volume * 100)|round|int }}%</span>
+            </label>
+            <input type="range" id="music_volume" name="music_volume"
+                   min="0" max="1" step="0.01" value="{{ cfg.music_volume }}">
+          </div>
+
           <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
       </section>
@@ -48,15 +56,15 @@
 
   <script>
     (function () {
-      var slider = document.getElementById('speed_mult');
-      var label = document.getElementById('speed_mult_val');
-      function fmt(v) { return Number(v).toFixed(2); }
-      if (slider && label) {
+      function bind(id, labelId, fmt) {
+        var slider = document.getElementById(id);
+        var label = document.getElementById(labelId);
+        if (!slider || !label) return;
         label.textContent = fmt(slider.value);
-        slider.addEventListener('input', function () {
-          label.textContent = fmt(slider.value);
-        });
+        slider.addEventListener('input', function () { label.textContent = fmt(slider.value); });
       }
+      bind('speed_mult', 'speed_mult_val', function (v) { return Number(v).toFixed(2); });
+      bind('music_volume', 'music_volume_val', function (v) { return Math.round(Number(v) * 100) + '%'; });
     })();
   </script>
 </body></html>

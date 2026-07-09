@@ -29,7 +29,7 @@ function addPresaved(store, id) {
 }
 
 // Server-tunable defaults (Task 21/23), used if GET /api/config fails.
-const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0 };
+const CONFIG_FALLBACK = { points_per_line: 5, speed_mult: 1.0, music_volume: 0.28 };
 
 // Quiet WebAudio "coin" ding on a score gain (catch/obstacle pass). Two quick
 // ascending notes; the special (Плов) gain adds a higher third note. Optional/
@@ -481,6 +481,11 @@ function boot() {
           img.src = AVATARS[s.character];
           img.alt = "";
           av.appendChild(img);
+        } else {
+          // Legacy runs saved before per-character tracking (character = -1) have
+          // no avatar — show a neutral placeholder instead of an empty box.
+          av.classList.add("lb-char--none");
+          av.textContent = "?";
         }
         li.appendChild(av);
       }
@@ -626,6 +631,8 @@ function boot() {
     game.pointsPerLine = cfg.points_per_line;
     game.speedMult = cfg.speed_mult;
     game.lyricsCount = LYRICS.length;
+    // Music loudness is admin-tunable; SFX stay at their fixed level.
+    if (cfg.music_volume != null) audio.setMusicVolume(cfg.music_volume);
   }
   fetch("/api/config")
     .then((r) => r.json())

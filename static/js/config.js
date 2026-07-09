@@ -22,7 +22,11 @@ export const GAME = {
   MAX_SPEED: 560,        // speed cap
   RUNNER_W: 34,
   RUNNER_H: 48,
-  RUNNER_X: 90,          // fixed horizontal position of the runner
+  RUNNER_X: 60,          // fixed horizontal position of the runner. Moved left
+                         // (was 90) so the zoomed-in mobile view (MIN_VIEW_W) still
+                         // leaves enough track ahead to react to obstacles. Draw and
+                         // collision share this, so lowering it just shifts the runner
+                         // left everywhere (desktop has ample width, unaffected in feel).
   ITEM_W: 60,
   ITEM_H: 60,
   ITEM_KINDS: 5,         // kinds 0..3 are normal (+1); kind 4 is the rare bonus item

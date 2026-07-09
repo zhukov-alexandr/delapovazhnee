@@ -107,6 +107,7 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
         request: Request,
         points_per_line: str = Form(default=""),
         speed_mult: str = Form(default=""),
+        music_volume: str = Form(default=""),
     ):
         if not is_admin(request):
             return RedirectResponse("/admin/login", status_code=302)
@@ -115,6 +116,7 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
             set_settings(conn, {
                 "points_per_line": points_per_line,
                 "speed_mult": speed_mult,
+                "music_volume": music_volume,
             })
         finally:
             conn.close()

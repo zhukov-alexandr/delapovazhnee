@@ -145,6 +145,7 @@ def build_api_router(settings: Settings) -> APIRouter:
             return {
                 "points_per_line": config["points_per_line"],
                 "speed_mult": config["speed_mult"],
+                "music_volume": config["music_volume"],
             }
         finally:
             conn.close()

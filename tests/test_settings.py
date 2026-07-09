@@ -88,6 +88,35 @@ class TestClampingAndCoercion:
         finally:
             conn.close()
 
+    def test_clamp_music_volume_high(self, settings):
+        """music_volume > 1.0 is clamped to 1.0."""
+        conn = get_conn(settings.db_path)
+        try:
+            result = set_settings(conn, {"music_volume": 3.0})
+            assert result["music_volume"] == 1.0
+        finally:
+            conn.close()
+
+    def test_clamp_music_volume_low(self, settings):
+        """music_volume < 0.0 is clamped to 0.0."""
+        conn = get_conn(settings.db_path)
+        try:
+            result = set_settings(conn, {"music_volume": -0.5})
+            assert result["music_volume"] == 0.0
+        finally:
+            conn.close()
+
+    def test_music_volume_is_float(self, settings):
+        """music_volume is returned as float."""
+        conn = get_conn(settings.db_path)
+        try:
+            set_settings(conn, {"music_volume": 0.5})
+            result = get_settings(conn)
+            assert isinstance(result["music_volume"], float)
+            assert result["music_volume"] == 0.5
+        finally:
+            conn.close()
+
     def test_points_per_line_is_int(self, settings):
         """points_per_line is returned as int."""
         conn = get_conn(settings.db_path)
@@ -138,8 +167,10 @@ class TestPublicConfigAPI:
         data = response.json()
         assert "points_per_line" in data
         assert "speed_mult" in data
+        assert "music_volume" in data
         assert isinstance(data["points_per_line"], int)
         assert isinstance(data["speed_mult"], float)
+        assert isinstance(data["music_volume"], float)
 
     def test_config_endpoint_returns_defaults_when_empty(self, client):
         """GET /api/config returns defaults when settings table is empty."""

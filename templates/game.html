@@ -68,7 +68,7 @@
       <p class="best">Рекорд: <span id="best-score">0</span></p>
       <ul class="manual" aria-label="Управление">
         <li><span class="manual-icon" aria-hidden="true">⎵👆</span>Пробел / тап — прыжок</li>
-        <li><span class="manual-icon" aria-hidden="true">👆👆</span>Двойной тап — двойной прыжок (выше)</li>
+        <li class="manual-hl"><span class="manual-icon" aria-hidden="true">👆👆</span><span><b>Двойной тап</b> — двойной прыжок, прыгаешь <b>выше</b>!</span></li>
         <li><span class="manual-icon" aria-hidden="true">🪙</span>Лови предметы в воздухе (+1)</li>
         <li><span class="manual-icon" aria-hidden="true">🍚</span>Плов возвращает 1 жизнь</li>
         <li><span class="manual-icon" aria-hidden="true">🏖️</span>Перепрыгивай препятствия</li>
@@ -125,7 +125,6 @@
          start + game-over overlays; the list is fetched + rendered by boot.js. -->
     <div id="leaderboard" class="overlay leaderboard-overlay hidden">
       <div class="leaderboard-card">
-        <h2 class="leaderboard-title">Топ-10</h2>
         <div class="lb-tabs" id="lb-tabs" role="tablist">
           <button type="button" class="lb-tab is-active" data-char="all">Все</button>
           <button type="button" class="lb-tab" data-char="0">Кирилл</button>
@@ -134,7 +133,7 @@
           <button type="button" class="lb-tab" data-char="3">Костя</button>
         </div>
         <ul id="leaderboard-list" class="leaderboard-list"></ul>
-        <button id="leaderboard-close" class="btn big">Закрыть</button>
+        <button id="leaderboard-close" class="btn ghost lb-close">Закрыть</button>
       </div>
     </div>
 

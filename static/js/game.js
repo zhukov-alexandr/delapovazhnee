@@ -236,8 +236,12 @@ export class Game {
       this.cam.x += this.game.obs.speed * dt;
       this.onTime(this.t);
 
+      // Defer the lyric-reveal popup until the runner is back on the ground: if
+      // the threshold is crossed mid-jump, freezing the scene in the air looks
+      // broken. nextRevealIndex is score/`revealed`-driven (not time), so it keeps
+      // returning the same index every frame until we finally reveal on landing.
       const idx = nextRevealIndex(this.game.score, this.pointsPerLine, this.revealed, this.lyricsCount);
-      if (idx !== null) {
+      if (idx !== null && this.game.runner.onGround) {
         this.game.state = "paused";
         this.onReveal(idx);
         this.revealed++;

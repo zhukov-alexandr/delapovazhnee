@@ -6,6 +6,7 @@ import sqlite3
 DEFAULTS = {
     "points_per_line": 5,
     "speed_mult": 1.0,
+    "music_volume": 0.28,
 }
 
 
@@ -29,6 +30,8 @@ def get_settings(conn: sqlite3.Connection) -> dict:
                 result[key] = int(value)
             elif key == "speed_mult":
                 result[key] = float(value)
+            elif key == "music_volume":
+                result[key] = float(value)
         except (ValueError, TypeError):
             # If coercion fails, use the default
             result[key] = DEFAULTS[key]
@@ -42,6 +45,7 @@ def set_settings(conn: sqlite3.Connection, updates: dict) -> dict:
     Validation:
     - points_per_line: int, min 1
     - speed_mult: float, clamped to [0.6, 1.2]
+    - music_volume: float, clamped to [0.0, 1.0]
     """
     # Validate and clamp each provided key
     to_upsert = {}
@@ -63,6 +67,15 @@ def set_settings(conn: sqlite3.Connection, updates: dict) -> dict:
             val = DEFAULTS["speed_mult"]
         val = max(0.6, min(val, 1.2))  # Clamp to [0.6, 1.2]
         to_upsert["speed_mult"] = val
+
+    if "music_volume" in updates:
+        val = updates["music_volume"]
+        try:
+            val = float(val)
+        except (ValueError, TypeError):
+            val = DEFAULTS["music_volume"]
+        val = max(0.0, min(val, 1.0))  # Clamp to [0.0, 1.0]
+        to_upsert["music_volume"] = val
 
     # Upsert each key
     for key, value in to_upsert.items():

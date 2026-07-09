@@ -24,8 +24,9 @@ ok(r1b.over === false && g1b.state === "running", "invulnerable skips collision 
 // Score increments when an obstacle passes the runner. Place it LEFT of the runner's
 // x-lane (right edge < RUNNER_X) so it scores this tick WITHOUT colliding — a standing
 // runner's box overlaps any obstacle in its own lane, so we must avoid the lane here.
+// Coordinates are relative to RUNNER_X so the fixture holds if RUNNER_X is retuned.
 const g2 = createGame(); startGame(g2);
-g2.obs.obstacles.push({ x: 40, y: GAME.GROUND_Y - 26, w: 44, h: 26, type: "single", passed: false });
+g2.obs.obstacles.push({ x: GAME.RUNNER_X - 50, y: GAME.GROUND_Y - 26, w: 44, h: 26, type: "single", passed: false });
 const r2 = stepGame(g2, 1 / 60, 640);
 ok(r2.scoreDelta >= 1 && g2.score >= 1 && r2.over === false, "score increments when an obstacle passes");
 
