@@ -4,13 +4,13 @@ from __future__ import annotations
 import csv
 import io
 import secrets
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, Query
 from fastapi.responses import RedirectResponse, HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
 from server.config import Settings
-from server.db import get_conn, fetch_all_events, clear_scores, clear_events
-from server.metrics import compute_dashboard, compute_presave_dashboard
+from server.db import get_conn, fetch_all_events, clear_scores, clear_events, delete_score
+from server.metrics import compute_dashboard, compute_presave_dashboard, compute_scores_dashboard
 from server.settings import get_settings, set_settings
 
 
@@ -64,6 +64,18 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
             request, "admin_presave.html",
             {"d": data, "active": "presave", "reset": bool(reset)})
 
+    @router.get("/leaderboard", response_class=HTMLResponse)
+    def leaderboard_dashboard(request: Request, character: int | None = Query(default=None, ge=0, le=3)):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            data = compute_scores_dashboard(conn, character)
+        finally:
+            conn.close()
+        return templates.TemplateResponse(
+            request, "admin_leaderboard.html", {"d": data, "active": "leaderboard"})
+
     # Reset the A/B test: wipe all analytics events (both dashboards read them).
     @router.post("/events/reset")
     def events_reset(request: Request, next: str = Form(default="/admin")):
@@ -88,6 +100,22 @@ def build_admin_router(settings: Settings, templates: Jinja2Templates) -> APIRou
         finally:
             conn.close()
         return RedirectResponse("/admin/settings?reset=1", status_code=303)
+
+    # Delete one leaderboard row (from the leaderboard table). `character` keeps
+    # the current filter so we land back on the same view.
+    @router.post("/scores/delete")
+    def score_delete(request: Request, id: int = Form(...), character: str = Form(default="")):
+        if not is_admin(request):
+            return RedirectResponse("/admin/login", status_code=302)
+        conn = get_conn(settings.db_path)
+        try:
+            delete_score(conn, id)
+        finally:
+            conn.close()
+        target = "/admin/leaderboard"
+        if character in ("0", "1", "2", "3"):
+            target += "?character=" + character
+        return RedirectResponse(target, status_code=303)
 
     @router.get("/settings", response_class=HTMLResponse)
     def settings_form(request: Request, saved: int = 0, reset: int = 0):

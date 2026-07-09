@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Лидерборд — админка</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="admin">
+  <div class="admin-shell">
+    {% include "_admin_nav.html" %}
+
+    <main class="admin-main">
+      <h1 class="page-title">Лидерборд{% if d.char_name %} — {{ d.char_name }}{% endif %}</h1>
+
+      <div class="lb-filter" role="tablist" aria-label="Фильтр по герою">
+        <a class="lb-filter-tab{{ ' is-active' if d.character is none else '' }}" href="/admin/leaderboard">Все</a>
+        <a class="lb-filter-tab{{ ' is-active' if d.character == 0 else '' }}" href="/admin/leaderboard?character=0">Кирилл</a>
+        <a class="lb-filter-tab{{ ' is-active' if d.character == 1 else '' }}" href="/admin/leaderboard?character=1">Никита</a>
+        <a class="lb-filter-tab{{ ' is-active' if d.character == 2 else '' }}" href="/admin/leaderboard?character=2">Саша</a>
+        <a class="lb-filter-tab{{ ' is-active' if d.character == 3 else '' }}" href="/admin/leaderboard?character=3">Костя</a>
+      </div>
+
+      <div class="lb-layout">
+        <!-- Left: full leaderboard, ~20 rows visible then scroll, full names. -->
+        <section class="card lb-card">
+          <h2 class="card-title">Результаты <span class="muted">({{ d.total }})</span></h2>
+          <div class="lb-scroll">
+            <table class="metrics lb-table">
+              <thead>
+                <tr><th>#</th><th>Герой</th><th>Имя</th><th class="num">Счёт</th><th class="num">Время</th><th>Дата</th><th></th></tr>
+              </thead>
+              <tbody>
+                {% for r in d.rows %}
+                  <tr>
+                    <td class="lb-rank">{{ r.rank }}</td>
+                    <td>{{ r.char_name }}</td>
+                    <td class="lb-name">{{ r.name }}</td>
+                    <td class="num"><b>{{ r.score }}</b></td>
+                    <td class="num">{{ r.time_str }}</td>
+                    <td class="muted">{{ r.date }}</td>
+                    <td class="lb-del">
+                      <form method="post" action="/admin/scores/delete"
+                            onsubmit="return confirm('Удалить «{{ r.name }}» ({{ r.score }})? Это навсегда.');">
+                        <input type="hidden" name="id" value="{{ r.id }}">
+                        {% if d.character is not none %}<input type="hidden" name="character" value="{{ d.character }}">{% endif %}
+                        <button type="submit" class="lb-del-btn" title="Удалить запись" aria-label="Удалить запись">×</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr><td colspan="7" class="muted">Пока пусто</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Right: stats dashboard for the current filter. -->
+        <div class="lb-stats">
+          <section class="cards-grid lb-cards">
+            <div class="card stat-card"><div class="stat-label">Всего игр</div><div class="stat-big">{{ d.total }}</div></div>
+            <div class="card stat-card stat-card--hi"><div class="stat-label">Лучший счёт</div><div class="stat-big">{{ d.score.max }}</div></div>
+            <div class="card stat-card"><div class="stat-label">Средний счёт</div><div class="stat-big">{{ d.score.mean }}</div></div>
+            <div class="card stat-card"><div class="stat-label">Медиана счёта</div><div class="stat-big">{{ d.score.median }}</div></div>
+            <div class="card stat-card"><div class="stat-label">Среднее время</div><div class="stat-big">{{ d.time.mean }}</div></div>
+            <div class="card stat-card"><div class="stat-label">Медиана времени</div><div class="stat-big">{{ d.time.median }}</div></div>
+          </section>
+
+          <section class="card">
+            <h2 class="card-title">Распределение счёта</h2>
+            {% if d.score.hist %}
+              <div class="hbars">
+                {% for b in d.score.hist %}
+                  <div class="hbar-row">
+                    <span class="hbar-label">{{ b.label }}</span>
+                    <span class="hbar-track"><span class="hbar-fill" style="width: {{ b.pct }}%"></span></span>
+                    <span class="hbar-count">{{ b.count }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}<p class="muted">Нет данных</p>{% endif %}
+          </section>
+
+          <section class="card">
+            <h2 class="card-title">Распределение времени в игре</h2>
+            {% if d.time.hist %}
+              <div class="hbars">
+                {% for b in d.time.hist %}
+                  <div class="hbar-row">
+                    <span class="hbar-label">{{ b.label }}</span>
+                    <span class="hbar-track"><span class="hbar-fill hbar-fill--2" style="width: {{ b.pct }}%"></span></span>
+                    <span class="hbar-count">{{ b.count }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+              <p class="muted lb-note">С учётом времени: {{ d.time.with_time }} из {{ d.total }} (без старых записей без таймера).</p>
+            {% else %}<p class="muted">Нет данных о времени</p>{% endif %}
+          </section>
+
+          <section class="card">
+            <h2 class="card-title">Сравнение героев</h2>
+            <div class="table-scroll">
+              <table class="metrics">
+                <thead>
+                  <tr><th>Герой</th><th class="num">Игр</th><th class="num">Ср. счёт</th><th class="num">Лучший</th><th class="num">Ср. время</th></tr>
+                </thead>
+                <tbody>
+                  {% for c in d.per_char %}
+                    <tr{{ ' class=hi' if d.character == c.idx else '' }}>
+                      <td>{{ c.name }}</td>
+                      <td class="num">{{ c.count }}</td>
+                      <td class="num">{{ c.avg_score }}</td>
+                      <td class="num">{{ c.best }}</td>
+                      <td class="num">{{ c.avg_time }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% if d.legacy_count %}<p class="muted lb-note">Без героя (старые записи): {{ d.legacy_count }}</p>{% endif %}
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</body></html>

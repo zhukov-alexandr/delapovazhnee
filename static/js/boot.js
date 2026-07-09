@@ -150,6 +150,7 @@ function boot() {
   const openedLinesClose = document.getElementById("opened-lines-close");
   const songCompleteEl = document.getElementById("song-complete");
   const songCompleteNext = document.getElementById("song-complete-next");
+  const songCompletePresave = document.getElementById("song-complete-presave");
   const songCompleteLyricsEl = document.getElementById("song-complete-lyrics");
   // Fill the song-complete popup once with the full lyrics (blank row between
   // stanzas of 4). Shown when the final line is revealed.
@@ -266,7 +267,7 @@ function boot() {
   ctaLink.addEventListener("click", (e) => {
     e.preventDefault();
     emit("cta_click", { src: "button" });
-    openPresaveModal();
+    openPresaveModal("button");
   });
 
   const isVariantA = session.variant === "A";
@@ -300,6 +301,10 @@ function boot() {
   const presaveModal = document.getElementById("presave-modal");
   const presaveClose = document.getElementById("presave-close");
   const presaveServicesEl = document.getElementById("presave-services");
+  // Where the currently-open presave modal was opened from: "button" (start/
+  // game-over CTA) or "life_lost" (the in-game «Ой» popup). Threaded into the
+  // return URL so a completed presave is attributed to the in-game surface.
+  let presaveSrc = "button";
 
   function savedActionSpan() {
     const span = document.createElement("span");
@@ -321,7 +326,8 @@ function boot() {
   // Path params (no query!): band.link appends its own "?…Presaved=<upc>" success
   // marker with a literal "?", which would corrupt a URL that already had a query.
   function presaveReturnUrl(id) {
-    return location.origin + "/presave/return/" + id + "/" + session.sid + "/" + session.variant;
+    return location.origin + "/presave/return/" + id + "/" + session.sid + "/" +
+      session.variant + "/" + presaveSrc;
   }
 
   // These resolve correctly through band.link's save-presave gateway AND honor
@@ -420,7 +426,9 @@ function boot() {
     presaveServicesEl.appendChild(li);
   }
 
-  function openPresaveModal() {
+  const PRESAVE_SRCS = new Set(["button", "life_lost", "song_complete"]);
+  function openPresaveModal(src) {
+    presaveSrc = PRESAVE_SRCS.has(src) ? src : "button";
     for (const id of readPresaved(localStorage)) markRowSaved(id);
     presaveModal.classList.remove("hidden");
     kbOpen(presaveModal, true);
@@ -447,7 +455,7 @@ function boot() {
   lifeLostCta.querySelector(".presave").addEventListener("click", (e) => {
     e.preventDefault();
     emit("cta_click", { src: "life_lost" });
-    openPresaveModal();
+    openPresaveModal("life_lost");
   });
   document.getElementById("life-lost-cta").appendChild(lifeLostCta.querySelector(".cta"));
 
@@ -718,6 +726,12 @@ function boot() {
     kbClear();
     songCompleteEl.classList.add("hidden");
     game.resume();
+  });
+
+  // The release-date badge on the song-complete popup is a presave CTA.
+  songCompletePresave.addEventListener("click", () => {
+    emit("cta_click", { src: "song_complete" });
+    openPresaveModal("song_complete");
   });
 
   // "Открытые строки": a read-only viewer of the lines unlocked so far this run,

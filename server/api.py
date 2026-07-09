@@ -96,8 +96,18 @@ def build_api_router(settings: Settings) -> APIRouter:
             conn.close()
         return RedirectResponse(settings.presave_url, status_code=302)
 
+    # Legacy 3-segment return URL (no source) — defaults src to "button".
     @router.get("/presave/return/{service}/{sid}/{variant}")
-    def presave_return(request: Request, service: str, sid: str, variant: str):
+    def presave_return_legacy(request: Request, service: str, sid: str, variant: str):
+        return _presave_return(request, service, sid, variant, "button")
+
+    # `src` = where the presave was started: "button" (start/game-over CTA) or
+    # "life_lost" (the in-game «Ой» popup) — lets us count in-game presaves.
+    @router.get("/presave/return/{service}/{sid}/{variant}/{src}")
+    def presave_return(request: Request, service: str, sid: str, variant: str, src: str):
+        return _presave_return(request, service, sid, variant, src)
+
+    def _presave_return(request: Request, service: str, sid: str, variant: str, src: str):
         # Path params (not query) so the redirectUrl we hand band.link carries NO
         # query string. On a successful save band.link appends its own
         # "?<service>Presaved=<upc>" marker with a LITERAL "?"; if our URL already
@@ -107,6 +117,7 @@ def build_api_router(settings: Settings) -> APIRouter:
             raise HTTPException(status_code=400, detail="bad variant")
         if service not in PRESAVE_SERVICES:
             service = "unknown"
+        src = src if src in ("button", "life_lost", "song_complete") else "button"
         # band.link redirects here only after the user completes the save,
         # tagging the URL "…Presaved=<upc>". Treat that marker as the success
         # signal; a bare return (no marker) is a cancel and is not counted.
@@ -114,7 +125,7 @@ def build_api_router(settings: Settings) -> APIRouter:
         if saved:
             conn = _conn()
             try:
-                insert_event(conn, sid, variant, "presave_done", {"service": service})
+                insert_event(conn, sid, variant, "presave_done", {"service": service, "src": src})
             finally:
                 conn.close()
         post = (

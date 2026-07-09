@@ -12,6 +12,12 @@
     <main class="admin-main">
       <h1 class="page-title">Дашборд A/B пресейвов</h1>
 
+      <p class="ab-legend">
+        <span class="pill pill-a">A</span> пресейв <b>сразу</b> — попапом на стартовом экране (до игры)
+        <span class="ab-legend-sep">·</span>
+        <span class="pill pill-b">B</span> пресейв <b>после игры</b> — на экране «Игра окончена»
+      </p>
+
       {% set A = d.variants.A %}{% set B = d.variants.B %}
       <section class="cards-grid">
         <div class="card stat-card">
@@ -51,6 +57,22 @@
           <div class="stat-row">
             <span class="pill pill-a">A {{ '%.1f'|format(A.cvr*100) }}%</span>
             <span class="pill pill-b">B {{ '%.1f'|format(B.cvr*100) }}%</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Клики во время игры («Ой»)</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.cta_click_ingame }}</span>
+            <span class="pill pill-b">B {{ B.cta_click_ingame }}</span>
+          </div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Пресейвы во время игры («Ой»)</div>
+          <div class="stat-row">
+            <span class="pill pill-a">A {{ A.presave_ingame }}</span>
+            <span class="pill pill-b">B {{ B.presave_ingame }}</span>
           </div>
         </div>
       </section>

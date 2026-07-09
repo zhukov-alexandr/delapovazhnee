@@ -117,6 +117,13 @@ def clear_scores(conn) -> None:
     conn.commit()
 
 
+def delete_score(conn, score_id: int) -> int:
+    """Delete one leaderboard row by id (admin). Returns rows deleted (0 or 1)."""
+    cur = conn.execute("DELETE FROM scores WHERE id = ?", (score_id,))
+    conn.commit()
+    return cur.rowcount
+
+
 def clear_events(conn) -> None:
     """Wipe all analytics events (admin «начать тест заново» — resets both A/B tests)."""
     conn.execute("DELETE FROM events")

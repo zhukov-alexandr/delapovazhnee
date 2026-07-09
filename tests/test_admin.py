@@ -99,3 +99,72 @@ def test_admin_dashboard_shows_both_tabs(client):
     assert "Настройки игры" in r.text
     assert 'href="/admin"' in r.text
     assert 'href="/admin/settings"' in r.text
+
+
+from server.db import insert_score
+from server.metrics import compute_scores_dashboard
+
+
+def test_leaderboard_requires_login(client):
+    r = client.get("/admin/leaderboard", follow_redirects=False)
+    assert r.status_code in (302, 307)
+    assert "/admin/login" in r.headers["location"]
+
+
+def test_leaderboard_renders_and_filters(client, settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    insert_score(conn, "Kirill_777", 142, 0, 95000)
+    insert_score(conn, "SashaPlayer", 77, 2, 50000)
+    conn.close()
+    _login(client)
+    r = client.get("/admin/leaderboard")
+    assert r.status_code == 200
+    assert "Лидерборд" in r.text
+    assert "Kirill_777" in r.text and "SashaPlayer" in r.text
+    # filter to Саша (character 2): only Sasha's row, not Kirill's
+    r2 = client.get("/admin/leaderboard?character=2")
+    assert "SashaPlayer" in r2.text and "Kirill_777" not in r2.text
+
+
+def test_leaderboard_rejects_bad_character(client):
+    # Query validation (0..3) fires before the handler — 422 regardless of auth.
+    assert client.get("/admin/leaderboard?character=9").status_code == 422
+
+
+def test_compute_scores_dashboard(settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    for name, sc, ch, tm in [("A", 100, 0, 60000), ("B", 50, 0, 30000), ("C", 80, 2, 40000)]:
+        insert_score(conn, name, sc, ch, tm)
+    d = compute_scores_dashboard(conn)
+    assert d["total"] == 3
+    assert d["score"]["max"] == 100
+    assert d["score"]["mean"] == round((100 + 50 + 80) / 3, 1)
+    per = {c["name"]: c for c in d["per_char"]}
+    assert per["Кирилл"]["count"] == 2 and per["Саша"]["count"] == 1
+    # filtered by character 0 (Кирилл): 2 rows, all Кирилл
+    d0 = compute_scores_dashboard(conn, 0)
+    assert d0["total"] == 2 and all(r["char_name"] == "Кирилл" for r in d0["rows"])
+    conn.close()
+
+
+from server.db import top_scores
+
+
+def test_scores_delete_requires_login(client):
+    r = client.post("/admin/scores/delete", data={"id": "1"}, follow_redirects=False)
+    assert r.status_code in (302, 307)
+    assert "/admin/login" in r.headers["location"]
+
+
+def test_scores_delete_removes_one_row_and_keeps_filter(client, settings):
+    conn = get_conn(settings.db_path); init_db(conn)
+    insert_score(conn, "Keep", 100, 0, 1000)
+    del_id = insert_score(conn, "DeleteMe", 50, 1, 2000)
+    conn.close()
+    _login(client)
+    r = client.post("/admin/scores/delete",
+                    data={"id": str(del_id), "character": "1"}, follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert r.headers["location"] == "/admin/leaderboard?character=1"
+    names = [row["name"] for row in top_scores(get_conn(settings.db_path), 10)]
+    assert "DeleteMe" not in names and "Keep" in names

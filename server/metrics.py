@@ -132,6 +132,8 @@ def _variant_stats(conn, v: str) -> dict:
           SUM(event_type='cta_click')                                  AS cta_click_total,
           SUM(event_type='cta_click' AND json_extract(meta,'$.src')='button') AS cta_click_button,
           SUM(event_type='cta_click' AND json_extract(meta,'$.src')='qr')     AS cta_click_qr,
+          SUM(event_type='cta_click'    AND json_extract(meta,'$.src')='life_lost') AS cta_click_ingame,
+          SUM(event_type='presave_done' AND json_extract(meta,'$.src')='life_lost') AS presave_ingame,
           COUNT(DISTINCT CASE WHEN event_type='cta_click' THEN session_id END) AS cta_click_sessions,
           SUM(event_type='game_start')                                 AS games_started,
           SUM(event_type='game_over')                                  AS games_finished,
@@ -165,7 +167,9 @@ def _presave_variant_stats(conn, v: str) -> dict:
           COUNT(DISTINCT CASE WHEN event_type='cta_click' THEN session_id END) AS cta_click_sessions,
           COUNT(DISTINCT CASE WHEN event_type='streaming_click' THEN session_id END) AS streaming_click_sessions,
           COUNT(DISTINCT CASE WHEN event_type='presave_done' THEN session_id END) AS presave_done_sessions,
-          SUM(event_type='presave_done')                               AS presave_done_total
+          SUM(event_type='presave_done')                               AS presave_done_total,
+          SUM(event_type='cta_click'    AND json_extract(meta,'$.src')='life_lost') AS cta_click_ingame,
+          SUM(event_type='presave_done' AND json_extract(meta,'$.src')='life_lost') AS presave_ingame
         FROM events WHERE variant=?
         """, (v,)).fetchone()
     d = {k: (row[k] or 0) for k in row.keys()}
@@ -237,4 +241,127 @@ def compute_dashboard(conn) -> dict:
         "fisher_p": fisher_p,
         "t_test": t_test,
         "enough_data": enough,
+    }
+
+
+# --- Leaderboard analytics (scores table) ---------------------------------
+# Character index -> display name (matches the game's picker order).
+CHAR_NAMES = ["Кирилл", "Никита", "Саша", "Костя"]
+
+
+def _median(xs: list) -> float:
+    if not xs:
+        return 0
+    s = sorted(xs)
+    n = len(s)
+    mid = n // 2
+    return s[mid] if n % 2 else (s[mid - 1] + s[mid]) / 2
+
+
+def _fmt_time(sec: float) -> str:
+    sec = int(sec)
+    return f"{sec // 60}:{sec % 60:02d}"
+
+
+def _histogram(values: list, bins: int, label_fmt) -> list:
+    """Equal-width histogram → list of {label, count, pct} (pct is bar height
+    relative to the tallest bin, so bars are readable regardless of counts)."""
+    if not values:
+        return []
+    lo, hi = min(values), max(values)
+    if hi == lo:
+        return [{"label": label_fmt(lo, hi), "count": len(values), "pct": 100}]
+    width = (hi - lo) / bins
+    counts = [0] * bins
+    for v in values:
+        idx = int((v - lo) / width)
+        if idx >= bins:
+            idx = bins - 1
+        counts[idx] += 1
+    peak = max(counts) or 1
+    out = []
+    for i, c in enumerate(counts):
+        blo, bhi = lo + i * width, lo + (i + 1) * width
+        out.append({"label": label_fmt(blo, bhi), "count": c, "pct": round(c / peak * 100)})
+    return out
+
+
+def _char_name(ci: int):
+    return CHAR_NAMES[ci] if 0 <= ci < len(CHAR_NAMES) else "—"
+
+
+def compute_scores_dashboard(conn, character: int | None = None) -> dict:
+    """Full leaderboard (optionally filtered by character 0-3) + summary stats,
+    score/time distributions, and a per-character comparison for the admin page."""
+    if character is None:
+        rows = conn.execute(
+            "SELECT id, name, score, character, time_ms, ts FROM scores "
+            "ORDER BY score DESC, id ASC LIMIT 2000"
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT id, name, score, character, time_ms, ts FROM scores WHERE character=? "
+            "ORDER BY score DESC, id ASC LIMIT 2000",
+            (character,),
+        ).fetchall()
+
+    lb = [{
+        "id": r["id"],
+        "rank": i + 1,
+        "name": r["name"],
+        "score": r["score"],
+        "char_name": _char_name(r["character"]),
+        "time_str": _fmt_time((r["time_ms"] or 0) / 1000) if r["time_ms"] else "—",
+        "date": (r["ts"] or "")[:10],
+    } for i, r in enumerate(rows)]
+
+    scores = [r["score"] for r in rows]
+    # Play time excludes legacy 0-time rows (saved before time tracking) so the
+    # time stats aren't skewed by a pile of zeros.
+    times = [(r["time_ms"] or 0) / 1000 for r in rows if r["time_ms"]]
+
+    score_stats = {
+        "min": min(scores) if scores else 0,
+        "max": max(scores) if scores else 0,
+        "mean": round(sum(scores) / len(scores), 1) if scores else 0,
+        "median": round(_median(scores), 1),
+        "hist": _histogram(scores, 10, lambda lo, hi: f"{round(lo)}–{round(hi)}"),
+    }
+    time_stats = {
+        "mean": _fmt_time(sum(times) / len(times)) if times else "—",
+        "median": _fmt_time(_median(times)) if times else "—",
+        "max": _fmt_time(max(times)) if times else "—",
+        "with_time": len(times),
+        "hist": _histogram(times, 10, lambda lo, hi: f"{_fmt_time(lo)}–{_fmt_time(hi)}"),
+    }
+
+    # Per-character comparison — always over the WHOLE table (ignores the filter)
+    # so you can compare heroes side by side.
+    per = conn.execute(
+        "SELECT character AS c, COUNT(*) AS n, AVG(score) AS avg_s, MAX(score) AS best, "
+        "AVG(CASE WHEN time_ms>0 THEN time_ms END) AS avg_t FROM scores GROUP BY character"
+    ).fetchall()
+    per_map = {r["c"]: r for r in per}
+    per_char = []
+    for idx, nm in enumerate(CHAR_NAMES):
+        r = per_map.get(idx)
+        per_char.append({
+            "idx": idx,
+            "name": nm,
+            "count": r["n"] if r else 0,
+            "avg_score": round(r["avg_s"], 1) if r and r["avg_s"] is not None else 0,
+            "best": r["best"] if r else 0,
+            "avg_time": _fmt_time((r["avg_t"] or 0) / 1000) if r and r["avg_t"] else "—",
+        })
+    legacy = per_map.get(-1)
+
+    return {
+        "character": character,
+        "char_name": _char_name(character) if character is not None else None,
+        "total": len(rows),
+        "rows": lb,
+        "score": score_stats,
+        "time": time_stats,
+        "per_char": per_char,
+        "legacy_count": legacy["n"] if legacy else 0,
     }
