@@ -230,7 +230,31 @@
         .poster-grid { grid-template-columns: 1fr; max-width: none; } /* stacked posters scroll; height cap is a desktop concern */
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
-        .hero__photo { min-height: 46vh; }
+        /* Phones: the frame still fills the whole hero (same geometry as always),
+           but `cover` alone cropped the two guys on the sides. Instead: a blurred
+           copy of the photo fills the frame edge-to-edge, and the sharp photo sits
+           on top `contain`-ed — full-bleed look, all four always visible. */
+        .hero__photo {
+          min-height: 46vh;
+          background: var(--kraft-deep); /* solid; the imagery moves to the layers below */
+          overflow: hidden;
+        }
+        .hero__photo::before,
+        .hero__photo::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+        }
+        .hero__photo::before { /* blurred edge-to-edge backdrop */
+          background: url("/static/home/band-mobile.jpg") center / cover no-repeat;
+          filter: blur(16px) brightness(0.92);
+          transform: scale(1.1); /* hide the blur's soft edges */
+        }
+        /* band-mobile.jpg = band.jpg with the empty gray sides trimmed to where
+           the guys end, so the four of them render as large as possible. */
+        .hero__photo::after {
+          background: url("/static/home/band-mobile.jpg") center / contain no-repeat;
+        }
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
