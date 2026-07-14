@@ -30,7 +30,7 @@
     <!-- Loading screen: covers everything until all in-game sprites are loaded,
          so you never start the game on placeholder art. boot.js drives the bar. -->
     <div id="loading" class="overlay loading-overlay">
-      <h1 class="loading-title">Загрузка игры</h1>
+      <h1 class="loading-title" data-i18n="loading_title">Загрузка игры</h1>
       <div class="loading-bar"><div id="loading-fill" class="loading-fill"></div></div>
       <p id="loading-pct" class="loading-pct">0%</p>
     </div>
@@ -38,45 +38,54 @@
     <!-- CTA block (moved into #start for variant A, into #over for variant B by boot.js) -->
     <template id="cta-tpl">
       <div class="cta">
-        <p class="cta-caption">Дела поважнее – 19</p>
+        <p class="cta-caption" data-i18n="cta_caption">Дела поважнее – 19</p>
         <img class="cover" alt="Обложка сингла" src="/static/sprites/cover.jpg" />
-        <a class="presave btn" target="_blank" rel="noopener">Сделать пресейв</a>
+        <a class="presave btn" target="_blank" rel="noopener" data-i18n="cta_presave">Сделать пресейв</a>
       </div>
     </template>
 
     <div id="start" class="overlay">
-      <h1>ДЕЛА ПОВАЖНЕЕ – 19</h1>
-      <p class="welcome-text">Кто не мечтает летом оказаться на красивом берегу? Выбирай героя и беги к своей мечте!</p>
+      <details class="lang-switch">
+        <summary class="lang-trigger" aria-label="Язык / 语言">
+          <span class="lang-globe" aria-hidden="true">🌐</span><span id="lang-current">RU</span>
+        </summary>
+        <div class="lang-menu" role="menu">
+          <button type="button" class="lang-btn" data-lang="ru" role="menuitem">RU</button>
+          <button type="button" class="lang-btn" data-lang="zh" role="menuitem">中文</button>
+        </div>
+      </details>
+      <h1 data-i18n="start_title">ДЕЛА ПОВАЖНЕЕ – 19</h1>
+      <p class="welcome-text" data-i18n="welcome">Кто не мечтает летом оказаться на красивом берегу? Выбирай героя и беги к своей мечте!</p>
       <div id="char-picker" class="char-picker" role="group" aria-label="Выбор персонажа">
         <button type="button" class="char-tile" data-char="0" aria-label="Кирилл">
-          <span class="char-tile-name">Кирилл</span>
+          <span class="char-tile-name" data-i18n="char_0">Кирилл</span>
           <img src="/static/sprites/characters/avatar1.png" alt="">
         </button>
         <button type="button" class="char-tile" data-char="1" aria-label="Никита">
-          <span class="char-tile-name">Никита</span>
+          <span class="char-tile-name" data-i18n="char_1">Никита</span>
           <img src="/static/sprites/characters/avatar2.png" alt="">
         </button>
         <button type="button" class="char-tile" data-char="2" aria-label="Саша">
-          <span class="char-tile-name">Саша</span>
+          <span class="char-tile-name" data-i18n="char_2">Саша</span>
           <img src="/static/sprites/characters/avatar3.png" alt="">
         </button>
         <button type="button" class="char-tile" data-char="3" aria-label="Костя">
-          <span class="char-tile-name">Костя</span>
+          <span class="char-tile-name" data-i18n="char_3">Костя</span>
           <img src="/static/sprites/characters/avatar4.png" alt="">
         </button>
       </div>
-      <p class="best">Рекорд: <span id="best-score">0</span></p>
+      <p class="best"><span data-i18n="best">Рекорд: </span><span id="best-score">0</span></p>
       <ul class="manual" aria-label="Управление">
-        <li><span class="manual-icon" aria-hidden="true">⎵👆</span>Пробел / тап — прыжок</li>
-        <li class="manual-hl"><span class="manual-icon" aria-hidden="true">👆👆</span><span><b>Двойной тап</b> — двойной прыжок, прыгаешь <b>выше</b>!</span></li>
-        <li><span class="manual-icon" aria-hidden="true">🪙</span>Лови предметы в воздухе (+1)</li>
-        <li><span class="manual-icon" aria-hidden="true">🍚</span>Плов возвращает 1 жизнь</li>
-        <li><span class="manual-icon" aria-hidden="true">🏖️</span>Перепрыгивай препятствия</li>
+        <li><span class="manual-icon" aria-hidden="true">⎵👆</span><span data-i18n="manual_jump">Пробел / тап — прыжок</span></li>
+        <li class="manual-hl"><span class="manual-icon" aria-hidden="true">👆👆</span><span data-i18n-html="manual_double_html"><b>Двойной тап</b> — двойной прыжок, прыгаешь <b>выше</b>!</span></li>
+        <li><span class="manual-icon" aria-hidden="true">🪙</span><span data-i18n="manual_catch">Лови предметы в воздухе (+1)</span></li>
+        <li><span class="manual-icon" aria-hidden="true">🍚</span><span data-i18n="manual_plov">Плов возвращает 1 жизнь</span></li>
+        <li><span class="manual-icon" aria-hidden="true">🏖️</span><span data-i18n="manual_obstacles">Перепрыгивай препятствия</span></li>
       </ul>
-      <button id="play" class="btn big">Играть</button>
+      <button id="play" class="btn big" data-i18n="play">Играть</button>
       <div class="menu-actions">
-        <button id="show-scores-start" class="btn ghost">Рекорды</button>
-        <a class="btn ghost" href="/home">На сайт</a>
+        <button id="show-scores-start" class="btn ghost" data-i18n="scores">Рекорды</button>
+        <a class="btn ghost" href="/home" data-i18n="to_site">На сайт</a>
       </div>
       <div class="menu-credits">
         <span>© Дела поважнее</span>
@@ -86,39 +95,39 @@
     </div>
 
     <div id="over" class="overlay hidden">
-      <h1>Игра окончена</h1>
+      <h1 data-i18n="over_title">Игра окончена</h1>
       <p class="over-stats">
-        Счёт: <b id="final-score">0</b> · Время: <b id="final-time">0:00</b>
+        <span data-i18n="stat_score">Счёт: </span><b id="final-score">0</b><span data-i18n="stat_time"> · Время: </span><b id="final-time">0:00</b>
       </p>
       <div class="save-score">
         <input id="name-input" class="name-input" type="text" maxlength="24" autocomplete="off"
-               placeholder="Твоё имя" aria-label="Имя для таблицы результатов" />
-        <button id="save-score" class="btn">Сохранить результат</button>
+               placeholder="Твоё имя" data-i18n-attr="placeholder:name_placeholder" aria-label="Имя для таблицы результатов" />
+        <button id="save-score" class="btn" data-i18n="save_score">Сохранить результат</button>
       </div>
       <p id="name-error" class="name-error hidden" role="alert"></p>
-      <button id="retry" class="btn big">Ещё раз</button>
+      <button id="retry" class="btn big" data-i18n="retry">Ещё раз</button>
       <!-- Presave is the focus of this screen: it sits right under «Ещё раз».
            Secondary nav (Главное меню / Рекорды / На сайт) is pushed to the
            dimmed footer below so it doesn't compete for attention. -->
       <div id="over-cta"></div>
       <div class="menu-actions over-footer">
-        <button id="over-lines" class="btn ghost">Открытые строки</button>
-        <button id="show-scores-over" class="btn ghost">Рекорды</button>
-        <button id="to-menu" class="btn ghost">Главное меню</button>
-        <a class="btn ghost" href="/home">На сайт</a>
+        <button id="over-lines" class="btn ghost" data-i18n="opened_lines">Открытые строки</button>
+        <button id="show-scores-over" class="btn ghost" data-i18n="scores">Рекорды</button>
+        <button id="to-menu" class="btn ghost" data-i18n="main_menu">Главное меню</button>
+        <a class="btn ghost" href="/home" data-i18n="to_site">На сайт</a>
       </div>
     </div>
 
     <!-- Life-lost popup: shown on a non-fatal hit (lives remain). Continue
          resumes the run; the presave CTA is cloned in by boot.js. -->
     <div id="life-lost" class="overlay hidden">
-      <h1 class="life-lost-title">Ой!</h1>
+      <h1 class="life-lost-title" data-i18n="life_lost_title">Ой!</h1>
       <p id="lives-left" class="lives-left"></p>
-      <p class="best">Очки: <span id="life-lost-score">0</span></p>
-      <button id="continue" class="btn big">Продолжить</button>
+      <p class="best"><span data-i18n="points">Очки: </span><span id="life-lost-score">0</span></p>
+      <button id="continue" class="btn big" data-i18n="continue_">Продолжить</button>
       <div class="menu-actions menu-actions--stack">
-        <button id="life-lost-lines" class="btn ghost">Открытые строки</button>
-        <button id="life-lost-menu" class="btn ghost">Главное меню</button>
+        <button id="life-lost-lines" class="btn ghost" data-i18n="opened_lines">Открытые строки</button>
+        <button id="life-lost-menu" class="btn ghost" data-i18n="main_menu">Главное меню</button>
       </div>
       <div id="life-lost-cta"></div>
     </div>
@@ -128,24 +137,24 @@
     <div id="leaderboard" class="overlay leaderboard-overlay hidden">
       <div class="leaderboard-card">
         <div class="lb-tabs" id="lb-tabs" role="tablist">
-          <button type="button" class="lb-tab is-active" data-char="all">Все</button>
-          <button type="button" class="lb-tab" data-char="0">Кирилл</button>
-          <button type="button" class="lb-tab" data-char="1">Никита</button>
-          <button type="button" class="lb-tab" data-char="2">Саша</button>
-          <button type="button" class="lb-tab" data-char="3">Костя</button>
+          <button type="button" class="lb-tab is-active" data-char="all" data-i18n="lb_all">Все</button>
+          <button type="button" class="lb-tab" data-char="0" data-i18n="char_0">Кирилл</button>
+          <button type="button" class="lb-tab" data-char="1" data-i18n="char_1">Никита</button>
+          <button type="button" class="lb-tab" data-char="2" data-i18n="char_2">Саша</button>
+          <button type="button" class="lb-tab" data-char="3" data-i18n="char_3">Костя</button>
         </div>
         <ul id="leaderboard-list" class="leaderboard-list"></ul>
-        <button id="leaderboard-close" class="btn ghost lb-close">Закрыть</button>
+        <button id="leaderboard-close" class="btn ghost lb-close" data-i18n="lb_close">Закрыть</button>
       </div>
     </div>
 
     <!-- Pause menu: opened by the pause button during play; freezes the game. -->
     <div id="pause" class="overlay pause-overlay hidden">
-      <h1>Пауза</h1>
-      <button id="pause-resume" class="btn big">Продолжить</button>
+      <h1 data-i18n="pause_title">Пауза</h1>
+      <button id="pause-resume" class="btn big" data-i18n="continue_">Продолжить</button>
       <div class="menu-actions menu-actions--stack">
-        <button id="pause-lines" class="btn ghost">Открытые строки</button>
-        <button id="pause-menu" class="btn ghost">Главное меню</button>
+        <button id="pause-lines" class="btn ghost" data-i18n="opened_lines">Открытые строки</button>
+        <button id="pause-menu" class="btn ghost" data-i18n="main_menu">Главное меню</button>
       </div>
     </div>
 
@@ -153,9 +162,9 @@
          lyric lines unlocked so far this run (boot.js fills it). -->
     <div id="opened-lines" class="overlay reveal-overlay hidden">
       <div class="song-complete-card">
-        <h2 class="song-complete-title">Открытые строки</h2>
+        <h2 class="song-complete-title" data-i18n="opened_lines">Открытые строки</h2>
         <ul id="opened-lines-list" class="song-complete-lyrics"></ul>
-        <button id="opened-lines-close" class="btn big">Назад</button>
+        <button id="opened-lines-close" class="btn big" data-i18n="opened_back">Назад</button>
       </div>
     </div>
 
@@ -163,10 +172,10 @@
          song text + "Играть дальше" (resumes the run). boot.js fills the lyrics. -->
     <div id="song-complete" class="overlay reveal-overlay hidden">
       <div class="song-complete-card">
-        <h2 class="song-complete-title">Ура, ты открыл все возможные строчки песни!</h2>
-        <button type="button" id="song-complete-presave" class="song-complete-sub">Песня «19» выйдет 17 июля 2026! · Пресейв</button>
+        <h2 class="song-complete-title" data-i18n="song_complete_title">Ура, ты открыл все возможные строчки песни!</h2>
+        <button type="button" id="song-complete-presave" class="song-complete-sub" data-i18n="song_complete_presave">Песня «19» выйдет 17 июля 2026! · Пресейв</button>
         <ul id="song-complete-lyrics" class="song-complete-lyrics"></ul>
-        <button id="song-complete-next" class="btn big">Играть дальше</button>
+        <button id="song-complete-next" class="btn big" data-i18n="song_complete_next">Играть дальше</button>
       </div>
     </div>
 
@@ -185,9 +194,9 @@
     <div id="presave-modal" class="overlay presave-overlay hidden">
       <div class="presave-card">
         <button type="button" id="presave-close" class="presave-close" aria-label="Закрыть">×</button>
-        <p class="presave-release">Дела поважнее – 19</p>
+        <p class="presave-release" data-i18n="presave_release">Дела поважнее – 19</p>
         <img class="presave-cover" alt="Обложка сингла" src="/static/sprites/19_2.jpg" />
-        <h2 class="presave-title">Пресейв</h2>
+        <h2 class="presave-title" data-i18n="presave_title">Пресейв</h2>
         <ul id="presave-services" class="presave-services"></ul>
       </div>
     </div>

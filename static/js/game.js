@@ -29,6 +29,9 @@ export class Game {
     this.lyricsCount = 0;     // total lines available to reveal (LYRICS.length)
     this.lyrics = [];         // the actual line strings (set by boot.js) — drawn in
                               // the sky "cloud" on reveal
+    this.lyricsZh = null;     // optional 中文 translations (index-aligned); when set,
+                              // the cloud draws the translation under the RU line
+    this.revealLabel = "Открыта новая строка песни:"; // cloud caption (localized by boot.js)
     this.revealed = 0;        // how many lines have been revealed so far
 
     // Lives (hearts): each obstacle hit costs one; the last hit is game over.
@@ -257,7 +260,11 @@ export class Game {
         if (this.revealed >= this.lyricsCount) {
           this.game.state = "paused"; // final line: celebrate the whole song
         } else {
-          this.reveal = { text: this.lyrics[idx] || "", t0: this.t };
+          this.reveal = {
+            text: this.lyrics[idx] || "",
+            zh: (this.lyricsZh && this.lyricsZh[idx]) || "",
+            t0: this.t,
+          };
         }
         this.onReveal(idx);
       }
@@ -317,7 +324,18 @@ export class Game {
       else cur = test;
     }
     if (cur) lines.push(cur);
-    return lines;
+    // CJK has no spaces: any "word" still wider than maxW is re-broken per char.
+    const out = [];
+    for (const ln of lines) {
+      if (ctx.measureText(ln).width <= maxW) { out.push(ln); continue; }
+      let chunk = "";
+      for (const ch of ln) {
+        if (chunk && ctx.measureText(chunk + ch).width > maxW) { out.push(chunk); chunk = ch; }
+        else chunk += ch;
+      }
+      if (chunk) out.push(chunk);
+    }
+    return out;
   }
 
   _roundRectPath(ctx, x, y, w, h, r) {
@@ -355,9 +373,10 @@ export class Game {
     const cs = Math.min(this.scale || 1, 1.5);
     const u = (v) => Math.round(v * cs * dpr); // world px (game-scaled, capped) -> device px
     const cssPx = (v) => Math.round(v * dpr);  // CSS px -> device px
-    const label = "Открыта новая строка песни:";
+    const label = this.revealLabel;
     const labelFont = `${u(12)}px "ProgressPixel", monospace`;
     const lineFont = `700 ${u(17)}px "ProgressPixelPab", monospace`;
+    const zhFont = `${u(14)}px "ProgressPixel", monospace`;
 
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0); // screen/device space
@@ -369,16 +388,23 @@ export class Game {
     // Lyrics carry a fixed "\n" break (always exactly two display lines);
     // word-wrap stays as a fallback for any text without one.
     const maxTextW = Math.min(W * 0.92, u(310)) - padX * 2;
-    const lines = r.text.includes("\n")
-      ? r.text.split("\n")
-      : this._wrapText(ctx, r.text, maxTextW);
+    // Fixed "\n" breaks are kept, but every segment still passes through the
+    // wrapper so a long half-line can't overflow the bubble on narrow screens.
+    const lines = String(r.text)
+      .split("\n")
+      .flatMap((seg) => this._wrapText(ctx, seg, maxTextW));
     const lineH = u(22);
     const labelH = u(18);
     let boxW = padX * 2;
     for (const ln of lines) boxW = Math.max(boxW, ctx.measureText(ln).width + padX * 2);
+    // 中文 mode: the translation goes UNDER the RU original.
+    ctx.font = zhFont;
+    const zhLines = r.zh ? this._wrapText(ctx, r.zh, maxTextW) : [];
+    const zhLineH = u(19);
+    for (const ln of zhLines) boxW = Math.max(boxW, ctx.measureText(ln).width + padX * 2);
     ctx.font = labelFont;
     boxW = Math.max(boxW, ctx.measureText(label).width + padX * 2);
-    const boxH = u(9) + labelH + lines.length * lineH + u(9);
+    const boxH = u(9) + labelH + lines.length * lineH + (zhLines.length ? u(4) + zhLines.length * zhLineH : 0) + u(9);
     const cx = W / 2;
     const x = Math.round(cx - boxW / 2);
     const y = cssPx(128); // just under the HUD/timer band (CSS-positioned)
@@ -399,6 +425,12 @@ export class Game {
     ctx.font = lineFont;
     const textTop = y + u(9) + labelH;
     lines.forEach((ln, i) => ctx.fillText(ln, cx, textTop + lineH / 2 + i * lineH));
+    if (zhLines.length) {
+      ctx.fillStyle = "rgba(42, 21, 51, 0.8)";
+      ctx.font = zhFont;
+      const zhTop = textTop + lines.length * lineH + u(4);
+      zhLines.forEach((ln, i) => ctx.fillText(ln, cx, zhTop + zhLineH / 2 + i * zhLineH));
+    }
     ctx.restore();
   }
 

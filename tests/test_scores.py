@@ -51,3 +51,18 @@ def test_scores_filter_by_character(client):
 
 def test_scores_reject_bad_character_filter(client):
     assert client.get("/api/scores?character=9").status_code == 422
+
+
+def test_scores_unique_per_name_max_score(client):
+    # The same player (name) appearing many times keeps only their best run.
+    client.post("/api/score", json={"name": "sora", "score": 100, "character": 0, "time_ms": 9000})
+    client.post("/api/score", json={"name": "sora", "score": 300, "character": 1, "time_ms": 5000})
+    client.post("/api/score", json={"name": "sora", "score": 200, "character": 0, "time_ms": 7000})
+    client.post("/api/score", json={"name": "Феня", "score": 250, "character": 2, "time_ms": 4000})
+    rows = client.get("/api/scores").json()["scores"]
+    assert [(r["name"], r["score"]) for r in rows] == [("sora", 300), ("Феня", 250)]
+    assert rows[0]["character"] == 1 and rows[0]["time_ms"] == 5000  # data of the best run
+
+    # Per-character tab: unique per name WITHIN that character.
+    only0 = client.get("/api/scores?character=0").json()["scores"]
+    assert [(r["name"], r["score"]) for r in only0] == [("sora", 200)]

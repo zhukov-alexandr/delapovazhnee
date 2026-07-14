@@ -7,6 +7,7 @@ import { getBest, updateBest, getChar, setChar } from "./prefs.js";
 import { loadSprites } from "./sprites.js";
 import { GAME, PRESAVE } from "./config.js";
 import { LYRICS } from "./lyrics.js";
+import { I18N, LYRICS_ZH, ERRORS_ZH, getLang, setLang } from "./i18n.js";
 
 // localStorage key: JSON array of service ids already presaved (Task 26).
 const PRESAVED_KEY = "dp_presaved";
@@ -105,6 +106,47 @@ function obstacleManifest() {
 }
 
 function boot() {
+  // --- i18n (RU / 中文, shared dp_lang key with /home). Applied FIRST so every
+  // element is already translated before the shell wires itself up. Dynamic
+  // strings below go through t(); lyrics always show the RU original with the
+  // Chinese translation rendered under each line (zhLyric). ---
+  const lang = getLang(localStorage);
+  const t = (k) => (I18N[lang] && I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.ru[k]);
+  const zhLyric = (idx) => (lang === "zh" ? LYRICS_ZH[idx] || "" : "");
+  document.documentElement.lang = lang === "zh" ? "zh" : "ru";
+  document.title = t("title");
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const v = t(el.dataset.i18n);
+    if (typeof v === "string") el.textContent = v;
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const v = t(el.dataset.i18nHtml);
+    if (typeof v === "string") el.innerHTML = v; // dictionary-only HTML, never user input
+  });
+  document.querySelectorAll("[data-i18n-attr]").forEach((el) => {
+    const [attr, key] = el.dataset.i18nAttr.split(":");
+    const v = t(key);
+    if (typeof v === "string") el.setAttribute(attr, v);
+  });
+  // Switcher (start screen): a <details> dropdown. The trigger shows the current
+  // language; picking another persists it + reloads (only reachable from the
+  // menu, so a full reload is safe and keeps every path single-language).
+  const langCurrent = document.getElementById("lang-current");
+  if (langCurrent) langCurrent.textContent = lang === "zh" ? "中文" : "RU";
+  const langDetails = document.querySelector(".lang-switch");
+  document.querySelectorAll(".lang-btn").forEach((b) => {
+    b.classList.toggle("is-active", b.dataset.lang === lang);
+    b.addEventListener("click", () => {
+      if (b.dataset.lang === lang) { if (langDetails) langDetails.open = false; return; }
+      setLang(b.dataset.lang, localStorage);
+      location.reload();
+    });
+  });
+  // Close the dropdown on an outside click / tap.
+  document.addEventListener("click", (e) => {
+    if (langDetails && langDetails.open && !langDetails.contains(e.target)) langDetails.open = false;
+  });
+
   // Loading screen: drive its bar as sprites load; the start screen is gated on
   // completion (see boot end) so you never play on placeholder art.
   const loadingEl = document.getElementById("loading");
@@ -163,6 +205,13 @@ function boot() {
     }
     const li = document.createElement("li");
     li.textContent = line.replace("\n", " "); // one display line per lyric here
+    const zh = zhLyric(idx);
+    if (zh) {
+      const tr = document.createElement("span");
+      tr.className = "lyric-zh";
+      tr.textContent = zh;
+      li.appendChild(tr);
+    }
     songCompleteLyricsEl.appendChild(li);
   });
   const livesEl = document.getElementById("lives");
@@ -248,12 +297,9 @@ function boot() {
       livesEl.appendChild(h);
     }
   }
-  // "Осталась 1 жизнь" / "Осталось 2 жизни" / "Осталось 5 жизней".
+  // "Осталась 1 жизнь" / "Осталось 2 жизни" / … (or the zh equivalent).
   function livesLeftText(n) {
-    if (n % 10 === 1 && n % 100 !== 11) return `Осталась ${n} жизнь`;
-    const d = n % 10, dd = n % 100;
-    const form = (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) ? "жизни" : "жизней";
-    return `Осталось ${n} ${form}`;
+    return (I18N[lang].lives_left || I18N.ru.lives_left)(n);
   }
 
   // --- CTA: build once from the <template>, mount by variant, and fire
@@ -310,7 +356,7 @@ function boot() {
     const span = document.createElement("span");
     span.className = "el-link__action el-link__action_disabled";
     span.title = "Релиз автоматически добавится в раздел Коллекция";
-    span.textContent = "Сохранено";
+    span.textContent = t("presave_saved");
     return span;
   }
 
@@ -413,7 +459,7 @@ function boot() {
 
     const actionSpan = document.createElement("span");
     actionSpan.className = "el-link__action";
-    actionSpan.textContent = "Пресейв";
+    actionSpan.textContent = t("presave_row");
 
     li.appendChild(nameSpan);
     li.appendChild(actionSpan);
@@ -473,7 +519,7 @@ function boot() {
     if (!list.length) {
       const li = document.createElement("li");
       li.className = "lb-empty";
-      li.textContent = "Пока пусто — стань первым!";
+      li.textContent = t("lb_empty");
       leaderboardList.appendChild(li);
       return;
     }
@@ -558,7 +604,7 @@ function boot() {
     const name = (nameInput.value || "").trim().slice(0, 24);
     showNameError("");
     saveScoreBtn.disabled = true;
-    saveScoreBtn.textContent = "Сохранение…";
+    saveScoreBtn.textContent = t("saving");
     fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -568,16 +614,17 @@ function boot() {
         if (r.status === 400) {
           // Rejected name (bad chars / blocklist): show the server's reason.
           const reason = await r.json().then((d) => d.detail).catch(() => "");
-          throw new Error(reason || "Недопустимое имя");
+          const mapped = lang === "zh" ? (ERRORS_ZH[reason] || reason) : reason;
+          throw new Error(mapped || t("err_default"));
         }
         if (!r.ok) throw new Error("");
         localStorage.setItem(NAME_KEY, name);
-        saveScoreBtn.textContent = "Сохранено ✓";
+        saveScoreBtn.textContent = t("saved");
         openLeaderboard();
       })
       .catch((e) => {
         saveScoreBtn.disabled = false;
-        saveScoreBtn.textContent = "Сохранить результат";
+        saveScoreBtn.textContent = t("save_score");
         if (e && e.message) showNameError(e.message);
       });
   });
@@ -647,6 +694,8 @@ function boot() {
     game.speedMult = cfg.speed_mult;
     game.lyricsCount = LYRICS.length;
     game.lyrics = LYRICS; // game.js draws the revealed line in the sky cloud
+    game.lyricsZh = lang === "zh" ? LYRICS_ZH : null; // translation under the RU line
+    game.revealLabel = t("reveal_label");
     // Music loudness is admin-tunable; SFX stay at their fixed level.
     if (cfg.music_volume != null) audio.setMusicVolume(cfg.music_volume);
   }
@@ -678,7 +727,7 @@ function boot() {
     // Arm the "save to leaderboard" control for this fresh result.
     lastGameScore = s;
     saveScoreBtn.disabled = false;
-    saveScoreBtn.textContent = "Сохранить результат";
+    saveScoreBtn.textContent = t("save_score");
     nameInput.value = localStorage.getItem(NAME_KEY) || "";
     hud.classList.add("hidden");
     livesEl.classList.add("hidden");
@@ -741,7 +790,7 @@ function boot() {
     const n = Math.min(game.revealed || 0, LYRICS.length);
     if (!n) {
       const li = document.createElement("li");
-      li.textContent = "Пока ничего не открыто — набирай очки!";
+      li.textContent = t("opened_empty");
       openedLinesListEl.appendChild(li);
       return;
     }
@@ -753,9 +802,17 @@ function boot() {
         openedLinesListEl.appendChild(gap);
       }
       const li = document.createElement("li");
-      // One display line per lyric here (the fixed "\n" is for the sky cloud
-      // and the song-complete popup, not this compact list).
+      // One display line per lyric here (the fixed "\n" is for the sky cloud,
+      // not this compact list). In 中文 mode the RU original stays and the
+      // translation renders on its own line underneath.
       li.textContent = LYRICS[idx].replace("\n", " ");
+      const zh = zhLyric(idx);
+      if (zh) {
+        const tr = document.createElement("span");
+        tr.className = "lyric-zh";
+        tr.textContent = zh;
+        li.appendChild(tr);
+      }
       openedLinesListEl.appendChild(li);
     }
   }

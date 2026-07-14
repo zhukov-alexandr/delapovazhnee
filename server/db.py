@@ -96,18 +96,29 @@ def insert_score(conn, name: str, score: int, character: int = -1, time_ms: int 
 
 
 def top_scores(conn, limit: int = 10, character: int | None = None) -> list:
-    # Highest score first; earlier submissions (lower id) win ties. Filter by
-    # character (0-3) for the per-character leaderboard tabs; None = overall.
+    # One row per NAME — that player's best (max score; earlier submission wins
+    # ties), so the public top-10 isn't filled by one player's repeat runs.
+    # Filter by character (0-3) for the per-character tabs; None = overall.
+    # The picked row carries the character/time of the best run itself.
     if character is None:
         return conn.execute(
-            "SELECT name, score, character, time_ms FROM scores "
-            "ORDER BY score DESC, id ASC LIMIT ?",
+            """
+            SELECT name, score, character, time_ms FROM scores s
+            WHERE s.id = (SELECT s2.id FROM scores s2 WHERE s2.name = s.name
+                          ORDER BY s2.score DESC, s2.id ASC LIMIT 1)
+            ORDER BY s.score DESC, s.id ASC LIMIT ?
+            """,
             (limit,),
         ).fetchall()
     return conn.execute(
-        "SELECT name, score, character, time_ms FROM scores WHERE character = ? "
-        "ORDER BY score DESC, id ASC LIMIT ?",
-        (character, limit),
+        """
+        SELECT name, score, character, time_ms FROM scores s
+        WHERE s.character = ?
+          AND s.id = (SELECT s2.id FROM scores s2 WHERE s2.name = s.name AND s2.character = ?
+                      ORDER BY s2.score DESC, s2.id ASC LIMIT 1)
+        ORDER BY s.score DESC, s.id ASC LIMIT ?
+        """,
+        (character, character, limit),
     ).fetchall()
 
 
