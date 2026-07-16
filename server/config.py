@@ -15,7 +15,13 @@ MAX_DELTA = 50               # max points accepted per tick chunk ("+50")
 MIN_TICK_INTERVAL_MS = 1000  # >= 1s between accepted ticks (per token)
 MAX_POINTS_PER_SEC = 2.0     # elapsed-path ceiling (generous vs observed ~1.0)
 GRACE = 20                   # absorb burst/latency at the very start
-TOKEN_TTL_MS = 600_000       # 10 min: a token older than this is dead
+# Sliding-window idle timeout: a token dies TOKEN_TTL_MS after its LAST activity
+# (mint, tick, or game-end), not after mint. An actively played run keeps
+# itself alive indefinitely — even a multi-hour game — because ticks refresh
+# the window; only an idle/abandoned token expires. Anti-banking is enforced by
+# the game-end freeze (ended_at stops scoring + pins the ceiling), so the TTL is
+# purely for cleaning up dead tokens.
+TOKEN_TTL_MS = 600_000       # 10 min of inactivity
 ABS_SCORE_CAP = 1_000_000    # existing hard ceiling, kept as a final backstop
 # Per-caller mint limits on POST /api/game/start (rolling 1-minute / 1-hour).
 START_LIMIT_PER_MIN = 5

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS play_tokens (
     ip          TEXT NOT NULL DEFAULT '',  -- client IP at mint (per-IP start rate limit)
     issued_at   TEXT NOT NULL,      -- server ISO ts (authoritative clock)
     last_tick   TEXT NOT NULL,      -- server ts of last accepted delta (rate limit)
+    ended_at    TEXT NOT NULL DEFAULT '',    -- server ts the run ended; '' = still live
     score       INTEGER NOT NULL DEFAULT 0,  -- server-accumulated running total
     character   INTEGER NOT NULL DEFAULT -1,
     tick_count  INTEGER NOT NULL DEFAULT 0,
@@ -81,6 +82,10 @@ def init_db(conn: sqlite3.Connection) -> None:
         conn.execute("ALTER TABLE scores ADD COLUMN character INTEGER NOT NULL DEFAULT -1")
     if "time_ms" not in cols:
         conn.execute("ALTER TABLE scores ADD COLUMN time_ms INTEGER NOT NULL DEFAULT 0")
+    # play_tokens.ended_at was added after the initial anti-cheat release.
+    ptcols = {r["name"] for r in conn.execute("PRAGMA table_info(play_tokens)").fetchall()}
+    if ptcols and "ended_at" not in ptcols:
+        conn.execute("ALTER TABLE play_tokens ADD COLUMN ended_at TEXT NOT NULL DEFAULT ''")
     conn.commit()
 
 
@@ -181,22 +186,69 @@ def get_play_token(conn, token: str):
     ).fetchone()
 
 
-def add_token_delta(conn, token: str, delta: int, server_ts: str) -> int:
-    """Add `delta` to the token's running total, bump last_tick/tick_count.
+def add_token_delta(
+    conn,
+    token: str,
+    delta: int,
+    server_ts: str,
+    min_interval_ms: int,
+    max_score: int,
+) -> int | None:
+    """Atomically apply a tick if it passes the interval + ceiling checks.
 
-    Returns the new running total. Caller is responsible for all validation
-    (cap, rate limit, elapsed backstop) BEFORE calling this.
+    The interval limit (>= `min_interval_ms` since `last_tick`) and the elapsed
+    ceiling (`score + delta <= max_score`) are enforced INSIDE the UPDATE's WHERE
+    clause. SQLite serializes writers, so concurrent ticks can't all read the
+    same pre-write `last_tick`/`score` and slip past together (TOCTOU race).
+
+    Returns the new running total, or None if the row wasn't updated (caller
+    maps None -> 429). The token must already be validated live + not ended.
     """
-    conn.execute(
-        "UPDATE play_tokens SET score = score + ?, last_tick = ?, "
-        "tick_count = tick_count + 1 WHERE token = ?",
-        (delta, server_ts, token),
+    cur = conn.execute(
+        """
+        UPDATE play_tokens
+           SET score = score + :delta,
+               last_tick = :now,
+               tick_count = tick_count + 1
+         WHERE token = :token
+           AND finalized = 0
+           AND ended_at = ''
+           AND score + :delta <= :max_score
+           AND (
+                 tick_count = 0
+                 OR (CAST((julianday(:now) - julianday(last_tick)) * 86400000 AS INTEGER))
+                    >= :min_interval
+               )
+        """,
+        {
+            "delta": delta,
+            "now": server_ts,
+            "token": token,
+            "max_score": max_score,
+            "min_interval": min_interval_ms,
+        },
     )
     conn.commit()
+    if cur.rowcount == 0:
+        return None
     row = conn.execute(
         "SELECT score FROM play_tokens WHERE token = ?", (token,)
     ).fetchone()
     return row["score"]
+
+
+def end_play_token(conn, token: str, server_ts: str) -> None:
+    """Freeze a run: stamp ended_at so no further ticks are accepted.
+
+    Idempotent — only the first end wins (a replayed game-over won't move the
+    clock), so the elapsed ceiling at finalize is pinned to the real duration.
+    Also refreshes last_tick so the player gets a full idle-TTL window to save.
+    """
+    conn.execute(
+        "UPDATE play_tokens SET ended_at = ?, last_tick = ? WHERE token = ? AND ended_at = ''",
+        (server_ts, server_ts, token),
+    )
+    conn.commit()
 
 
 def finalize_play_token(conn, token: str) -> None:
@@ -206,13 +258,14 @@ def finalize_play_token(conn, token: str) -> None:
 
 
 def prune_play_tokens(conn, cutoff_iso: str) -> int:
-    """Delete non-finalized tokens issued before `cutoff_iso`. Returns rows removed.
+    """Delete non-finalized tokens idle since before `cutoff_iso`. Returns rows removed.
 
     Cheap housekeeping so the table doesn't grow unbounded from abandoned runs.
-    Finalized tokens are kept as replay guards (they're small and single-use).
+    Uses last_tick (the sliding-window clock) so an actively played run is never
+    pruned. Finalized tokens are kept as replay guards (small and single-use).
     """
     cur = conn.execute(
-        "DELETE FROM play_tokens WHERE finalized = 0 AND issued_at < ?", (cutoff_iso,)
+        "DELETE FROM play_tokens WHERE finalized = 0 AND last_tick < ?", (cutoff_iso,)
     )
     conn.commit()
     return cur.rowcount

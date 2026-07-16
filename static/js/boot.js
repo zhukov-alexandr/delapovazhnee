@@ -713,19 +713,34 @@ function boot() {
 
   // Flush the not-yet-sent score as a capped "+N" tick, no more than one per
   // TICK_MS. `force` ignores the interval (used at game over to drain the tail).
+  // Returns a promise that settles when the tick request does (or immediately
+  // if nothing was sent) so callers can sequence a game-end after the tail flush.
   function flushTick(force) {
-    if (!playToken) return;
+    if (!playToken) return Promise.resolve();
     const owed = curScore - flushedScore;
-    if (owed <= 0) return;
+    if (owed <= 0) return Promise.resolve();
     const now = Date.now();
-    if (!force && now - lastFlushAt < TICK_MS) return;
+    if (!force && now - lastFlushAt < TICK_MS) return Promise.resolve();
     const delta = Math.min(owed, TICK_MAX);
     lastFlushAt = now;
     flushedScore += delta; // optimistic; the server re-checks the cap regardless
-    fetch("/api/game/tick", {
+    return fetch("/api/game/tick", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: playToken, delta }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
+  // Freeze the run server-side: scoring stops and the elapsed ceiling is pinned
+  // to the real play duration. Idempotent; the server also does this on finalize
+  // if we never got here (e.g. the request was dropped).
+  function endPlayRun() {
+    if (!playToken) return;
+    fetch("/api/game/end", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: playToken }),
       keepalive: true,
     }).catch(() => {});
   }
@@ -775,7 +790,9 @@ function boot() {
   game.onGameOver = (s) => {
     lastGameTimeMs = Math.round(game.t * 1000);
     curScore = s;
-    flushTick(true); // drain the pending tail delta ("less if the player died")
+    // Drain the pending tail delta ("less if the player died"), THEN freeze the
+    // run — order matters so the last tick isn't rejected as "game ended".
+    flushTick(true).then(endPlayRun);
     emit("game_over", { score: s, time_ms: lastGameTimeMs });
     audio.sfxGameOver();
     finalScoreEl.textContent = String(s);

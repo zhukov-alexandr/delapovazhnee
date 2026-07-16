@@ -31,6 +31,7 @@ from server.db import (
     create_play_token,
     get_play_token,
     add_token_delta,
+    end_play_token,
     finalize_play_token,
     prune_play_tokens,
     count_recent_tokens_for_sid,
@@ -84,6 +85,10 @@ class TickIn(BaseModel):
     delta: int = Field(ge=1, le=ABS_SCORE_CAP)  # server re-clamps to MAX_DELTA
 
 
+class EndIn(BaseModel):
+    token: str = Field(min_length=1, max_length=128)
+
+
 class ScoreIn(BaseModel):
     # Score/character/time now come from the server-accumulated token row —
     # never from the client. The client only names the run it finalizes.
@@ -126,8 +131,11 @@ def build_api_router(settings: Settings) -> APIRouter:
             raise HTTPException(status_code=400, detail="token session mismatch")
         now = _now_iso()
         issued_dt = parse_iso(row["issued_at"])
-        elapsed_ms = (parse_iso(now) - issued_dt).total_seconds() * 1000
-        if elapsed_ms > TOKEN_TTL_MS:
+        # Sliding window: expiry is measured from the last activity (last_tick,
+        # which is bumped on every tick and on game-end), not from mint — so an
+        # actively played run never expires mid-game.
+        idle_ms = (parse_iso(now) - parse_iso(row["last_tick"])).total_seconds() * 1000
+        if idle_ms > TOKEN_TTL_MS:
             raise HTTPException(status_code=400, detail="token expired")
         return row, now, issued_dt
 
@@ -165,26 +173,41 @@ def build_api_router(settings: Settings) -> APIRouter:
         conn = _conn()
         try:
             row, now, issued_dt = _validate_live_token(conn, body.token, request)
+            # A run that has ended no longer accepts score (anti-banking): you
+            # can't idle on the game-over screen and keep ticking.
+            if row["ended_at"]:
+                raise HTTPException(status_code=400, detail="game ended")
             # Chunk cap: a single tick can never move the total by more than MAX_DELTA.
             if body.delta < 1 or body.delta > MAX_DELTA:
                 raise HTTPException(status_code=400, detail="delta out of range")
-            # Rate limit: at most one accepted tick per MIN_TICK_INTERVAL_MS.
-            # The first tick is exempt — its last_tick equals issued_at, so the
-            # interval would otherwise reject a legit early score. The elapsed
-            # backstop below still bounds it.
-            if row["tick_count"] > 0:
-                since_last_ms = (parse_iso(now) - parse_iso(row["last_tick"])).total_seconds() * 1000
-                if since_last_ms < MIN_TICK_INTERVAL_MS:
-                    raise HTTPException(status_code=429, detail="too fast")
-            # Elapsed backstop: the tighter, interval-independent ceiling.
+            # Elapsed backstop: the running total can never exceed what real time
+            # allows (max_points/sec * elapsed + grace). The interval limit and
+            # this ceiling are BOTH enforced atomically inside add_token_delta's
+            # UPDATE, so concurrent ticks can't race past them.
             elapsed_s = (parse_iso(now) - issued_dt).total_seconds()
-            new_total = row["score"] + body.delta
-            if new_total > elapsed_s * MAX_POINTS_PER_SEC + GRACE:
+            max_score = int(elapsed_s * MAX_POINTS_PER_SEC + GRACE)
+            total = add_token_delta(
+                conn, body.token, body.delta, now, MIN_TICK_INTERVAL_MS, max_score
+            )
+            if total is None:
+                # Rejected by the interval limit or the elapsed ceiling.
                 raise HTTPException(status_code=429, detail="score too fast")
-            total = add_token_delta(conn, body.token, body.delta, now)
         finally:
             conn.close()
         return {"score": total}
+
+    # --- Game end: freeze the token so scoring stops and the elapsed ceiling is
+    # pinned to the real play duration. Idempotent; safe to call on abandon. ---
+    @router.post("/api/game/end")
+    def post_game_end(body: EndIn, request: Request):
+        conn = _conn()
+        try:
+            row, now, _issued_dt = _validate_live_token(conn, body.token, request)
+            if not row["ended_at"]:
+                end_play_token(conn, body.token, now)
+        finally:
+            conn.close()
+        return {"ok": True}
 
     # --- Finalize: name the run and write the SERVER-accumulated total to the
     # leaderboard. Score/character/time come from the token row, not the body. ---
@@ -197,10 +220,19 @@ def build_api_router(settings: Settings) -> APIRouter:
         conn = _conn()
         try:
             row, now, issued_dt = _validate_live_token(conn, s.token, request)
+            # Freeze the run if the client didn't already call /api/game/end, so
+            # the elapsed clock can't keep growing while the player sits on the
+            # save screen. The play duration is issued_at -> ended_at.
+            if not row["ended_at"]:
+                end_play_token(conn, s.token, now)
+                ended_at = now
+            else:
+                ended_at = row["ended_at"]
             score = min(int(row["score"]), ABS_SCORE_CAP)
             character = row["character"]
-            elapsed_ms = int((parse_iso(now) - issued_dt).total_seconds() * 1000)
-            # Final sanity: re-apply the elapsed ceiling one last time.
+            elapsed_ms = int((parse_iso(ended_at) - issued_dt).total_seconds() * 1000)
+            # Final sanity: re-apply the elapsed ceiling one last time, pinned to
+            # the real play duration (not "now").
             if score > (elapsed_ms / 1000) * MAX_POINTS_PER_SEC + GRACE:
                 score = int((elapsed_ms / 1000) * MAX_POINTS_PER_SEC + GRACE)
             insert_score(conn, name, score, character, elapsed_ms)
