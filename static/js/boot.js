@@ -509,9 +509,7 @@ function boot() {
   // overlays; scores are saved from the game-over name input and persisted
   // server-side (POST /api/score, GET /api/scores). ---
   const NAME_KEY = "dp_name";
-  let lastGameScore = 0;
-  let lastGameChar = 0;
-  let lastGameTimeMs = 0;
+  let lastGameTimeMs = 0;  // for the game_over analytics event (display only)
 
   // isAll: the overall tab shows a per-row character avatar column.
   function renderScores(list, isAll) {
@@ -603,12 +601,18 @@ function boot() {
   saveScoreBtn.addEventListener("click", () => {
     const name = (nameInput.value || "").trim().slice(0, 24);
     showNameError("");
+    // No token → this run can't be finalized (start failed / offline). Don't
+    // fall back to the old trust-the-client path; just surface the error.
+    if (!playToken) {
+      showNameError(t("err_default"));
+      return;
+    }
     saveScoreBtn.disabled = true;
     saveScoreBtn.textContent = t("saving");
     fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, score: lastGameScore, character: lastGameChar, time_ms: lastGameTimeMs }),
+      body: JSON.stringify({ token: playToken, name }),
     })
       .then(async (r) => {
         if (r.status === 400) {
@@ -677,6 +681,55 @@ function boot() {
     else if (e.key === "ArrowUp" || e.key === "ArrowLeft") { e.preventDefault(); kbPaint(m.index - 1); }
   });
 
+  // --- Leaderboard anti-cheat: server-side play token + batched score
+  // accumulation. The on-screen score stays client-side for responsiveness, but
+  // it is cosmetic: the server accumulates the *trusted* total from capped,
+  // rate-limited "+N" ticks against a token minted at game start, and the
+  // leaderboard write (finalize) reads that server total — never the client's.
+  // See docs/superpowers/specs/…leaderboard-anti-cheat-design.md ---
+  const TICK_MS = 1000;   // matches server MIN_TICK_INTERVAL_MS (>=1s between ticks)
+  const TICK_MAX = 50;    // matches server MAX_DELTA (points per tick chunk)
+  let playToken = null;   // this run's token; null = couldn't start (save disabled)
+  let curScore = 0;       // latest client total (display value)
+  let flushedScore = 0;   // amount already POSTed to the server this run
+  let lastFlushAt = 0;    // ms timestamp of the last accepted tick POST
+
+  function resetPlayRun() {
+    playToken = null; curScore = 0; flushedScore = 0; lastFlushAt = 0;
+  }
+
+  // Mint a token for this run. Resolves once done (or on failure → no token).
+  function startPlayRun() {
+    resetPlayRun();
+    return fetch("/api/game/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ character: game.charIndex }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { playToken = (d && d.token) || null; })
+      .catch(() => { playToken = null; });
+  }
+
+  // Flush the not-yet-sent score as a capped "+N" tick, no more than one per
+  // TICK_MS. `force` ignores the interval (used at game over to drain the tail).
+  function flushTick(force) {
+    if (!playToken) return;
+    const owed = curScore - flushedScore;
+    if (owed <= 0) return;
+    const now = Date.now();
+    if (!force && now - lastFlushAt < TICK_MS) return;
+    const delta = Math.min(owed, TICK_MAX);
+    lastFlushAt = now;
+    flushedScore += delta; // optimistic; the server re-checks the cap regardless
+    fetch("/api/game/tick", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: playToken, delta }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
   // --- Game wiring ---
   const game = new Game("game");
   game.charIndex = getChar(localStorage);
@@ -706,17 +759,23 @@ function boot() {
 
   game.onStart = () => {
     emit("game_start", {});
+    startPlayRun(); // mint the anti-cheat token for this run (async, fire-and-forget)
     audio.startMusic();
     renderLives(GAME.MAX_LIVES);
   };
-  game.onScore = (s) => { scoreEl.textContent = String(s); };
+  game.onScore = (s) => {
+    curScore = s;
+    scoreEl.textContent = String(s);
+    flushTick(false); // send a capped, rate-limited "+N" tick to the server
+  };
   // Reward feedback: quiet coin/note on every catch or obstacle pass.
   game.onGain = (_amount, special) => sfxGain(special);
   // Play-time clock (excludes menus/popups — game.t only advances while running).
   game.onTime = (seconds) => { if (timerEl) timerEl.textContent = fmtTime(seconds); };
   game.onGameOver = (s) => {
-    lastGameChar = game.charIndex;
     lastGameTimeMs = Math.round(game.t * 1000);
+    curScore = s;
+    flushTick(true); // drain the pending tail delta ("less if the player died")
     emit("game_over", { score: s, time_ms: lastGameTimeMs });
     audio.sfxGameOver();
     finalScoreEl.textContent = String(s);
@@ -725,7 +784,6 @@ function boot() {
     renderBest();
     renderLives(0);
     // Arm the "save to leaderboard" control for this fresh result.
-    lastGameScore = s;
     saveScoreBtn.disabled = false;
     saveScoreBtn.textContent = t("save_score");
     nameInput.value = localStorage.getItem(NAME_KEY) || "";

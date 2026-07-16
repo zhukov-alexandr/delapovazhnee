@@ -6,6 +6,21 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
+# --- Leaderboard anti-cheat tuning (see docs/…/leaderboard-anti-cheat) --------
+# The ceiling is derived from real observed play (~1 point / 1000 ms). Two
+# independent bounds enforce it: the interval path (MAX_DELTA per tick, at most
+# one tick per MIN_TICK_INTERVAL_MS) and the tighter elapsed path
+# (MAX_POINTS_PER_SEC * elapsed + GRACE). Keep both.
+MAX_DELTA = 50               # max points accepted per tick chunk ("+50")
+MIN_TICK_INTERVAL_MS = 1000  # >= 1s between accepted ticks (per token)
+MAX_POINTS_PER_SEC = 2.0     # elapsed-path ceiling (generous vs observed ~1.0)
+GRACE = 20                   # absorb burst/latency at the very start
+TOKEN_TTL_MS = 600_000       # 10 min: a token older than this is dead
+ABS_SCORE_CAP = 1_000_000    # existing hard ceiling, kept as a final backstop
+# Per-caller mint limits on POST /api/game/start (rolling 1-minute / 1-hour).
+START_LIMIT_PER_MIN = 5
+START_LIMIT_PER_HOUR = 30
+
 
 @dataclass(frozen=True)
 class Settings:
