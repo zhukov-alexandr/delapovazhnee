@@ -64,15 +64,15 @@ def test_reason_messages():
     assert check_name("хуй")[1] == "Недопустимое имя"
 
 
-def test_endpoint_rejects_bad_name(client):
-    r = client.post("/api/score", json={"name": "хуй", "score": 10})
+def test_endpoint_rejects_bad_name(client, save_score):
+    r = save_score(client, name="хуй", score=10)
     assert r.status_code == 400
     assert r.json()["detail"] == "Недопустимое имя"
     # a name with a space is rejected for characters
-    assert client.post("/api/score", json={"name": "bad name", "score": 5}).status_code == 400
+    assert save_score(client, name="bad name", score=5).status_code == 400
 
 
-def test_endpoint_accepts_clean_name(client):
-    assert client.post("/api/score", json={"name": "Кирилл_2026", "score": 7}).status_code == 200
+def test_endpoint_accepts_clean_name(client, save_score):
+    assert save_score(client, name="Кирилл_2026", score=7).status_code == 200
     # empty still allowed (defaults to Аноним upstream)
-    assert client.post("/api/score", json={"name": "", "score": 3}).status_code == 200
+    assert save_score(client, name="", score=3).status_code == 200
