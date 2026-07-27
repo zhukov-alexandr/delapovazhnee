@@ -4,7 +4,7 @@ from __future__ import annotations
 import pathlib
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -31,8 +31,21 @@ def create_app(settings: Settings) -> FastAPI:
     templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
     app.state.templates = templates
 
-    # Game at the root: assign (or reuse) the sticky A/B variant, then render.
+    # Landing at the root. Served as a plain file (NOT via Jinja) so the JS
+    # template literals in it are untouched. (Assets under static/home/.)
     @app.get("/", response_class=HTMLResponse)
+    def home_page():
+        return FileResponse(BASE_DIR / "templates" / "home.html")
+
+    # Old landing path → root, so existing /home links keep working.
+    @app.get("/home", response_class=HTMLResponse)
+    @app.get("/home/", response_class=HTMLResponse)
+    def home_redirect():
+        return RedirectResponse("/", status_code=301)
+
+    # Game at /game: assign (or reuse) the sticky A/B variant, then render.
+    @app.get("/game", response_class=HTMLResponse)
+    @app.get("/game/", response_class=HTMLResponse)
     def game_page(request: Request):
         sid, variant, is_new = resolve(request)
         resp = templates.TemplateResponse(
@@ -43,13 +56,6 @@ def create_app(settings: Settings) -> FastAPI:
             resp.set_cookie(VARIANT_COOKIE, variant, max_age=COOKIE_MAX_AGE, samesite="lax")
         return resp
 
-    # Existing landing (moved to templates/home.html; its assets under static/home/).
-    # Served as a plain file (NOT via Jinja) so the JS template literals in it are untouched.
-    @app.get("/home", response_class=HTMLResponse)
-    @app.get("/home/", response_class=HTMLResponse)
-    def home_page():
-        return FileResponse(BASE_DIR / "templates" / "home.html")
-
     # Make the browser revalidate the HTML pages and static assets on every load
     # (cheap 304 via ETag/Last-Modified) instead of heuristically caching them —
     # otherwise a landing/game/JS/CSS update isn't picked up without a hard refresh.
@@ -57,7 +63,7 @@ def create_app(settings: Settings) -> FastAPI:
     async def _no_cache(request: Request, call_next):
         response = await call_next(request)
         path = request.url.path
-        if path.startswith("/static/") or path in ("/", "/home", "/home/"):
+        if path.startswith("/static/") or path in ("/", "/game", "/game/"):
             response.headers["Cache-Control"] = "no-cache"
         return response
 
