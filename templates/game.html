@@ -40,7 +40,7 @@
       <div class="cta">
         <p class="cta-caption" data-i18n="cta_caption">Дела поважнее – 19</p>
         <img class="cover" alt="Обложка сингла" src="/static/sprites/cover.jpg" />
-        <a class="presave btn" target="_blank" rel="noopener" data-i18n="cta_presave">Сделать пресейв</a>
+        <a class="presave btn" target="_blank" rel="noopener" data-i18n="cta_presave">Слушать песню</a>
       </div>
     </template>
 
@@ -173,7 +173,7 @@
     <div id="song-complete" class="overlay reveal-overlay hidden">
       <div class="song-complete-card">
         <h2 class="song-complete-title" data-i18n="song_complete_title">Ура, ты открыл все возможные строчки песни!</h2>
-        <button type="button" id="song-complete-presave" class="song-complete-sub" data-i18n="song_complete_presave">Песня «19» выйдет 17 июля 2026! · Пресейв</button>
+        <button type="button" id="song-complete-presave" class="song-complete-sub" data-i18n="song_complete_presave">Песня «19» выйдет 17 июля 2026! · Слушать</button>
         <ul id="song-complete-lyrics" class="song-complete-lyrics"></ul>
         <button id="song-complete-next" class="btn big" data-i18n="song_complete_next">Играть дальше</button>
       </div>
@@ -189,7 +189,18 @@
       </div>
     </div>
 
-    <!-- Presave modal (Task 26): opened by the CTA button (both variants).
+    <!-- Listen modal: the "Слушать песню" CTA embeds the band's smartlink page
+         (dnkmusic.ru/devyatnadtsat) in an iframe — all 5 services, always current. -->
+    <div id="listen-modal" class="overlay listen-overlay hidden">
+      <div class="listen-card">
+        <button type="button" id="listen-close" class="presave-close listen-close" aria-label="Закрыть">×</button>
+        <iframe id="listen-frame" class="listen-frame" title="Слушать песню «19»" src="about:blank"
+                allow="autoplay; clipboard-write"></iframe>
+      </div>
+    </div>
+
+    <!-- DORMANT (kept for future use): the in-app presave modal + band.link OAuth
+         flow. Not opened by any CTA right now — the CTAs open #listen-modal above.
          Service rows are built by boot.js from PRESAVE.SERVICES. -->
     <div id="presave-modal" class="overlay presave-overlay hidden">
       <div class="presave-card">

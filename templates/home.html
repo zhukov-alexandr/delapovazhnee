@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дела поважнее – Официальный сайт</title>
-    <meta name="description" content="Дела поважнее – новый сингл «19», релиз 17 июля 2026. Сделай пресейв, слушай в стримингах, приходи на концерты.">
+    <meta name="description" content="Дела поважнее – новый сингл «19», релиз 17 июля 2026. Слушай в стримингах, приходи на концерты.">
     <link rel="icon" href="/static/home/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png">
     <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
@@ -164,7 +164,7 @@
       .cue--mobile { display: none; }
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
-      .single__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+      .single__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vw, 44px); }
       .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--crimson); background: rgba(179,42,56,0.14); border: 1px solid rgba(179,42,56,0.5); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
       .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
       .single__title em { font-style: normal; color: var(--crimson); }
@@ -260,6 +260,14 @@
         html { scroll-behavior: auto; }
         .cue .arr, .btn, .poster, .nav__links { animation: none; transition: none; }
       }
+
+      /* Listen modal: embeds the band's smartlink (all 5 services) in an iframe. */
+      .listen-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(23,19,15,0.72); padding: 20px; }
+      .listen-modal[hidden] { display: none; }
+      .listen-modal__card { position: relative; width: min(440px, 96vw); height: min(82vh, 760px); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.5); }
+      .listen-modal__frame { width: 100%; height: 100%; border: 0; display: block; }
+      .listen-modal__close { position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff; font-size: 24px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+      .listen-modal__close:hover { background: rgba(0,0,0,0.78); }
     </style>
 </head>
 <body>
@@ -299,21 +307,27 @@
 
     <section id="single" class="screen single">
       <div class="wrap">
-        <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Пресейв</div>
+        <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Слушать</div>
         <div class="single__grid">
           <div class="single__cover-wrap">
             <img class="single__cover" src="/static/sprites/19_2.jpg" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «19»">
           </div>
           <div>
             <div class="release-row">
+              <!-- Restore before the next single: release-date badge. (i18n key
+                   "release_date" is kept in the dictionary for restoration.)
               <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span>
+              -->
               <a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
             </div>
             <h2 class="display single__title" data-i18n-html="single_title">Новый<br>сингл <em>«19»</em></h2>
+            <!-- Restore before the next single: pre-save lead copy. (i18n key
+                 "single_lead" is kept in the dictionary for restoration.)
             <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее. Так ты поможешь нам продвинуть песню, а ещё она появится в твоем плейлисте сразу после выхода, 17 июля.</p>
+            -->
             <div class="single__cta">
-              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener" data-i18n="btn_presave">Сделать пресейв</a>
-              <a class="btn btn--paper" href="/" data-i18n="btn_play">…или сыграй и сохрани</a>
+              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener" data-listen-open data-i18n="btn_presave">Слушать песню</a>
+              <a class="btn btn--paper" href="/" data-i18n="btn_play">…или сыграй и послушай</a>
             </div>
           </div>
         </div>
@@ -396,16 +410,16 @@
         var I18N = {
           ru: {
             title: "Дела поважнее – Официальный сайт",
-            meta_desc: "Дела поважнее – новый сингл «19», релиз 17 июля 2026. Сделай пресейв, слушай в стримингах, приходи на концерты.",
+            meta_desc: "Дела поважнее – новый сингл «19», релиз 17 июля 2026. Слушай в стримингах, приходи на концерты.",
             logo_alt: "Дела поважнее", nav_menu: "Меню",
             nav_single: "Сингл «19»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
             hero_title: 'Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span>',
             hero_tag: 'новый сингл<b>«19»</b>', hero_photo_aria: "Группа «Дела поважнее»",
             hero_cue: 'Новый сингл «19» <span class="arr">↓</span>',
-            single_eyebrow: "Пресейв", single_cover_alt: "Обложка сингла «19»", release_date: "Релиз · 17 июля 2026",
+            single_eyebrow: "Слушать", single_cover_alt: "Обложка сингла «19»", release_date: "Релиз · 17 июля 2026",
             cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: 'Новый<br>сингл <em>«19»</em>',
             single_lead: "Сохрани сингл заранее. Так ты поможешь нам продвинуть песню, а ещё она появится в твоем плейлисте сразу после выхода, 17 июля.",
-            btn_presave: "Сделать пресейв", btn_play: "…или сыграй и сохрани",
+            btn_presave: "Слушать песню", btn_play: "…или сыграй и послушай",
             concerts_eyebrow: "Концерты · презентация альбома",
             poster_msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
             msk_when: "18 ноября · Москва", msk_where: "Урбан · Большая Новодмитровская, 36с24",
@@ -418,16 +432,16 @@
           },
           en: {
             title: "Dela povazhnee – Official site",
-            meta_desc: "Dela povazhnee – new single «19», out July 17, 2026. Pre-save it, listen on streaming, come to the shows.",
+            meta_desc: "Dela povazhnee – new single «19», out July 17, 2026. Listen on streaming, come to the shows.",
             logo_alt: "Dela povazhnee", nav_menu: "Menu",
             nav_single: "Single «19»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
             hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
             hero_tag: 'new single<b>«19»</b>', hero_photo_aria: "Dela povazhnee band",
             hero_cue: 'New single «19» <span class="arr">↓</span>',
-            single_eyebrow: "Pre-save", single_cover_alt: "«19» single cover", release_date: "Out · July 17, 2026",
+            single_eyebrow: "Listen", single_cover_alt: "«19» single cover", release_date: "Out · July 17, 2026",
             cue_concerts: 'Shows <span class="arr">↓</span>', single_title: 'New<br>single <em>«19»</em>',
-            single_lead: "Pre-save the single — the second it drops on July 17, it lands right in your library. One tap in your favorite streaming app.",
-            btn_presave: "Pre-save now", btn_play: "…or play & save",
+            single_lead: "Save the single early — the second it drops on July 17, it lands right in your library. One tap in your favorite streaming app.",
+            btn_presave: "Listen now", btn_play: "…or play & listen",
             concerts_eyebrow: "Shows · album presentation",
             poster_msk_alt: "Moscow show poster, November 18, Urban",
             msk_when: "November 18 · Moscow", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
@@ -440,16 +454,16 @@
           },
           zh: {
             title: "Dela povazhnee – 官方网站",
-            meta_desc: "Dela povazhnee 全新单曲《19》，2026年7月17日发行。预存单曲、在流媒体收听、来看现场演出。",
+            meta_desc: "Dela povazhnee 全新单曲《19》，2026年7月17日发行。在流媒体收听，来看现场演出。",
             logo_alt: "Dela povazhnee", nav_menu: "菜单",
             nav_single: "单曲《19》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
             hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
             hero_tag: '全新单曲<b>《19》</b>', hero_photo_aria: "Dela povazhnee 乐队",
             hero_cue: '全新单曲《19》<span class="arr">↓</span>',
-            single_eyebrow: "预存", single_cover_alt: "《19》单曲封面", release_date: "发行 · 2026年7月17日",
+            single_eyebrow: "收听", single_cover_alt: "《19》单曲封面", release_date: "发行 · 2026年7月17日",
             cue_concerts: '演出 <span class="arr">↓</span>', single_title: '全新<br>单曲 <em>《19》</em>',
-            single_lead: "现在就预存单曲——7月17日一上线，它就会自动进入你的音乐库。在你常用的流媒体里一键完成。",
-            btn_presave: "立即预存", btn_play: "……或边玩边预存",
+            single_lead: "现在就收藏单曲——7月17日一上线，它就会自动进入你的音乐库。在你常用的流媒体里一键完成。",
+            btn_presave: "收听歌曲", btn_play: "……或边玩边听",
             concerts_eyebrow: "演出 · 专辑首演",
             poster_msk_alt: "莫斯科演出海报，11月18日，Urban",
             msk_when: "11月18日 · 莫斯科", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
@@ -530,6 +544,41 @@
           a.setAttribute("href", h + (h.indexOf("?") !== -1 ? "&" : "?") + utm);
         });
       })();
+
+      // Listen modal: embed the smartlink in-page instead of leaving the site.
+      // The button keeps its href as a graceful fallback (JS off / new-tab click).
+      // Deferred to DOMContentLoaded so #listen-modal (placed after this script)
+      // exists when we wire it.
+      document.addEventListener("DOMContentLoaded", function () {
+        var modal = document.getElementById("listen-modal");
+        var frame = document.getElementById("listen-frame");
+        var closeBtn = document.getElementById("listen-close");
+        if (!modal || !frame) return;
+        var URL = "https://dnkmusic.ru/devyatnadtsat";
+        function open() {
+          if (frame.getAttribute("src") !== URL) frame.setAttribute("src", URL);
+          modal.hidden = false;
+          document.body.style.overflow = "hidden";
+        }
+        function close() { modal.hidden = true; document.body.style.overflow = ""; }
+        document.querySelectorAll("[data-listen-open]").forEach(function (b) {
+          b.addEventListener("click", function (e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let open-in-new-tab work
+            e.preventDefault();
+            open();
+          });
+        });
+        closeBtn.addEventListener("click", close);
+        modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) close(); });
+      });
     </script>
+
+    <div id="listen-modal" class="listen-modal" hidden>
+      <div class="listen-modal__card">
+        <button type="button" class="listen-modal__close" id="listen-close" aria-label="Закрыть">×</button>
+        <iframe id="listen-frame" class="listen-modal__frame" title="Слушать «19»" src="about:blank" allow="autoplay; clipboard-write"></iframe>
+      </div>
+    </div>
 </body>
 </html>

@@ -302,23 +302,25 @@ function boot() {
     return (I18N[lang].lives_left || I18N.ru.lives_left)(n);
   }
 
-  // --- CTA: build once from the <template>, mount by variant, and fire
-  // cta_view exactly once when it actually becomes visible to the player. ---
-  const ctaTpl = document.getElementById("cta-tpl");
-  const ctaFrag = ctaTpl.content.cloneNode(true);
-  const ctaRoot = ctaFrag.querySelector(".cta");
-  // Cover image is static in the template; the presave link no longer
-  // navigates — it opens the in-page presave modal (Task 26).
-  const ctaLink = ctaFrag.querySelector(".presave");
-  ctaLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    emit("cta_click", { src: "button" });
-    openPresaveModal("button");
+  // --- Listen CTA (cover + "Слушать песню" button). Shown BOTH on the start
+  // screen (as a popup) AND on game-over — every player sees both placements
+  // (the old A/B split is retired; the variant cookie stays server-side for
+  // future use). The button embeds the band's smartlink (all 5 services) in
+  // #listen-modal. The old in-app presave modal + band.link OAuth flow is kept
+  // but DORMANT (see openPresaveModal / openPresave) for future reuse. ---
+  const listenModal = document.getElementById("listen-modal");
+  const listenFrame = document.getElementById("listen-frame");
+  const LISTEN_URL = "https://dnkmusic.ru/devyatnadtsat";
+  function openListenModal() {
+    // Lazy: only load the external page the first time the modal opens.
+    if (listenFrame.getAttribute("src") !== LISTEN_URL) listenFrame.setAttribute("src", LISTEN_URL);
+    listenModal.classList.remove("hidden");
+    kbOpen(listenModal, true);
+  }
+  document.getElementById("listen-close").addEventListener("click", () => {
+    listenModal.classList.add("hidden");
+    kbClose();
   });
-
-  const isVariantA = session.variant === "A";
-  const ctaHost = document.getElementById(isVariantA ? "start-cta" : "over-cta");
-  ctaHost.appendChild(ctaRoot);
 
   let ctaViewFired = false;
   function fireCtaView() {
@@ -327,10 +329,30 @@ function boot() {
     emit("cta_view", {});
   }
 
-  // Variant A shows the CTA as a popup over the start screen (#start-presave)
-  // instead of a static block under the menu. cta_view fires when it opens (a
-  // real view), and the "Сделать пресейв" button inside keeps the same
-  // cta_click -> presave-modal funnel as variant B.
+  // Clone the CTA card into both hosts; each button opens the listen modal.
+  const ctaTpl = document.getElementById("cta-tpl");
+  // Translate a freshly-cloned CTA fragment (the global i18n pass already ran
+  // before these clones exist, so data-i18n on them needs applying by hand).
+  function i18nFrag(frag) {
+    frag.querySelectorAll("[data-i18n]").forEach((el) => {
+      const v = t(el.dataset.i18n);
+      if (typeof v === "string") el.textContent = v;
+    });
+  }
+  function mountCta(hostId, src) {
+    const frag = ctaTpl.content.cloneNode(true);
+    i18nFrag(frag);
+    frag.querySelector(".presave").addEventListener("click", (e) => {
+      e.preventDefault();
+      emit("cta_click", { src });
+      openListenModal();
+    });
+    document.getElementById(hostId).appendChild(frag.querySelector(".cta"));
+  }
+  mountCta("start-cta", "start"); // start-screen popup
+  mountCta("over-cta", "over");   // game-over screen
+
+  // The start-screen popup (#start-presave) greets every player on load.
   const startPresaveEl = document.getElementById("start-presave");
   function openStartPresave() {
     startPresaveEl.classList.remove("hidden");
@@ -494,14 +516,14 @@ function boot() {
     // Server already logged presave_done for this return — no emit here.
   });
 
-  // The life-lost popup offers the same presave (cover + button → modal). It's a
-  // separate CTA surface, tagged src:"life_lost" so it doesn't skew the
-  // start-vs-gameover A/B click split; no cta_view is fired for it.
+  // The life-lost popup offers the same listen CTA (cover + button → modal),
+  // tagged src:"life_lost" for the click analytics.
   const lifeLostCta = ctaTpl.content.cloneNode(true);
+  i18nFrag(lifeLostCta);
   lifeLostCta.querySelector(".presave").addEventListener("click", (e) => {
     e.preventDefault();
     emit("cta_click", { src: "life_lost" });
-    openPresaveModal("life_lost");
+    openListenModal();
   });
   document.getElementById("life-lost-cta").appendChild(lifeLostCta.querySelector(".cta"));
 
@@ -809,7 +831,7 @@ function boot() {
     timerEl.classList.add("hidden");
     pauseBtn.classList.add("hidden");
     overEl.classList.remove("hidden");
-    if (!isVariantA) fireCtaView(); // becomes visible only now, for variant B
+    fireCtaView(); // game-over CTA is visible now (once-only guard; usually already fired on start)
     kbOpen(overEl);
   };
   // Non-fatal hit: game.js already paused + granted grace. Show the popup with
@@ -852,10 +874,10 @@ function boot() {
     game.resume();
   });
 
-  // The release-date badge on the song-complete popup is a presave CTA.
+  // The release-date badge on the song-complete popup is a listen CTA.
   songCompletePresave.addEventListener("click", () => {
     emit("cta_click", { src: "song_complete" });
-    openPresaveModal("song_complete");
+    openListenModal();
   });
 
   // "Открытые строки": a read-only viewer of the lines unlocked so far this run,
@@ -942,7 +964,7 @@ function boot() {
     pauseBtn.classList.add("hidden");
     startEl.classList.remove("hidden");
     kbOpen(startEl);
-    if (isVariantA) openStartPresave(); // greet the start screen with the popup again
+    openStartPresave(); // greet the start screen with the popup again
   }
   toMenuBtn.addEventListener("click", goToMenu);
   document.getElementById("life-lost-menu").addEventListener("click", goToMenu);
@@ -974,7 +996,7 @@ function boot() {
       setTimeout(() => loadingEl.classList.add("hidden"), 400);
     }
     kbOpen(startEl); // the start overlay is visible on load
-    if (isVariantA) openStartPresave(); // variant A: greet with the presave popup
+    openStartPresave(); // greet every player with the listen popup
   });
 }
 
