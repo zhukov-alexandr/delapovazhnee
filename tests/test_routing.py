@@ -76,6 +76,14 @@ def test_home_references_all_new_posters(client):
         assert f"/static/home/{name}" in html
 
 
+def test_desktop_ticket_buttons_use_primary_button_design(client):
+    html = client.get("/").text
+
+    assert html.count(
+        'class="poster__tix btn btn--fill tc-background-tomato"'
+    ) == 5
+
+
 def test_new_poster_assets_are_at_most_300kb():
     home_assets = Path(__file__).parents[1] / "static" / "home"
 

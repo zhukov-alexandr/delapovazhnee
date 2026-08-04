@@ -171,21 +171,23 @@
       .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts ---- */
+      .concerts .wrap { width: min(1760px, 92vw); flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
       .poster-grid {
         display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: clamp(8px, 1.3vw, 16px); width: 100%; margin: 0 auto;
+        align-items: stretch; gap: clamp(8px, 1.3vw, 18px); width: 100%; margin-block: auto;
+        padding-block: clamp(12px, 2.5vh, 28px);
       }
-      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 7px 7px 0; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
+      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 10px 10px 0; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
       .poster:nth-child(even) { transform: rotate(1deg); }
       .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(23,19,15,0.3); }
       .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: var(--kraft-deep); }
-      .poster__meta { display: flex; flex: 1; flex-direction: column; align-items: stretch; gap: 9px; padding: 10px 4px; }
-      .poster__details { flex: 1; min-width: 0; }
-      .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(10px, 1.05vw, 14px); line-height: 1.1; overflow-wrap: anywhere; }
-      .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
-      .poster__tix { width: auto; align-self: flex-end; appearance: none; border: 0; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: none !important; font-size: 12px !important; letter-spacing: 0.04em !important; color: var(--paper) !important; background: var(--crimson) !important; padding: 10px 16px; border-radius: 2px; text-decoration: none; white-space: nowrap; cursor: pointer; }
-      .poster__tix:hover { background: var(--crimson-deep) !important; }
+      .poster__meta { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(8px, 1vw, 14px); padding: 16px 8px; }
+      .poster__details { min-width: 0; }
+      .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(11px, 0.85vw, 16px); line-height: 1.1; overflow-wrap: anywhere; }
+      .poster__where { font-size: clamp(10px, 0.7vw, 13px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
+      .poster__tix { width: auto; align-self: center; justify-content: center; appearance: none; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: none !important; font-size: clamp(13px, 1.6vw, 15px) !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--crimson) !important; border: 2px solid var(--crimson) !important; border-radius: 2px !important; padding: 15px 26px !important; }
+      .poster__tix:hover { background: var(--crimson-deep) !important; border-color: var(--crimson-deep) !important; }
       .tour-poster-mobile { display: none; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
@@ -220,6 +222,11 @@
         .nav__links a { color: var(--paper); font-size: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid rgba(240,233,220,0.12); }
         .nav__links a:hover, .nav__links a.is-play { border-bottom-color: rgba(240,233,220,0.12); color: var(--paper); }
         .nav__toggle { display: flex; }
+      }
+      @media (min-width: 761px) and (max-width: 1399px) {
+        .poster { padding: 7px 7px 0; }
+        .poster__meta { grid-template-columns: 1fr; align-items: stretch; gap: 10px; padding: 10px 4px; }
+        .poster__tix { align-self: flex-end; font-size: 12px !important; padding: 10px 14px !important; }
       }
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
@@ -356,7 +363,7 @@
                 <div class="poster__when" data-i18n="ufa_when">31 октября · Уфа</div>
                 <div class="poster__where" data-i18n="ufa_where">MusicHall27 · ул. Кирова, 27</div>
               </div>
-              <button type="button" class="poster__tix tc-background-tomato" data-tc-event="6a46a070983da59ac77d8ccd" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
+              <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a46a070983da59ac77d8ccd" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
           <article class="poster">
@@ -366,7 +373,7 @@
                 <div class="poster__when" data-i18n="ekb_when">1 ноября · Екатеринбург</div>
                 <div class="poster__where" data-i18n="ekb_where">Корчма «Пристанище» · ул. Бебеля, 124</div>
               </div>
-              <button type="button" class="poster__tix tc-background-tomato" data-tc-event="6a4b6ed19f4bf9931aca2868" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
+              <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a4b6ed19f4bf9931aca2868" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
           <article class="poster">
@@ -376,7 +383,7 @@
                 <div class="poster__when" data-i18n="nsk_when">3 ноября · Новосибирск</div>
                 <div class="poster__where" data-i18n="nsk_where">The Rooks · ул. Коммунистическая, 45</div>
               </div>
-              <button type="button" class="poster__tix tc-background-tomato" data-tc-event="6a7085d06d1bdc42b48fdf81" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
+              <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a7085d06d1bdc42b48fdf81" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
           <article class="poster">
@@ -386,7 +393,7 @@
                 <div class="poster__when" data-i18n="msk_when">18 ноября · Москва</div>
                 <div class="poster__where" data-i18n="msk_where">Урбан · Большая Новодмитровская, 36с24</div>
               </div>
-              <button type="button" class="poster__tix tc-background-tomato" data-tc-event="6a186cb9dd25944b28dbb181" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
+              <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a186cb9dd25944b28dbb181" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
           <article class="poster">
@@ -396,7 +403,7 @@
                 <div class="poster__when" data-i18n="spb_when">21 ноября · Санкт-Петербург</div>
                 <div class="poster__where" data-i18n="spb_where">Ритмы · Кожевенная линия, 34</div>
               </div>
-              <button type="button" class="poster__tix tc-background-tomato" data-tc-event="6a19b3b6f4606596ec821030" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
+              <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a19b3b6f4606596ec821030" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
         </div>
