@@ -1,7 +1,9 @@
 name: Deploy
 
 # Деплой по тэгу v* (v1.0.0, v0.3, v2, ...): тесты -> сборка образа в GHCR -> сервер тянет и поднимает.
-# Секреты: VDS_HOST, VDS_USER, VDS_PATH, VDS_SSH_KEY (+ опц. VDS_SSH_PORT), GHCR_PAT (read:packages).
+# Секреты: VDS_HOST, VDS_USER, VDS_PATH, VDS_SSH_KEY (+ опц. VDS_SSH_PORT).
+# GHCR-логин на VDS идёт через одноразовый GITHUB_TOKEN текущего run'а (permissions.packages:
+# read ниже), а не через ручной PAT — тот протухал и ронял деплой с "denied: denied".
 on:
   push:
     tags:
@@ -62,6 +64,9 @@ jobs:
   deploy:
     needs: build-push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - uses: actions/checkout@v4
 
@@ -74,8 +79,8 @@ jobs:
       - name: Ship compose + Caddyfile, then pull & up on VDS
         env:
           IMAGE: ${{ needs.build-push.outputs.image }}:${{ github.ref_name }}
-          GHCR_OWNER: ${{ github.repository_owner }}
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GHCR_ACTOR: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VDS_HOST: ${{ secrets.VDS_HOST }}
           VDS_USER: ${{ secrets.VDS_USER }}
           VDS_PATH: ${{ secrets.VDS_PATH }}
@@ -88,10 +93,11 @@ jobs:
           # Кладём compose-файл и Caddyfile рядом (сервер не хранит git-репозиторий).
           scp $COMMON -P "$PORT" docker-compose.yml "$VDS_USER@$VDS_HOST:$VDS_PATH/docker-compose.yml"
           scp $COMMON -P "$PORT" deploy/Caddyfile   "$VDS_USER@$VDS_HOST:$VDS_PATH/Caddyfile"
-          # На сервере: логин в GHCR (приватный образ), тянем нужный тег, поднимаем, чистим старьё.
+          # На сервере: логин в GHCR (приватный образ) run'овым GITHUB_TOKEN, тянем нужный тег,
+          # поднимаем, чистим старьё.
           ssh $COMMON -p "$PORT" "$VDS_USER@$VDS_HOST" "\
             cd '$VDS_PATH' && \
-            echo '$GHCR_PAT' | docker login ghcr.io -u '$GHCR_OWNER' --password-stdin && \
+            echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_ACTOR' --password-stdin && \
             export IMAGE='$IMAGE' && \
             docker compose pull && \
             docker compose up -d && \
