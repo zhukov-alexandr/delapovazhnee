@@ -171,22 +171,22 @@
       .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts ---- */
-      .concerts .wrap { width: min(1760px, 92vw); flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+      .concerts .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
       .poster-grid {
         display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
-        align-items: stretch; gap: clamp(8px, 1.3vw, 18px); width: 100%; margin-block: auto;
+        align-items: start; gap: clamp(8px, 1.3vw, 18px); width: 100%; margin-block: auto;
         padding-block: clamp(12px, 2.5vh, 28px);
       }
-      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 10px 10px 0; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
+      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 7px 7px 12px; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
       .poster:nth-child(even) { transform: rotate(1deg); }
       .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(23,19,15,0.3); }
       .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: var(--kraft-deep); }
-      .poster__meta { display: grid; flex: 1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(8px, 1vw, 14px); padding: 16px 8px; }
+      .poster__meta { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 0 0; }
       .poster__details { min-width: 0; }
-      .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(11px, 0.85vw, 16px); line-height: 1.1; overflow-wrap: anywhere; }
-      .poster__where { font-size: clamp(10px, 0.7vw, 13px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
-      .poster__tix { width: auto; align-self: center; justify-content: center; appearance: none; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: none !important; font-size: clamp(13px, 1.6vw, 15px) !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--crimson) !important; border: 2px solid var(--crimson) !important; border-radius: 2px !important; padding: 15px 26px !important; }
+      .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(10px, 1.05vw, 14px); line-height: 1.1; overflow-wrap: anywhere; }
+      .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
+      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--crimson) !important; border: 2px solid var(--crimson) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
       .poster__tix:hover { background: var(--crimson-deep) !important; border-color: var(--crimson-deep) !important; }
       .tour-poster-mobile { display: none; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
@@ -224,9 +224,7 @@
         .nav__toggle { display: flex; }
       }
       @media (min-width: 761px) and (max-width: 1399px) {
-        .poster { padding: 7px 7px 0; }
-        .poster__meta { grid-template-columns: 1fr; align-items: stretch; gap: 10px; padding: 10px 4px; }
-        .poster__tix { align-self: flex-end; font-size: 12px !important; padding: 10px 14px !important; }
+        .poster__tix { font-size: 13px !important; }
       }
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
@@ -234,16 +232,32 @@
         .cue--desktop { display: none; }
         .cue--mobile { display: inline-flex; }
         .poster-grid--desktop { display: none; }
-        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: 0 auto; background: var(--paper); padding: 7px; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transform: rotate(-0.5deg); }
+        /* Paper frame via border (not padding) so absolute-positioned buttons
+           measure their % from the poster image itself, with no inset offset. */
+        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: 0 auto; background: var(--paper); border: 7px solid var(--paper); box-shadow: 0 16px 40px rgba(23,19,15,0.22); transform: rotate(-0.5deg); }
         .tour-poster-mobile img { display: block; width: 100%; height: auto; }
-        .tour-poster-mobile__trigger { position: absolute; left: 4.2%; width: 67.5%; height: 5.6%; padding: 0; border: 2px solid transparent; border-radius: 2px; background: transparent !important; cursor: pointer; }
-        .tour-poster-mobile__trigger:hover { border-color: rgba(179,42,56,0.72); background: rgba(179,42,56,0.08) !important; }
-        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--crimson); outline-offset: 2px; background: rgba(179,42,56,0.1) !important; }
-        .tour-poster-mobile__trigger--ufa { top: 19.2%; }
-        .tour-poster-mobile__trigger--ekb { top: 24.8%; }
-        .tour-poster-mobile__trigger--nsk { top: 30.4%; }
-        .tour-poster-mobile__trigger--msk { top: 36%; }
-        .tour-poster-mobile__trigger--spb { top: 41.6%; }
+        /* Each city's «купить» = its buyN image, dropped to the right of the row
+           and centered on it. TicketsCloud (tcwidget.js) wires the click via
+           data-tc-event; !important keeps the widget from restyling the button. */
+        .tour-poster-mobile__trigger {
+          position: absolute !important; right: 5% !important; width: 16% !important;
+          height: auto !important; min-height: 0 !important; aspect-ratio: 445 / 190;
+          transform: translateY(-50%) !important;
+          margin: 0 !important; padding: 0 !important; border: none !important;
+          box-shadow: none !important; cursor: pointer; appearance: none;
+          font-size: 0 !important; /* hide any widget-injected label — the image is the label */
+          background-color: transparent !important; background-repeat: no-repeat !important;
+          background-position: center !important; background-size: contain !important;
+          transition: transform .12s ease, filter .15s ease;
+        }
+        .tour-poster-mobile__trigger:hover { transform: translateY(-50%) scale(1.04) !important; filter: brightness(0.96); }
+        .tour-poster-mobile__trigger:active { transform: translateY(-50%) scale(0.98) !important; }
+        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; border-radius: 8px; }
+        .tour-poster-mobile__trigger--ufa { top: 26.8% !important; background-image: url("/static/home/buy1.png") !important; }
+        .tour-poster-mobile__trigger--ekb { top: 33.1% !important; background-image: url("/static/home/buy2.png") !important; }
+        .tour-poster-mobile__trigger--nsk { top: 38.9% !important; background-image: url("/static/home/buy3.png") !important; }
+        .tour-poster-mobile__trigger--msk { top: 45.0% !important; background-image: url("/static/home/buy4.png") !important; }
+        .tour-poster-mobile__trigger--spb { top: 51.4% !important; background-image: url("/static/home/buy5.png") !important; }
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
         /* Phones: the frame still fills the whole hero (same geometry as always),
@@ -360,8 +374,8 @@
             <img src="/static/home/уфа а4.png" data-i18n-attr="alt:poster_ufa_alt" alt="Афиша концерта в Уфе, 31 октября, MusicHall27">
             <div class="poster__meta">
               <div class="poster__details">
-                <div class="poster__when" data-i18n="ufa_when">31 октября · Уфа</div>
-                <div class="poster__where" data-i18n="ufa_where">MusicHall27 · ул. Кирова, 27</div>
+                <div class="poster__when" data-i18n-html="ufa_when">31 октября<br>Уфа</div>
+                <div class="poster__where" data-i18n-html="ufa_where">MusicHall27<br>ул. Кирова, 27</div>
               </div>
               <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a46a070983da59ac77d8ccd" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
@@ -370,8 +384,8 @@
             <img src="/static/home/екб а4.png" data-i18n-attr="alt:poster_ekb_alt" alt="Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»">
             <div class="poster__meta">
               <div class="poster__details">
-                <div class="poster__when" data-i18n="ekb_when">1 ноября · Екатеринбург</div>
-                <div class="poster__where" data-i18n="ekb_where">Корчма «Пристанище» · ул. Бебеля, 124</div>
+                <div class="poster__when" data-i18n-html="ekb_when">1 ноября<br>Екатеринбург</div>
+                <div class="poster__where" data-i18n-html="ekb_where">Корчма «Пристанище»<br>ул. Бебеля, 124</div>
               </div>
               <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a4b6ed19f4bf9931aca2868" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
@@ -380,8 +394,8 @@
             <img src="/static/home/нск а4.png" data-i18n-attr="alt:poster_nsk_alt" alt="Афиша концерта в Новосибирске, 3 ноября, The Rooks">
             <div class="poster__meta">
               <div class="poster__details">
-                <div class="poster__when" data-i18n="nsk_when">3 ноября · Новосибирск</div>
-                <div class="poster__where" data-i18n="nsk_where">The Rooks · ул. Коммунистическая, 45</div>
+                <div class="poster__when" data-i18n-html="nsk_when">3 ноября<br>Новосибирск</div>
+                <div class="poster__where" data-i18n-html="nsk_where">The Rooks<br>ул. Коммунистическая, 45</div>
               </div>
               <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a7085d06d1bdc42b48fdf81" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
@@ -390,8 +404,8 @@
             <img src="/static/home/мск а4.png" data-i18n-attr="alt:poster_msk_alt" alt="Афиша концерта в Москве, 18 ноября, Урбан">
             <div class="poster__meta">
               <div class="poster__details">
-                <div class="poster__when" data-i18n="msk_when">18 ноября · Москва</div>
-                <div class="poster__where" data-i18n="msk_where">Урбан · Большая Новодмитровская, 36с24</div>
+                <div class="poster__when" data-i18n-html="msk_when">18 ноября<br>Москва</div>
+                <div class="poster__where" data-i18n-html="msk_where">Урбан<br>ул. Б. Новодмитровская, 36с24</div>
               </div>
               <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a186cb9dd25944b28dbb181" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
@@ -400,15 +414,15 @@
             <img src="/static/home/спб а4.png" data-i18n-attr="alt:poster_spb_alt" alt="Афиша концерта в Санкт-Петербурге, 21 ноября, Ритмы">
             <div class="poster__meta">
               <div class="poster__details">
-                <div class="poster__when" data-i18n="spb_when">21 ноября · Санкт-Петербург</div>
-                <div class="poster__where" data-i18n="spb_where">Ритмы · Кожевенная линия, 34</div>
+                <div class="poster__when" data-i18n-html="spb_when">21 ноября<br>Санкт-Петербург</div>
+                <div class="poster__where" data-i18n-html="spb_where">Ритмы<br>Кожевенная линия, 34</div>
               </div>
               <button type="button" class="poster__tix btn btn--fill tc-background-tomato" data-tc-event="6a19b3b6f4606596ec821030" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button>
             </div>
           </article>
         </div>
         <div class="tour-poster-mobile">
-          <img src="/static/home/все афиши.png" data-i18n-attr="alt:poster_all_alt" alt="Афиша тура: Уфа, Екатеринбург, Новосибирск, Москва и Санкт-Петербург">
+          <img src="/static/home/mobile_afisha.jpg" data-i18n-attr="alt:poster_all_alt" alt="Афиша тура: Уфа, Екатеринбург, Новосибирск, Москва и Санкт-Петербург">
           <button type="button" class="tour-poster-mobile__trigger tour-poster-mobile__trigger--ufa tc-background-tomato" data-tc-event="6a46a070983da59ac77d8ccd" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n-attr="aria-label:tickets_ufa_aria" aria-label="Купить билеты в Уфе"><span class="visually-hidden" data-i18n="tickets_ufa_aria">Купить билеты в Уфе</span></button>
           <button type="button" class="tour-poster-mobile__trigger tour-poster-mobile__trigger--ekb tc-background-tomato" data-tc-event="6a4b6ed19f4bf9931aca2868" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n-attr="aria-label:tickets_ekb_aria" aria-label="Купить билеты в Екатеринбурге"><span class="visually-hidden" data-i18n="tickets_ekb_aria">Купить билеты в Екатеринбурге</span></button>
           <button type="button" class="tour-poster-mobile__trigger tour-poster-mobile__trigger--nsk tc-background-tomato" data-tc-event="6a7085d06d1bdc42b48fdf81" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n-attr="aria-label:tickets_nsk_aria" aria-label="Купить билеты в Новосибирске"><span class="visually-hidden" data-i18n="tickets_nsk_aria">Купить билеты в Новосибирске</span></button>
@@ -476,15 +490,15 @@
             btn_presave: "Слушать песню", btn_play: "…или сыграй и послушай",
             concerts_eyebrow: "Концерты · презентация альбома",
             poster_ufa_alt: "Афиша концерта в Уфе, 31 октября, MusicHall27",
-            ufa_when: "31 октября · Уфа", ufa_where: "MusicHall27 · ул. Кирова, 27",
+            ufa_when: "31 октября<br>Уфа", ufa_where: "MusicHall27<br>ул. Кирова, 27",
             poster_ekb_alt: "Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»",
-            ekb_when: "1 ноября · Екатеринбург", ekb_where: "Корчма «Пристанище» · ул. Бебеля, 124",
+            ekb_when: "1 ноября<br>Екатеринбург", ekb_where: "Корчма «Пристанище»<br>ул. Бебеля, 124",
             poster_nsk_alt: "Афиша концерта в Новосибирске, 3 ноября, The Rooks",
-            nsk_when: "3 ноября · Новосибирск", nsk_where: "The Rooks · ул. Коммунистическая, 45",
+            nsk_when: "3 ноября<br>Новосибирск", nsk_where: "The Rooks<br>ул. Коммунистическая, 45",
             poster_msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
-            msk_when: "18 ноября · Москва", msk_where: "Урбан · Большая Новодмитровская, 36с24",
+            msk_when: "18 ноября<br>Москва", msk_where: "Урбан<br>ул. Б. Новодмитровская, 36с24",
             poster_spb_alt: "Афиша концерта в Санкт-Петербурге, 21 ноября, Ритмы",
-            spb_when: "21 ноября · Санкт-Петербург", spb_where: "Ритмы · Кожевенная линия, 34",
+            spb_when: "21 ноября<br>Санкт-Петербург", spb_where: "Ритмы<br>Кожевенная линия, 34",
             poster_all_alt: "Афиша тура: Уфа, Екатеринбург, Новосибирск, Москва и Санкт-Петербург",
             tickets_ufa_aria: "Купить билеты в Уфе", tickets_ekb_aria: "Купить билеты в Екатеринбурге",
             tickets_nsk_aria: "Купить билеты в Новосибирске", tickets_msk_aria: "Купить билеты в Москве",
@@ -508,15 +522,15 @@
             btn_presave: "Listen now", btn_play: "…or play & listen",
             concerts_eyebrow: "Shows · album presentation",
             poster_ufa_alt: "Ufa show poster, October 31, MusicHall27",
-            ufa_when: "October 31 · Ufa", ufa_where: "MusicHall27 · Kirova 27",
+            ufa_when: "October 31<br>Ufa", ufa_where: "MusicHall27<br>Kirova 27",
             poster_ekb_alt: "Ekaterinburg show poster, November 1, Pristanishche",
-            ekb_when: "November 1 · Ekaterinburg", ekb_where: "Pristanishche · Bebelya 124",
+            ekb_when: "November 1<br>Ekaterinburg", ekb_where: "Pristanishche<br>Bebelya 124",
             poster_nsk_alt: "Novosibirsk show poster, November 3, The Rooks",
-            nsk_when: "November 3 · Novosibirsk", nsk_where: "The Rooks · Kommunisticheskaya 45",
+            nsk_when: "November 3<br>Novosibirsk", nsk_where: "The Rooks<br>Kommunisticheskaya 45",
             poster_msk_alt: "Moscow show poster, November 18, Urban",
-            msk_when: "November 18 · Moscow", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
+            msk_when: "November 18<br>Moscow", msk_where: "Urban<br>B. Novodmitrovskaya 36s24",
             poster_spb_alt: "Saint Petersburg show poster, November 21, Ritmy",
-            spb_when: "November 21 · Saint Petersburg", spb_where: "Ritmy · Kozhevennaya liniya 34",
+            spb_when: "November 21<br>Saint Petersburg", spb_where: "Ritmy<br>Kozhevennaya liniya 34",
             poster_all_alt: "Tour poster: Ufa, Ekaterinburg, Novosibirsk, Moscow and Saint Petersburg",
             tickets_ufa_aria: "Buy tickets in Ufa", tickets_ekb_aria: "Buy tickets in Ekaterinburg",
             tickets_nsk_aria: "Buy tickets in Novosibirsk", tickets_msk_aria: "Buy tickets in Moscow",
@@ -540,15 +554,15 @@
             btn_presave: "收听歌曲", btn_play: "……或边玩边听",
             concerts_eyebrow: "演出 · 专辑首演",
             poster_ufa_alt: "乌法演出海报，10月31日，MusicHall27",
-            ufa_when: "10月31日 · 乌法", ufa_where: "MusicHall27 · Kirova 27",
+            ufa_when: "10月31日<br>乌法", ufa_where: "MusicHall27<br>Kirova 27",
             poster_ekb_alt: "叶卡捷琳堡演出海报，11月1日，Pristanishche",
-            ekb_when: "11月1日 · 叶卡捷琳堡", ekb_where: "Pristanishche · Bebelya 124",
+            ekb_when: "11月1日<br>叶卡捷琳堡", ekb_where: "Pristanishche<br>Bebelya 124",
             poster_nsk_alt: "新西伯利亚演出海报，11月3日，The Rooks",
-            nsk_when: "11月3日 · 新西伯利亚", nsk_where: "The Rooks · Kommunisticheskaya 45",
+            nsk_when: "11月3日<br>新西伯利亚", nsk_where: "The Rooks<br>Kommunisticheskaya 45",
             poster_msk_alt: "莫斯科演出海报，11月18日，Urban",
-            msk_when: "11月18日 · 莫斯科", msk_where: "Urban · Bolshaya Novodmitrovskaya 36s24",
+            msk_when: "11月18日<br>莫斯科", msk_where: "Urban<br>B. Novodmitrovskaya 36s24",
             poster_spb_alt: "圣彼得堡演出海报，11月21日，Ritmy",
-            spb_when: "11月21日 · 圣彼得堡", spb_where: "Ritmy · Kozhevennaya liniya 34",
+            spb_when: "11月21日<br>圣彼得堡", spb_where: "Ritmy<br>Kozhevennaya liniya 34",
             poster_all_alt: "巡演海报：乌法、叶卡捷琳堡、新西伯利亚、莫斯科和圣彼得堡",
             tickets_ufa_aria: "购买乌法演出门票", tickets_ekb_aria: "购买叶卡捷琳堡演出门票",
             tickets_nsk_aria: "购买新西伯利亚演出门票", tickets_msk_aria: "购买莫斯科演出门票",
