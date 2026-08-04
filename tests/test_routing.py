@@ -8,7 +8,7 @@ POSTER_NAMES = (
     "нск а4.png",
     "мск а4.png",
     "спб а4.png",
-    "все афиши.png",
+    "mobile_afisha.jpg",
 )
 
 EVENT_IDS = (
