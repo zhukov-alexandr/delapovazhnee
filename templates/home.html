@@ -240,8 +240,8 @@
            and centered on it. TicketsCloud (tcwidget.js) wires the click via
            data-tc-event; !important keeps the widget from restyling the button. */
         .tour-poster-mobile__trigger {
-          position: absolute !important; right: 5% !important; width: 16% !important;
-          height: auto !important; min-height: 0 !important; aspect-ratio: 445 / 190;
+          position: absolute !important; right: 4% !important; width: 23% !important;
+          height: auto !important; min-height: 0 !important; aspect-ratio: 640 / 190;
           transform: translateY(-50%) !important;
           margin: 0 !important; padding: 0 !important; border: none !important;
           box-shadow: none !important; cursor: pointer; appearance: none;
@@ -253,11 +253,13 @@
         .tour-poster-mobile__trigger:hover { transform: translateY(-50%) scale(1.04) !important; filter: brightness(0.96); }
         .tour-poster-mobile__trigger:active { transform: translateY(-50%) scale(0.98) !important; }
         .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; border-radius: 8px; }
-        .tour-poster-mobile__trigger--ufa { top: 26.8% !important; background-image: url("/static/home/buy1.png") !important; }
-        .tour-poster-mobile__trigger--ekb { top: 33.1% !important; background-image: url("/static/home/buy2.png") !important; }
-        .tour-poster-mobile__trigger--nsk { top: 38.9% !important; background-image: url("/static/home/buy3.png") !important; }
-        .tour-poster-mobile__trigger--msk { top: 45.0% !important; background-image: url("/static/home/buy4.png") !important; }
-        .tour-poster-mobile__trigger--spb { top: 51.4% !important; background-image: url("/static/home/buy5.png") !important; }
+        /* top = each city row's optical centre, measured off the poster art
+           (rows sit on an even 6.10% grid). */
+        .tour-poster-mobile__trigger--ufa { top: 26.76% !important; background-image: url("/static/home/buy1.png") !important; }
+        .tour-poster-mobile__trigger--ekb { top: 32.86% !important; background-image: url("/static/home/buy2.png") !important; }
+        .tour-poster-mobile__trigger--nsk { top: 38.96% !important; background-image: url("/static/home/buy3.png") !important; }
+        .tour-poster-mobile__trigger--msk { top: 45.05% !important; background-image: url("/static/home/buy4.png") !important; }
+        .tour-poster-mobile__trigger--spb { top: 51.15% !important; background-image: url("/static/home/buy5.png") !important; }
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
         .hero__tag { display: none; }
         /* Phones: the frame still fills the whole hero (same geometry as always),
