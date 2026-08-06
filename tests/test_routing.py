@@ -69,6 +69,20 @@ def test_home_has_desktop_and_mobile_ticketcloud_triggers(client):
     assert 'class="tour-poster-mobile"' in html
 
 
+def test_home_forwards_utm_tags_to_ticketscloud(client):
+    html = client.get("/").text
+
+    # The passthrough must execute BEFORE tcwidget.js: the widget script is
+    # synchronous, so a DOMContentLoaded handler would set the attributes too late.
+    widget_tag = '<script src="https://ticketscloud.com/static/scripts/widget/tcwidget.js">'
+    assert html.index('var STORE = "dp_utm"') < html.index(widget_tag)
+    assert 'btn.setAttribute("data-tc-" + k, utm[k])' in html
+    # utm_source is pinned to "site" on the buttons, so it stays out of the
+    # forwarded set (the separate outbound-link propagation still carries it).
+    assert 'var KEYS = ["utm_medium", "utm_campaign", "utm_content", "utm_term"];' in html
+    assert html.count('data-tc-utm_source="site"') == 10
+
+
 def test_home_references_all_new_posters(client):
     html = client.get("/").text
 

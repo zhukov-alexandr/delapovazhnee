@@ -676,6 +676,40 @@
         document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) close(); });
       });
     </script>
+    <!-- UTM passthrough: campaign tags on the landing's own URL ride along into
+         the TicketsCloud checkout, so a ticket sale is attributed to the ad that
+         brought the visitor. Deliberately NOT wrapped in DOMContentLoaded — that
+         fires after the widget script below has already run; a plain sync script
+         here lands between the parsed buttons and the widget. sessionStorage
+         carries the tags through the /game round-trip (the one way off this page). -->
+    <script>
+      (function () {
+        // utm_source stays pinned to "site" in the markup — this page IS the source.
+        var KEYS = ["utm_medium", "utm_campaign", "utm_content", "utm_term"];
+        var STORE = "dp_utm";
+        var params = new URLSearchParams(location.search);
+        var utm = {};
+        KEYS.forEach(function (k) {
+          var v = params.get(k);
+          if (v) utm[k] = v.slice(0, 200); // cap absurd values; setAttribute can't inject markup
+        });
+        try {
+          if (Object.keys(utm).length) {
+            sessionStorage.setItem(STORE, JSON.stringify(utm));
+          } else {
+            var saved = JSON.parse(sessionStorage.getItem(STORE) || "{}");
+            if (saved && typeof saved === "object") utm = saved;
+          }
+        } catch (_) { /* private mode / storage off — tags from this URL still apply */ }
+        // Nothing to pass: the source tag already hard-coded on each button stands.
+        if (!Object.keys(utm).length) return;
+        document.querySelectorAll("[data-tc-event]").forEach(function (btn) {
+          KEYS.forEach(function (k) {
+            if (utm[k]) btn.setAttribute("data-tc-" + k, utm[k]);
+          });
+        });
+      })();
+    </script>
     <script src="https://ticketscloud.com/static/scripts/widget/tcwidget.js"></script>
 
     <div id="listen-modal" class="listen-modal" hidden>
