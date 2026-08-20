@@ -27,25 +27,30 @@
 
     <style>
       /* Palette lifted straight off the «31 августа» cover: spruce seen from
-         above, frost on the tips, near-black in the hollows. The cover has no
-         accent hue at all — its whole drama is light against dark — so the site
-         has none either. --accent is the tone that stands apart from whatever
-         field it lands on, and it flips below. */
+         above, frost on the tips, near-black in the hollows. Green is the whole
+         world here; the one thing on that cover that is NOT green is the linen
+         ribbon of lyrics, and its warmth — saturated into ochre — is the only
+         accent the page gets — but only ever as a bright ochre. Darkened enough to
+         sit on the light ground it turns to mud, so it never touches the big type:
+         --cta is the ochre and it means "press me". --accent is the tonal highlight
+         and stays in the green world on light screens, going ochre on the dark ones
+         where the bright value works. */
       :root {
         --frost: #a9ba95;       /* page ground — frost on the treetops */
         --frost-deep: #8a9c76;  /* one step into the moss; sits under loading images */
         --ink: #0c1a13;         /* the forest floor: near-black, deep green */
         --paper: #f2f5e7;       /* the chalk-white handwriting on the ribbon */
-        --accent: #46633a;      /* on the frost ground: foliage in shade */
-        --accent-deep: #32492a;
+        --accent: #2c4a33;      /* tonal highlight on the frost ground: deep spruce */
+        --accent-deep: #1e3524;
+        --cta: #e9b451;         /* the ribbon's warmth — every button, nothing else */
+        --cta-deep: #f2c877;
         --muted: #414f3c;       /* deep moss — secondary text on the frost ground */
         --nav-h: 60px;
         --peek: 40px; /* strip of the NEXT section visible at each screen's bottom */
       }
 
-      /* The dark screens invert the pair: there the accent is the frost, not the
-         foliage. Every rule keeps reading var(--accent) — only its value moves. */
-      .single, .listen { --accent: #b5d47e; --accent-deep: #c8e097; }
+      /* On the ink screens the ochre IS the readable highlight, so --accent joins it. */
+      .single, .listen { --accent: var(--cta); --accent-deep: var(--cta-deep); }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -80,10 +85,9 @@
         border: 2px solid var(--ink); text-decoration: none; cursor: pointer;
         transition: transform .12s ease, background .15s ease, color .15s ease; white-space: nowrap;
       }
-      .btn--fill { background: var(--accent); border-color: var(--accent); color: var(--paper); }
-      .btn--fill:hover { transform: translateY(-2px); background: var(--accent-deep); border-color: var(--accent-deep); }
+      .btn--fill { background: var(--cta); border-color: var(--accent); color: var(--ink); }
+      .btn--fill:hover { transform: translateY(-2px); background: var(--cta-deep); }
       .btn--paper { background: var(--paper); border-color: var(--paper); color: var(--ink); }
-      .single .btn--fill, .listen .btn--fill { color: var(--ink); }
       .btn--paper:hover { transform: translateY(-2px); }
       .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
@@ -104,7 +108,7 @@
       .lang-switch { display: flex; align-items: center; gap: 2px; }
       .lang-btn { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.03em; color: var(--muted); background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
       .lang-btn:hover { color: var(--ink); }
-      .lang-btn.is-active { color: var(--accent); background: rgba(70,99,58,0.14); }
+      .lang-btn.is-active { color: var(--accent); background: rgba(44,74,51,0.12); }
       .nav__toggle { display: none; width: 42px; height: 42px; border: none; background: transparent; cursor: pointer; flex-direction: column; justify-content: center; gap: 5px; align-items: flex-end; }
       .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--ink); transition: transform .2s ease, opacity .2s ease; }
       .nav--open .nav__toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -148,8 +152,7 @@
         /* identical width for all cues regardless of label length (em: scales with the fluid font) */
         width: 17.5em; justify-content: center;
       }
-      .cue:hover { background: var(--accent); border-color: var(--accent); }
-      .single .cue:hover { color: var(--ink); }
+      .cue:hover { background: var(--cta); border-color: var(--cta); color: var(--ink); }
       .cue .arr { animation: bob 1.6s ease-in-out infinite; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
@@ -176,7 +179,7 @@
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
       .single__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vw, 44px); }
-      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--accent); background: rgba(181,212,126,0.14); border: 1px solid rgba(181,212,126,0.45); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
+      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--accent); background: rgba(233,180,81,0.14); border: 1px solid rgba(233,180,81,0.45); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
       .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
       .single__title em { font-style: normal; color: var(--accent); }
       .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #c6d3b6; font-size: clamp(15px, 1.9vw, 19px); }
@@ -197,8 +200,8 @@
       .poster__details { min-width: 0; }
       .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(10px, 1.05vw, 14px); line-height: 1.1; overflow-wrap: anywhere; }
       .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
-      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--accent) !important; border: 2px solid var(--accent) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
-      .poster__tix:hover { background: var(--accent-deep) !important; border-color: var(--accent-deep) !important; }
+      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--ink) !important; text-shadow: none !important; background: var(--cta) !important; border: 1px solid var(--accent) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
+      .poster__tix:hover { background: var(--cta-deep) !important; }
       .tour-poster-mobile { display: none; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
