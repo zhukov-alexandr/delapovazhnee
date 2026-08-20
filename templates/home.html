@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дела поважнее – Официальный сайт</title>
-    <meta name="description" content="Дела поважнее – новый сингл «19», релиз 17 июля 2026. Слушай в стримингах, приходи на концерты.">
+    <meta name="description" content="Дела поважнее – новый сингл «31 августа». Сделай пресейв и приходи на концерты.">
     <link rel="icon" href="/static/home/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png">
     <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
@@ -26,17 +26,26 @@
     <!-- /Yandex.Metrika counter -->
 
     <style>
+      /* Palette lifted straight off the «31 августа» cover: spruce seen from
+         above, frost on the tips, near-black in the hollows. The cover has no
+         accent hue at all — its whole drama is light against dark — so the site
+         has none either. --accent is the tone that stands apart from whatever
+         field it lands on, and it flips below. */
       :root {
-        --kraft: #c8a67c;
-        --kraft-deep: #b7935f;
-        --ink: #17130f;
-        --paper: #f0e9dc;
-        --crimson: #b32a38;
-        --crimson-deep: #8c1f2a;
-        --muted: #6f5b45;
+        --frost: #a9ba95;       /* page ground — frost on the treetops */
+        --frost-deep: #8a9c76;  /* one step into the moss; sits under loading images */
+        --ink: #0c1a13;         /* the forest floor: near-black, deep green */
+        --paper: #f2f5e7;       /* the chalk-white handwriting on the ribbon */
+        --accent: #46633a;      /* on the frost ground: foliage in shade */
+        --accent-deep: #32492a;
+        --muted: #414f3c;       /* deep moss — secondary text on the frost ground */
         --nav-h: 60px;
         --peek: 40px; /* strip of the NEXT section visible at each screen's bottom */
       }
+
+      /* The dark screens invert the pair: there the accent is the frost, not the
+         foliage. Every rule keeps reading var(--accent) — only its value moves. */
+      .single, .listen { --accent: #b5d47e; --accent-deep: #c8e097; }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -45,7 +54,7 @@
       html { scroll-behavior: smooth; }
       body {
         font-family: "Golos Text", system-ui, sans-serif;
-        background: var(--kraft);
+        background: var(--frost);
         color: var(--ink);
         line-height: 1.5;
         overflow-x: hidden;
@@ -71,30 +80,31 @@
         border: 2px solid var(--ink); text-decoration: none; cursor: pointer;
         transition: transform .12s ease, background .15s ease, color .15s ease; white-space: nowrap;
       }
-      .btn--fill { background: var(--crimson); border-color: var(--crimson); color: var(--paper); }
-      .btn--fill:hover { transform: translateY(-2px); background: var(--crimson-deep); border-color: var(--crimson-deep); }
+      .btn--fill { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+      .btn--fill:hover { transform: translateY(-2px); background: var(--accent-deep); border-color: var(--accent-deep); }
       .btn--paper { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+      .single .btn--fill, .listen .btn--fill { color: var(--ink); }
       .btn--paper:hover { transform: translateY(-2px); }
-      .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; }
+      .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
       /* ---- Fixed nav ---- */
       .nav {
         position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 100;
-        background: rgba(200,166,124,0.92); backdrop-filter: blur(8px);
-        border-bottom: 1px solid rgba(23,19,15,0.14);
+        background: rgba(169,186,149,0.92); backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(12,26,19,0.16);
       }
       .nav__inner { width: min(1120px, 92vw); margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
       .nav__brand { display: flex; align-items: center; text-decoration: none; }
       .nav__brand img { height: 24px; width: auto; display: block; }
       .nav__links { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 30px); }
       .nav__links a { font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--ink); text-decoration: none; padding-bottom: 3px; border-bottom: 2px solid transparent; }
-      .nav__links a:hover { border-bottom-color: var(--crimson); }
-      .nav__links a.is-play { color: var(--crimson); border-bottom-color: var(--crimson); }
+      .nav__links a:hover { border-bottom-color: var(--accent); }
+      .nav__links a.is-play { color: var(--accent); border-bottom-color: var(--accent); }
       .nav__right { display: flex; align-items: center; gap: clamp(12px, 2vw, 22px); }
       .lang-switch { display: flex; align-items: center; gap: 2px; }
       .lang-btn { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.03em; color: var(--muted); background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
       .lang-btn:hover { color: var(--ink); }
-      .lang-btn.is-active { color: var(--crimson); background: rgba(179, 42, 56, 0.10); }
+      .lang-btn.is-active { color: var(--accent); background: rgba(70,99,58,0.14); }
       .nav__toggle { display: none; width: 42px; height: 42px; border: none; background: transparent; cursor: pointer; flex-direction: column; justify-content: center; gap: 5px; align-items: flex-end; }
       .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--ink); transition: transform .2s ease, opacity .2s ease; }
       .nav--open .nav__toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -119,26 +129,27 @@
       /* ---- Hero ---- */
       .hero__head { position: relative; }
       .hero__title { font-size: clamp(44px, 12.6vw, 180px); letter-spacing: -0.03em; }
-      .hero__title .l2 { color: var(--crimson); }
+      .hero__title .l2 { color: var(--accent); }
       .hero__tag { position: absolute; top: 4px; right: 0; text-align: right; font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: lowercase; color: var(--muted); font-size: clamp(13px, 1.8vw, 18px); line-height: 1.3; }
-      .hero__tag b { display: block; color: var(--crimson); font-weight: 700; }
+      .hero__tag b { display: block; color: var(--accent); font-weight: 700; }
       .hero__photo {
         position: relative; margin-top: clamp(22px, 3.5vw, 40px); flex: 1 1 auto; min-height: 0;
-        background: var(--kraft-deep) url("/static/home/band.jpg") center 28% / cover no-repeat;
-        border: 6px solid var(--paper); box-shadow: 0 22px 54px rgba(23,19,15,0.3);
+        background: var(--frost-deep) url("/static/home/band.jpg") center 28% / cover no-repeat;
+        border: 6px solid var(--paper); box-shadow: 0 22px 54px rgba(12,26,19,0.34);
         clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
       }
       /* nav overlaid on the photo, bottom-left — jumps to the single */
       .cue {
         position: absolute; left: clamp(14px, 2vw, 26px); bottom: clamp(14px, 2vw, 24px); z-index: 2;
         display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
-        background: rgba(23,19,15,0.6); backdrop-filter: blur(4px); color: var(--paper);
+        background: rgba(12,26,19,0.62); backdrop-filter: blur(4px); color: var(--paper);
         font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em;
-        font-size: clamp(12px, 1.5vw, 15px); padding: 12px 18px; border-radius: 2px; border: 2px solid rgba(240,233,220,0.5);
+        font-size: clamp(12px, 1.5vw, 15px); padding: 12px 18px; border-radius: 2px; border: 2px solid rgba(242,245,231,0.5);
         /* identical width for all cues regardless of label length (em: scales with the fluid font) */
-        width: 16.5em; justify-content: center;
+        width: 17.5em; justify-content: center;
       }
-      .cue:hover { background: var(--crimson); border-color: var(--crimson); }
+      .cue:hover { background: var(--accent); border-color: var(--accent); }
+      .single .cue:hover { color: var(--ink); }
       .cue .arr { animation: bob 1.6s ease-in-out infinite; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
@@ -150,7 +161,7 @@
         clip-path: polygon(0 18px, 6% 4px, 12% 16px, 19% 3px, 26% 15px, 33% 5px, 41% 18px, 48% 4px, 56% 14px, 63% 3px, 70% 16px, 77% 5px, 84% 17px, 91% 4px, 96% 14px, 100% 6px,
                            100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
       }
-      .single .section__eyebrow { color: #b9a892; }
+      .single .section__eyebrow { color: #93a887; }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
       .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
       /* The wrap fills the one-screen section, so the desktop cue (base .cue
@@ -165,10 +176,10 @@
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
       .single__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vw, 44px); }
-      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--crimson); background: rgba(179,42,56,0.14); border: 1px solid rgba(179,42,56,0.5); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
+      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--accent); background: rgba(181,212,126,0.14); border: 1px solid rgba(181,212,126,0.45); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
       .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
-      .single__title em { font-style: normal; color: var(--crimson); }
-      .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #d7cbb8; font-size: clamp(15px, 1.9vw, 19px); }
+      .single__title em { font-style: normal; color: var(--accent); }
+      .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #c6d3b6; font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts ---- */
       .concerts .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
@@ -177,17 +188,17 @@
         align-items: start; gap: clamp(8px, 1.3vw, 18px); width: 100%; margin-block: auto;
         padding-block: clamp(12px, 2.5vh, 28px);
       }
-      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 7px 7px 12px; box-shadow: 0 16px 40px rgba(23,19,15,0.22); transition: transform .15s ease, box-shadow .15s ease; }
+      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 7px 7px 12px; box-shadow: 0 16px 40px rgba(12,26,19,0.24); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
       .poster:nth-child(even) { transform: rotate(1deg); }
-      .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(23,19,15,0.3); }
-      .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: var(--kraft-deep); }
+      .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(12,26,19,0.34); }
+      .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: var(--frost-deep); }
       .poster__meta { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 0 0; }
       .poster__details { min-width: 0; }
       .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(10px, 1.05vw, 14px); line-height: 1.1; overflow-wrap: anywhere; }
       .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
-      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--crimson) !important; border: 2px solid var(--crimson) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
-      .poster__tix:hover { background: var(--crimson-deep) !important; border-color: var(--crimson-deep) !important; }
+      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--paper) !important; background: var(--accent) !important; border: 2px solid var(--accent) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
+      .poster__tix:hover { background: var(--accent-deep) !important; border-color: var(--accent-deep) !important; }
       .tour-poster-mobile { display: none; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
@@ -196,7 +207,7 @@
         background: var(--ink); color: var(--paper);
         clip-path: polygon(0 18px, 7% 4px, 14% 15px, 22% 4px, 30% 16px, 38% 4px, 47% 15px, 55% 3px, 63% 16px, 71% 5px, 79% 15px, 87% 4px, 95% 15px, 100% 6px, 100% 100%, 0 100%);
       }
-      .listen .section__eyebrow { color: #b9a892; }
+      .listen .section__eyebrow { color: #93a887; }
       .listen__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: clamp(28px, 5vw, 56px); align-items: start; }
       .listen__title { font-size: clamp(34px, 5vw, 64px); color: var(--paper); }
       /* The band's squiggle mark. Ink-dark PNG: inverted to paper for the dark
@@ -204,12 +215,12 @@
       .listen__dog { width: clamp(110px, 12vw, 160px); margin-top: 18px; display: block; filter: brightness(0) invert(0.93); }
       /* the squiggle dog in the void right of «ДЕЛА» — em-sized, scales with the title */
       .title-dog { display: inline-block; height: 0.55em; width: auto; margin-left: 0.28em; vertical-align: 0.06em; transform: rotate(-4deg); }
-      .listen__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #b9a892; margin-bottom: 16px; }
+      .listen__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #93a887; margin-bottom: 16px; }
       .link-list { display: flex; flex-direction: column; gap: 11px; }
       .link-list a { color: var(--paper); text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.8vw, 18px); width: fit-content; border-bottom: 1px solid transparent; }
-      .link-list a:hover { border-bottom-color: var(--crimson); }
-      .listen__foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: clamp(40px, 7vh, 72px); padding-top: 22px; border-top: 1px solid rgba(240,233,220,0.16); font-size: 13px; color: #9c8c78; }
-      .listen__foot a { color: var(--paper); text-decoration: none; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; border-bottom: 2px solid var(--crimson); padding-bottom: 3px; }
+      .link-list a:hover { border-bottom-color: var(--accent); }
+      .listen__foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: clamp(40px, 7vh, 72px); padding-top: 22px; border-top: 1px solid rgba(242,245,231,0.16); font-size: 13px; color: #8a9c7e; }
+      .listen__foot a { color: var(--paper); text-decoration: none; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
 
       @media (max-width: 820px) {
         .nav__links {
@@ -219,8 +230,8 @@
           transform: translateY(-130%); transition: transform .28s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.35);
         }
         .nav--open .nav__links { transform: translateY(0); }
-        .nav__links a { color: var(--paper); font-size: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid rgba(240,233,220,0.12); }
-        .nav__links a:hover, .nav__links a.is-play { border-bottom-color: rgba(240,233,220,0.12); color: var(--paper); }
+        .nav__links a { color: var(--paper); font-size: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid rgba(242,245,231,0.12); }
+        .nav__links a:hover, .nav__links a.is-play { border-bottom-color: rgba(242,245,231,0.12); color: var(--paper); }
         .nav__toggle { display: flex; }
       }
       @media (min-width: 761px) and (max-width: 1399px) {
@@ -237,7 +248,7 @@
         /* Phones give the poster more of the screen than the 92vw default wrap;
            eyebrow rides along so both keep the same left edge. */
         .concerts .wrap { width: min(1120px, 96vw); }
-        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: auto; background: var(--paper); border: 7px solid var(--paper); box-shadow: 0 16px 40px rgba(23,19,15,0.22); }
+        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: auto; background: var(--paper); border: 7px solid var(--paper); box-shadow: 0 16px 40px rgba(12,26,19,0.24); }
         .tour-poster-mobile img { display: block; width: 100%; height: auto; }
         /* Each city's «купить» = its buyN image, dropped to the right of the row
            and centered on it. TicketsCloud (tcwidget.js) wires the click via
@@ -255,7 +266,7 @@
         }
         .tour-poster-mobile__trigger:hover { transform: translateY(-50%) scale(1.04) !important; filter: brightness(0.96); }
         .tour-poster-mobile__trigger:active { transform: translateY(-50%) scale(0.98) !important; }
-        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--crimson); outline-offset: 3px; border-radius: 8px; }
+        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
         /* top = each city row's optical centre, measured off the poster art
            (rows sit on an even 11.0% grid). */
         .tour-poster-mobile__trigger--ufa { top: 31.59% !important; background-image: url("/static/home/buy1.png") !important; }
@@ -271,7 +282,7 @@
            on top `contain`-ed — full-bleed look, all four always visible. */
         .hero__photo {
           min-height: 46vh;
-          background: var(--kraft-deep); /* solid; the imagery moves to the layers below */
+          background: var(--frost-deep); /* solid; the imagery moves to the layers below */
           overflow: hidden;
         }
         .hero__photo::before,
@@ -297,7 +308,7 @@
       }
 
       /* Listen modal: embeds the band's smartlink (all 5 services) in an iframe. */
-      .listen-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(23,19,15,0.72); padding: 20px; }
+      .listen-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(12,26,19,0.74); padding: 20px; }
       .listen-modal[hidden] { display: none; }
       .listen-modal__card { position: relative; width: min(440px, 96vw); height: min(82vh, 760px); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.5); }
       .listen-modal__frame { width: 100%; height: 100%; border: 0; display: block; }
@@ -311,7 +322,7 @@
         <a class="nav__brand" href="#top"><img src="/static/home/logo.svg" data-i18n-attr="alt:logo_alt" alt="Дела поважнее"></a>
         <div class="nav__right">
           <div class="nav__links" id="nav-links">
-            <a href="#single" data-i18n="nav_single">Сингл «19»</a>
+            <a href="#single" data-i18n="nav_single">Сингл «31 августа»</a>
             <a href="#concerts" data-i18n="nav_concerts">Концерты</a>
             <a href="#listen" data-i18n="nav_listen">Слушать</a>
             <a class="is-play" href="/game" data-i18n="nav_play">Играть →</a>
@@ -332,20 +343,20 @@
       <div class="wrap" style="display:flex; flex-direction:column; flex:1; min-height:0;">
         <div class="hero__head">
           <h1 class="display hero__title" data-i18n-html="hero_title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span></h1>
-          <p class="hero__tag" data-i18n-html="hero_tag">новый сингл<b>«19»</b></p>
+          <p class="hero__tag" data-i18n-html="hero_tag">новый сингл<b>«31 августа»</b></p>
         </div>
         <div class="hero__photo" role="img" data-i18n-attr="aria-label:hero_photo_aria" aria-label="Группа «Дела поважнее»">
-          <a class="cue" href="#single" data-i18n-html="hero_cue">Новый сингл «19» <span class="arr">↓</span></a>
+          <a class="cue" href="#single" data-i18n-html="hero_cue">Сингл «31 августа» <span class="arr">↓</span></a>
         </div>
       </div>
     </header>
 
     <section id="single" class="screen single">
       <div class="wrap">
-        <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Слушать</div>
+        <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Пресейв</div>
         <div class="single__grid">
           <div class="single__cover-wrap">
-            <img class="single__cover" src="/static/sprites/19_2.jpg" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «19»">
+            <img class="single__cover" src="/static/home/31_avgusta.jpg" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «31 августа»">
           </div>
           <div>
             <div class="release-row">
@@ -355,14 +366,10 @@
               -->
               <a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
             </div>
-            <h2 class="display single__title" data-i18n-html="single_title">Новый<br>сингл <em>«19»</em></h2>
-            <!-- Restore before the next single: pre-save lead copy. (i18n key
-                 "single_lead" is kept in the dictionary for restoration.)
-            <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее. Так ты поможешь нам продвинуть песню, а ещё она появится в твоем плейлисте сразу после выхода, 17 июля.</p>
-            -->
+            <h2 class="display single__title" data-i18n-html="single_title">Новый<br>сингл <em>«31 августа»</em></h2>
+            <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее — он придёт в твой плейлист в день выхода. И чем больше пресейвов, тем выше песня поднимется в стримингах.</p>
             <div class="single__cta">
-              <a class="btn btn--fill" href="https://dnkmusic.ru/devyatnadtsat" target="_blank" rel="noopener" data-listen-open data-i18n="btn_presave">Слушать песню</a>
-              <a class="btn btn--paper" href="/game" data-i18n="btn_play">…или сыграй и послушай</a>
+              <a class="btn btn--fill" href="https://dnkmusic.ru/august_31" target="_blank" rel="noopener" data-listen-open data-i18n="btn_presave">Сделать пресейв</a>
             </div>
           </div>
         </div>
@@ -483,16 +490,16 @@
         var I18N = {
           ru: {
             title: "Дела поважнее – Официальный сайт",
-            meta_desc: "Дела поважнее – новый сингл «19», релиз 17 июля 2026. Слушай в стримингах, приходи на концерты.",
+            meta_desc: "Дела поважнее – новый сингл «31 августа». Сделай пресейв и приходи на концерты.",
             logo_alt: "Дела поважнее", nav_menu: "Меню",
-            nav_single: "Сингл «19»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
+            nav_single: "Сингл «31 августа»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
             hero_title: 'Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span>',
-            hero_tag: 'новый сингл<b>«19»</b>', hero_photo_aria: "Группа «Дела поважнее»",
-            hero_cue: 'Новый сингл «19» <span class="arr">↓</span>',
-            single_eyebrow: "Слушать", single_cover_alt: "Обложка сингла «19»", release_date: "Релиз · 17 июля 2026",
-            cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: 'Новый<br>сингл <em>«19»</em>',
-            single_lead: "Сохрани сингл заранее. Так ты поможешь нам продвинуть песню, а ещё она появится в твоем плейлисте сразу после выхода, 17 июля.",
-            btn_presave: "Слушать песню", btn_play: "…или сыграй и послушай",
+            hero_tag: 'новый сингл<b>«31 августа»</b>', hero_photo_aria: "Группа «Дела поважнее»",
+            hero_cue: 'Сингл «31 августа» <span class="arr">↓</span>',
+            single_eyebrow: "Пресейв", single_cover_alt: "Обложка сингла «31 августа»", release_date: "Релиз · 17 июля 2026",
+            cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: 'Новый<br>сингл <em>«31 августа»</em>',
+            single_lead: "Сохрани сингл заранее — он придёт в твой плейлист в день выхода. И чем больше пресейвов, тем выше песня поднимется в стримингах.",
+            btn_presave: "Сделать пресейв",
             concerts_eyebrow: "Концерты · презентация альбома",
             poster_ufa_alt: "Афиша концерта в Уфе, 31 октября, MusicHall27",
             ufa_when: "31 октября<br>Уфа", ufa_where: "MusicHall27<br>ул. Кирова, 27",
@@ -515,16 +522,16 @@
           },
           en: {
             title: "Dela povazhnee – Official site",
-            meta_desc: "Dela povazhnee – new single «19», out July 17, 2026. Listen on streaming, come to the shows.",
+            meta_desc: "Dela povazhnee – new single «31 avgusta». Pre-save it and come to the shows.",
             logo_alt: "Dela povazhnee", nav_menu: "Menu",
-            nav_single: "Single «19»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
+            nav_single: "Single «31 avgusta»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
             hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
-            hero_tag: 'new single<b>«19»</b>', hero_photo_aria: "Dela povazhnee band",
-            hero_cue: 'New single «19» <span class="arr">↓</span>',
-            single_eyebrow: "Listen", single_cover_alt: "«19» single cover", release_date: "Out · July 17, 2026",
-            cue_concerts: 'Shows <span class="arr">↓</span>', single_title: 'New<br>single <em>«19»</em>',
-            single_lead: "Save the single early — the second it drops on July 17, it lands right in your library. One tap in your favorite streaming app.",
-            btn_presave: "Listen now", btn_play: "…or play & listen",
+            hero_tag: 'new single<b>«31 avgusta»</b>', hero_photo_aria: "Dela povazhnee band",
+            hero_cue: 'Single «31 avgusta» <span class="arr">↓</span>',
+            single_eyebrow: "Pre-save", single_cover_alt: "«31 avgusta» single cover", release_date: "Out · July 17, 2026",
+            cue_concerts: 'Shows <span class="arr">↓</span>', single_title: 'New<br>single <em>«31 avgusta»</em>',
+            single_lead: "Pre-save it now and it lands in your library the day it drops. Every pre-save also pushes the song higher on streaming.",
+            btn_presave: "Pre-save the single",
             concerts_eyebrow: "Shows · album presentation",
             poster_ufa_alt: "Ufa show poster, October 31, MusicHall27",
             ufa_when: "October 31<br>Ufa", ufa_where: "MusicHall27<br>Kirova 27",
@@ -547,16 +554,16 @@
           },
           zh: {
             title: "Dela povazhnee – 官方网站",
-            meta_desc: "Dela povazhnee 全新单曲《19》，2026年7月17日发行。在流媒体收听，来看现场演出。",
+            meta_desc: "Dela povazhnee 全新单曲《31 avgusta》。立即预存，来看现场演出。",
             logo_alt: "Dela povazhnee", nav_menu: "菜单",
-            nav_single: "单曲《19》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
+            nav_single: "单曲《31 avgusta》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
             hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
-            hero_tag: '全新单曲<b>《19》</b>', hero_photo_aria: "Dela povazhnee 乐队",
-            hero_cue: '全新单曲《19》<span class="arr">↓</span>',
-            single_eyebrow: "收听", single_cover_alt: "《19》单曲封面", release_date: "发行 · 2026年7月17日",
-            cue_concerts: '演出 <span class="arr">↓</span>', single_title: '全新<br>单曲 <em>《19》</em>',
-            single_lead: "现在就收藏单曲——7月17日一上线，它就会自动进入你的音乐库。在你常用的流媒体里一键完成。",
-            btn_presave: "收听歌曲", btn_play: "……或边玩边听",
+            hero_tag: '全新单曲<b>《31 avgusta》</b>', hero_photo_aria: "Dela povazhnee 乐队",
+            hero_cue: '单曲《31 avgusta》<span class="arr">↓</span>',
+            single_eyebrow: "预存", single_cover_alt: "《31 avgusta》单曲封面", release_date: "发行 · 2026年7月17日",
+            cue_concerts: '演出 <span class="arr">↓</span>', single_title: '全新<br>单曲 <em>《31 avgusta》</em>',
+            single_lead: "现在就预存这首单曲——上线当天它会自动进入你的音乐库。预存越多，歌曲在流媒体上的排名越高。",
+            btn_presave: "预存单曲",
             concerts_eyebrow: "演出 · 专辑首演",
             poster_ufa_alt: "乌法演出海报，10月31日，MusicHall27",
             ufa_when: "10月31日<br>乌法", ufa_where: "MusicHall27<br>Kirova 27",
@@ -657,7 +664,7 @@
         var frame = document.getElementById("listen-frame");
         var closeBtn = document.getElementById("listen-close");
         if (!modal || !frame) return;
-        var URL = "https://dnkmusic.ru/devyatnadtsat";
+        var URL = "https://dnkmusic.ru/august_31";
         function open() {
           if (frame.getAttribute("src") !== URL) frame.setAttribute("src", URL);
           modal.hidden = false;
@@ -715,7 +722,7 @@
     <div id="listen-modal" class="listen-modal" hidden>
       <div class="listen-modal__card">
         <button type="button" class="listen-modal__close" id="listen-close" aria-label="Закрыть">×</button>
-        <iframe id="listen-frame" class="listen-modal__frame" title="Слушать «19»" src="about:blank" allow="autoplay; clipboard-write"></iframe>
+        <iframe id="listen-frame" class="listen-modal__frame" title="Пресейв сингла «31 августа»" src="about:blank" allow="autoplay; clipboard-write"></iframe>
       </div>
     </div>
 </body>
