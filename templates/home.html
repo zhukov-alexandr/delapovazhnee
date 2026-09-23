@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дела поважнее – Официальный сайт</title>
-    <meta name="description" content="Дела поважнее – новый сингл «31 августа». Сделай пресейв и приходи на концерты.">
+    <meta name="description" content="Дела поважнее – новый сингл «Пламя». Сделай пресейв и приходи на концерты.">
+    <meta name="theme-color" content="#1d0f0a">
     <link rel="icon" href="/static/home/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png">
     <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
@@ -26,31 +27,32 @@
     <!-- /Yandex.Metrika counter -->
 
     <style>
-      /* Palette lifted straight off the «31 августа» cover: spruce seen from
-         above, frost on the tips, near-black in the hollows. Green is the whole
-         world here; the one thing on that cover that is NOT green is the linen
-         ribbon of lyrics, and its warmth — saturated into ochre — is the only
-         accent the page gets — but only ever as a bright ochre. Darkened enough to
-         sit on the light ground it turns to mud, so it never touches the big type:
-         --cta is the ochre and it means "press me". --accent is the tonal highlight
-         and stays in the green world on light screens, going ochre on the dark ones
-         where the bright value works. */
+      /* Everything here is lifted off the «Пламя» cover: a rust-brown sheet
+         burning away along a ragged line, and under it a cream page of pencil
+         lyrics. The page is built the same way — rust sheets (hero, concerts)
+         and the lyric paper (presave) meet along burnt edges, and exactly one
+         of those edges is still alight: the one that reveals the presave.
+         The rust and the handwriting are real crops of the cover
+         (plamya-rust.webp, plamya-lyrics.webp), not CSS imitations. */
       :root {
-        --frost: #a9ba95;       /* page ground — frost on the treetops */
-        --frost-deep: #8a9c76;  /* one step into the moss; sits under loading images */
-        --ink: #0c1a13;         /* the forest floor: near-black, deep green */
-        --paper: #f2f5e7;       /* the chalk-white handwriting on the ribbon */
-        --accent: #2c4a33;      /* tonal highlight on the frost ground: deep spruce */
-        --accent-deep: #1e3524;
-        --cta: #e9b451;         /* the ribbon's warmth — every button, nothing else */
-        --cta-deep: #f2c877;
-        --muted: #414f3c;       /* deep moss — secondary text on the frost ground */
+        --soot: #1d0f0a;        /* the charred curl — nav, footer, text on paper */
+        --rust: #6b2816;        /* the unburnt sheet; sits under the rust texture */
+        --ash: #ecdfc9;         /* the lyric paper; also the light text on rust/soot */
+        --ash-dim: #c9ad97;     /* secondary text on rust/soot (5:1 on --rust) */
+        --graphite: #4a3a31;    /* pencil — secondary text on the paper (8:1) */
+        --flame: #ff8a24;       /* the burning rim — every button, nothing else */
+        --glow: #ffd27d;        /* flame core — hover */
+        --focus: var(--flame);
         --nav-h: 60px;
-        --peek: 40px; /* strip of the NEXT section visible at each screen's bottom */
+        --peek: 40px;  /* strip of the NEXT section visible at each screen's bottom */
+        /* Edge heights are baked into the generated clip polygons (y in px) and
+           the SVG viewBoxes — change them only together with those. */
+        --edge-a: 100px; /* the burning edge that opens the presave */
+        --edge: 44px;   /* the cold burnt edges further down */
       }
 
-      /* On the ink screens the ochre IS the readable highlight, so --accent joins it. */
-      .single, .listen { --accent: var(--cta); --accent-deep: var(--cta-deep); }
+      /* On the paper an orange ring is 1.8:1 — soot is what reads there. */
+      .single { --focus: var(--soot); }
 
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -59,8 +61,8 @@
       html { scroll-behavior: smooth; }
       body {
         font-family: "Golos Text", system-ui, sans-serif;
-        background: var(--frost);
-        color: var(--ink);
+        background: var(--soot);
+        color: var(--ash);
         line-height: 1.5;
         overflow-x: hidden;
         -webkit-font-smoothing: antialiased;
@@ -75,50 +77,47 @@
       .wrap { width: min(1120px, 92vw); margin: 0 auto; }
 
       .display { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em; }
-      .eyebrow { font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; font-size: clamp(11px, 1.4vw, 13px); }
+      .eyebrow { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: clamp(15px, 1.7vw, 17px); letter-spacing: 0.01em; }
 
       /* ---- Buttons ---- */
       .btn {
         display: inline-flex; align-items: center; gap: 10px;
         font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em;
         font-size: clamp(13px, 1.6vw, 15px); padding: 15px 26px; border-radius: 2px;
-        border: 2px solid var(--ink); text-decoration: none; cursor: pointer;
+        border: 2px solid var(--soot); text-decoration: none; cursor: pointer;
         transition: transform .12s ease, background .15s ease, color .15s ease; white-space: nowrap;
       }
-      .btn--fill { background: var(--cta); border-color: var(--accent); color: var(--ink); }
-      .btn--fill:hover { transform: translateY(-2px); background: var(--cta-deep); }
-      .btn--paper { background: var(--paper); border-color: var(--paper); color: var(--ink); }
-      .btn--paper:hover { transform: translateY(-2px); }
-      .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+      .btn--fill { background: var(--flame); color: var(--soot); box-shadow: 0 0 0 0 rgba(255,138,36,0); }
+      .btn--fill:hover { transform: translateY(-2px); background: var(--glow); }
+      .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
-      /* ---- Fixed nav ---- */
+      /* ---- Fixed nav: a strip of soot over everything ---- */
       .nav {
         position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 100;
-        background: rgba(169,186,149,0.92); backdrop-filter: blur(8px);
-        border-bottom: 1px solid rgba(12,26,19,0.16);
+        background: rgba(29,15,10,0.9); backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(236,223,201,0.12);
       }
       .nav__inner { width: min(1120px, 92vw); margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
       .nav__brand { display: flex; align-items: center; text-decoration: none; }
-      .nav__brand img { height: 24px; width: auto; display: block; }
+      .nav__brand img { height: 24px; width: auto; display: block; filter: brightness(0) invert(0.92); }
       .nav__links { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 30px); }
-      .nav__links a { font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; color: var(--ink); text-decoration: none; padding-bottom: 3px; border-bottom: 2px solid transparent; }
-      .nav__links a:hover { border-bottom-color: var(--accent); }
-      .nav__links a.is-play { color: var(--accent); border-bottom-color: var(--accent); }
+      .nav__links a { font-family: "Golos Text", sans-serif; font-weight: 600; font-size: 15px; color: var(--ash); text-decoration: none; padding-bottom: 3px; border-bottom: 2px solid transparent; }
+      .nav__links a:hover { border-bottom-color: var(--flame); }
+      .nav__links a.is-play { color: var(--flame); border-bottom-color: var(--flame); }
       .nav__right { display: flex; align-items: center; gap: clamp(12px, 2vw, 22px); }
       .lang-switch { display: flex; align-items: center; gap: 2px; }
-      .lang-btn { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.03em; color: var(--muted); background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
-      .lang-btn:hover { color: var(--ink); }
-      .lang-btn.is-active { color: var(--accent); background: rgba(44,74,51,0.12); }
+      .lang-btn { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.03em; color: var(--ash-dim); background: transparent; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
+      .lang-btn:hover { color: var(--ash); }
+      .lang-btn.is-active { color: var(--flame); background: rgba(255,138,36,0.14); }
       .nav__toggle { display: none; width: 42px; height: 42px; border: none; background: transparent; cursor: pointer; flex-direction: column; justify-content: center; gap: 5px; align-items: flex-end; }
-      .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--ink); transition: transform .2s ease, opacity .2s ease; }
+      .nav__toggle span { display: block; width: 24px; height: 2px; background: var(--ash); transition: transform .2s ease, opacity .2s ease; }
       .nav--open .nav__toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
       .nav--open .nav__toggle span:nth-child(2) { opacity: 0; }
       .nav--open .nav__toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
       /* ---- One section = one screen, minus a --peek strip: the next section's
-           torn edge stays visible at the bottom of every screen as a "there's
-           more below" teaser. Content starts right under the fixed nav; leftover
-           space is background. On small screens content may exceed the height —
+           burnt edge stays visible at the bottom of every screen as a "there's
+           more below" teaser. On small screens content may exceed the height —
            the section then grows and scrolls. ---- */
       .screen {
         min-height: calc(100svh - var(--peek));
@@ -126,115 +125,163 @@
         padding: calc(var(--nav-h) + clamp(12px, 2.5vh, 28px)) 0 clamp(20px, 3.5vh, 40px);
         position: relative;
       }
-      #listen { min-height: 0; } /* footer: ends where its content ends, not a full screen */
-      .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--muted); margin-bottom: clamp(22px, 4vw, 40px); }
-      .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
+      .rust { background: var(--rust) url("/static/home/plamya-rust.webp") center / cover no-repeat; }
 
-      /* ---- Hero ---- */
+      /* ---- Sheets: every section after the hero slides UP over the previous
+           one by its edge height; its ground (::before) is clipped to a ragged
+           burnt line, so the section above shows through the gaps. The line's
+           strokes (char, scorch, ember) are SVGs drawn with the same points —
+           x in % of the width, y in px — so clip and strokes stay in register
+           at any width. ---- */
+      .sheet { --h: var(--edge); margin-top: calc(-1 * var(--h)); padding-top: calc(max(var(--nav-h), var(--h)) + clamp(16px, 3vh, 36px)); isolation: isolate; }
+      /* the element itself stays transparent — only the clipped ::before is ground */
+      .sheet, .sheet.rust { background: none; }
+      .sheet::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--ground); }
+      .sheet.rust::before { background: var(--rust) url("/static/home/plamya-rust.webp") center / cover no-repeat; }
+      .sheet > .wrap { position: relative; z-index: 1; }
+      .burn { position: absolute; top: 0; left: 0; width: 100%; height: var(--h); pointer-events: none; z-index: 0; }
+      .burn svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+      .burn use { fill: none; }
+      .burn__scorch use { stroke: #5b2410; stroke-width: 18px; }
+      .burn__scorch { filter: blur(6px); opacity: 0.55; transform: translateY(4px); }
+      .burn__char use { stroke: var(--soot); stroke-width: 6px; }
+      .burn__char { filter: blur(0.8px); transform: translateY(-2.5px); }
+      .burn__ember use { stroke: url(#heat); stroke-width: 3px; }
+      .burn__core use { stroke: url(#heat-core); stroke-width: 1.2px; }
+      .burn__ember, .burn__core { animation: smoulder 3.6s ease-in-out infinite; }
+      /* the glow leans upward: the fire lights the sheet it is eating */
+      .burn__ember { filter: drop-shadow(0 0 2px rgba(255,190,90,0.95)) drop-shadow(0 0 10px rgba(255,112,20,0.85)) drop-shadow(0 -8px 26px rgba(255,96,16,0.45)); }
+      .burn__core { animation-delay: -1.3s; }
+      /* irregular on purpose — an ember breathes, it doesn't pulse */
+      @keyframes smoulder {
+        0% { opacity: .82; } 17% { opacity: 1; } 29% { opacity: .74; } 44% { opacity: .96; }
+        58% { opacity: .8; } 71% { opacity: 1; } 86% { opacity: .86; } 100% { opacity: .82; }
+      }
+
+      .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--ash-dim); margin-bottom: clamp(22px, 4vw, 40px); }
+      .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
+      .section__eyebrow small { font-size: inherit; font-weight: 500; opacity: 0.8; }
+
+      /* ---- Hero: the unburnt sheet ---- */
+      /* the rim's highest point sits ~20px into the edge, so the photo clears it */
+      .hero { padding-bottom: calc(var(--edge-a) - 8px); }
+      .hero.rust {
+        background:
+          radial-gradient(90% 55% at 72% 100%, rgba(255,122,34,0.34), rgba(255,122,34,0) 70%),
+          linear-gradient(to bottom, rgba(29,15,10,0.45), rgba(29,15,10,0) 40%),
+          url("/static/home/plamya-rust.webp") center / cover no-repeat,
+          var(--rust);
+      }
       .hero__head { position: relative; }
-      .hero__title { font-size: clamp(44px, 12.6vw, 180px); letter-spacing: -0.03em; }
-      .hero__title .l2 { color: var(--accent); }
-      .hero__tag { position: absolute; top: 4px; right: 0; text-align: right; font-family: "Golos Text", sans-serif; font-weight: 600; text-transform: lowercase; color: var(--muted); font-size: clamp(13px, 1.8vw, 18px); line-height: 1.3; }
-      .hero__tag b { display: block; color: var(--accent); font-weight: 700; }
+      .hero__title { font-size: clamp(44px, 12.6vw, 180px); letter-spacing: -0.03em; color: var(--ash); }
+      .hero__tag { position: absolute; top: 4px; right: 0; text-align: right; font-family: "Golos Text", sans-serif; font-weight: 600; color: var(--ash-dim); font-size: clamp(13px, 1.8vw, 18px); line-height: 1.3; }
+      .hero__tag b { display: block; color: var(--flame); font-weight: 700; }
       .hero__photo {
         position: relative; margin-top: clamp(22px, 3.5vw, 40px); flex: 1 1 auto; min-height: 0;
-        background: var(--frost-deep) url("/static/home/band.jpg") center 28% / cover no-repeat;
-        border: 6px solid var(--paper); box-shadow: 0 22px 54px rgba(12,26,19,0.34);
-        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
+        background: var(--soot) url("/static/home/band.jpg") center 28% / cover no-repeat;
+        border: 6px solid var(--ash); box-shadow: 0 22px 54px rgba(29,15,10,0.5);
       }
       /* nav overlaid on the photo, bottom-left — jumps to the single */
       .cue {
         position: absolute; left: clamp(14px, 2vw, 26px); bottom: clamp(14px, 2vw, 24px); z-index: 2;
         display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
-        background: rgba(12,26,19,0.62); backdrop-filter: blur(4px); color: var(--paper);
+        background: rgba(29,15,10,0.66); backdrop-filter: blur(4px); color: var(--ash);
         font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em;
-        font-size: clamp(12px, 1.5vw, 15px); padding: 12px 18px; border-radius: 2px; border: 2px solid rgba(242,245,231,0.5);
+        font-size: clamp(12px, 1.5vw, 15px); padding: 12px 18px; border-radius: 2px; border: 2px solid rgba(236,223,201,0.5);
         /* identical width for all cues regardless of label length (em: scales with the fluid font) */
         width: 17.5em; justify-content: center;
       }
-      .cue:hover { background: var(--cta); border-color: var(--cta); color: var(--ink); }
+      .cue:hover { background: var(--flame); border-color: var(--flame); color: var(--soot); }
+      .single .cue { background: var(--soot); border-color: var(--soot); } /* translucent soot on paper reads as mud */
       .cue .arr { animation: bob 1.6s ease-in-out infinite; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
-      /* ---- Single (presave) ---- */
-      .single {
-        background: var(--ink); color: var(--paper);
-        /* torn top AND torn bottom — the bottom wavy line is what peeks into the
-           single screen's fold as the concerts teaser */
-        clip-path: polygon(0 18px, 6% 4px, 12% 16px, 19% 3px, 26% 15px, 33% 5px, 41% 18px, 48% 4px, 56% 14px, 63% 3px, 70% 16px, 77% 5px, 84% 17px, 91% 4px, 96% 14px, 100% 6px,
-                           100% calc(100% - 10px), 94% 100%, 88% calc(100% - 14px), 81% calc(100% - 4px), 74% 100%, 67% calc(100% - 12px), 60% calc(100% - 2px), 53% calc(100% - 15px), 46% 100%, 39% calc(100% - 6px), 32% calc(100% - 16px), 25% calc(100% - 3px), 18% 100%, 11% calc(100% - 13px), 5% calc(100% - 4px), 0 100%);
+      /* ---- Single (presave): the lyric page the fire uncovered ---- */
+      .single { --h: var(--edge-a); --ground: var(--ash); color: var(--soot); }
+      .single::before { clip-path: polygon(0.00% 80.3px,0.76% 77.4px,1.46% 78.1px,2.36% 74.7px,2.91% 74.3px,3.82% 76.6px,4.20% 77.7px,5.22% 75.6px,5.99% 72.5px,6.35% 73.5px,6.74% 71.1px,7.25% 69.2px,7.92% 69.2px,8.85% 67.1px,9.65% 65.3px,10.45% 64.0px,10.99% 66.0px,12.03% 65.2px,12.87% 63.2px,13.38% 63.5px,13.77% 66.0px,14.40% 67.2px,15.01% 68.7px,15.95% 66.4px,16.44% 71.5px,17.12% 73.7px,17.74% 71.5px,18.52% 77.0px,19.06% 75.4px,19.64% 80.6px,20.51% 78.0px,21.03% 78.0px,21.42% 80.7px,21.89% 78.8px,22.55% 75.3px,23.40% 71.7px,24.20% 68.1px,24.84% 65.6px,25.37% 66.7px,26.28% 60.6px,27.24% 57.8px,27.86% 59.6px,28.65% 55.4px,29.69% 55.0px,30.21% 57.0px,30.79% 54.3px,31.19% 52.9px,31.94% 52.9px,32.70% 53.1px,33.36% 55.6px,34.05% 54.1px,35.00% 52.7px,35.45% 56.0px,36.37% 53.0px,36.85% 54.8px,37.85% 50.9px,38.85% 52.0px,39.62% 48.5px,40.04% 46.1px,41.05% 46.0px,41.89% 46.1px,42.81% 48.3px,43.36% 47.0px,44.21% 47.5px,44.71% 50.1px,45.65% 51.1px,46.19% 52.9px,46.68% 49.3px,47.22% 51.7px,47.61% 50.9px,48.21% 53.3px,48.65% 52.6px,49.61% 55.2px,50.42% 53.5px,51.17% 50.2px,51.54% 49.2px,52.52% 50.8px,53.54% 46.6px,54.33% 48.3px,55.18% 48.2px,56.22% 49.1px,56.95% 53.9px,57.92% 56.6px,58.76% 58.5px,59.74% 57.1px,60.56% 59.3px,61.52% 56.5px,62.41% 57.7px,63.16% 56.2px,63.77% 55.8px,64.54% 53.5px,65.33% 57.5px,66.29% 56.2px,66.91% 55.7px,67.66% 53.3px,68.59% 50.1px,69.45% 48.3px,70.22% 49.2px,70.73% 49.7px,71.42% 49.2px,72.41% 48.3px,72.76% 48.9px,73.58% 49.7px,74.04% 53.6px,74.85% 52.6px,75.82% 52.7px,76.62% 52.0px,77.27% 54.2px,78.25% 53.4px,78.87% 51.3px,79.43% 48.6px,80.13% 50.8px,81.06% 49.0px,82.07% 45.1px,82.53% 44.7px,83.07% 42.1px,83.71% 41.8px,84.40% 37.9px,85.33% 37.5px,85.99% 31.6px,86.36% 34.2px,86.73% 32.9px,87.48% 30.3px,88.37% 28.5px,88.82% 30.4px,89.18% 32.0px,89.69% 28.9px,90.07% 31.0px,90.73% 30.7px,91.53% 30.9px,92.55% 29.2px,93.03% 27.7px,93.50% 25.2px,94.18% 27.7px,94.65% 25.5px,95.24% 27.1px,95.94% 26.6px,96.82% 25.3px,97.71% 26.7px,98.12% 26.1px,98.97% 20.6px,99.63% 20.8px,100.00% 20.8px,100% 100%,0 100%); }
+      /* The cover's own handwriting, flattened to pencil-on-white and multiplied
+         onto the paper — faint enough to stay texture, never competing with type.
+         It's a seamless tile of the cover's lines (the «…ГАВ» one left out) laid
+         out at its native pixel size, so big screens get more lines, not blur. */
+      .single::after {
+        content: ""; position: absolute; inset: var(--h) 0 0; z-index: -1; pointer-events: none;
+        background: url("/static/home/plamya-lyrics.webp") 0 0 / 2379px auto repeat;
+        mix-blend-mode: multiply; opacity: 0.08;
+        -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+        mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
       }
-      .single .section__eyebrow { color: #93a887; }
+      .single .section__eyebrow { color: var(--graphite); }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(0,0,0,0.5); }
+      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(29,15,10,0.42), 0 4px 12px rgba(29,15,10,0.25); }
       /* The wrap fills the one-screen section, so the desktop cue (base .cue
          offsets) lands in the SAME on-screen spot as the hero's cue: bottom-left
          of the screen. Mobile uses a static cue in the release-date row instead. */
-      .single .wrap { position: relative; flex: 1 1 auto; }
+      .single .wrap { flex: 1 1 auto; }
       /* +6px on both axes mirrors the hero photo's paper border, so both cues
          land on the exact same screen pixel */
       .cue--desktop { left: calc(clamp(14px, 2vw, 26px) + 6px); bottom: calc(clamp(14px, 2vw, 24px) + 6px); }
       .cue--flow { position: static; width: auto; } /* mobile row cue keeps natural width */
       .cue--mobile { display: none; }
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-      .single__cover { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 6px solid var(--paper); }
-      .single__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vw, 44px); }
-      .release-date { display: inline-flex; align-items: baseline; gap: 8px; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: var(--accent); background: rgba(233,180,81,0.14); border: 1px solid rgba(233,180,81,0.45); padding: 8px 14px; border-radius: 2px; font-size: clamp(12px, 1.5vw, 15px); }
-      .single__title { font-size: clamp(38px, 6vw, 88px); color: var(--paper); }
-      .single__title em { font-style: normal; color: var(--accent); }
-      .single__lead { max-width: 42ch; margin: clamp(14px, 2vw, 22px) 0 clamp(22px, 3.5vw, 34px); color: #c6d3b6; font-size: clamp(15px, 1.9vw, 19px); }
+      .release-row:empty { display: none; }
+      .single__cover { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; display: block; background: var(--rust); }
+      .single__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+      .single__title { color: var(--soot); }
+      .single__kicker { display: block; font-size: clamp(20px, 2.6vw, 34px); letter-spacing: -0.01em; color: var(--graphite); margin-bottom: 0.3em; }
+      .single__name { display: block; font-size: clamp(64px, 10.2vw, 148px); letter-spacing: -0.045em; line-height: 0.82; margin-left: -0.04em; }
+      /* Latin «PLAMYA» runs ~13% wider than «ПЛАМЯ» — scaled down to fit the column */
+      :lang(en) .single__name, :lang(zh) .single__name { font-size: clamp(56px, 8.9vw, 130px); }
+      .single__lead { max-width: 42ch; margin: clamp(16px, 2.2vw, 26px) 0 clamp(22px, 3.5vw, 34px); color: var(--graphite); font-size: clamp(15px, 1.9vw, 19px); }
 
-      /* ---- Concerts ---- */
+      /* ---- Concerts: back onto a rust sheet ---- */
+      .concerts::before { clip-path: polygon(0.00% 17.6px,0.50% 18.5px,1.41% 17.7px,2.10% 17.2px,2.45% 17.8px,3.21% 17.5px,4.11% 19.0px,4.61% 19.0px,5.65% 22.4px,6.61% 22.8px,6.98% 22.1px,7.67% 21.8px,8.68% 22.9px,9.14% 24.3px,9.57% 24.7px,10.23% 23.4px,10.82% 23.2px,11.29% 21.7px,12.24% 22.3px,13.13% 22.4px,14.15% 24.8px,15.02% 24.7px,15.77% 24.7px,16.21% 23.9px,17.13% 22.9px,18.12% 24.6px,18.75% 22.4px,19.41% 21.8px,20.45% 20.6px,20.81% 19.2px,21.66% 21.2px,22.35% 18.9px,23.08% 19.2px,23.58% 18.6px,24.31% 18.5px,24.79% 17.1px,25.38% 19.7px,25.96% 18.9px,26.52% 17.6px,26.92% 20.2px,27.80% 19.3px,28.62% 20.6px,29.60% 21.8px,30.23% 21.9px,31.24% 20.5px,32.20% 19.9px,32.81% 19.0px,33.77% 18.5px,34.16% 20.5px,35.05% 19.5px,35.97% 18.3px,36.50% 19.2px,37.14% 19.0px,37.53% 19.6px,38.51% 21.8px,39.37% 20.0px,39.89% 21.3px,40.61% 20.1px,40.97% 18.2px,41.90% 19.1px,42.86% 17.3px,43.50% 16.5px,44.44% 14.7px,45.16% 14.0px,46.04% 12.8px,46.86% 15.8px,47.23% 14.8px,48.02% 15.9px,48.77% 14.5px,49.40% 17.2px,50.38% 15.3px,50.79% 15.4px,51.16% 16.7px,51.60% 18.3px,52.40% 16.2px,53.13% 17.0px,53.82% 16.7px,54.28% 16.7px,54.89% 18.5px,55.62% 16.5px,56.46% 19.5px,57.34% 19.7px,57.70% 18.9px,58.09% 20.2px,58.56% 20.4px,59.08% 20.8px,59.64% 19.2px,60.26% 20.5px,61.23% 21.0px,61.93% 22.0px,62.94% 20.5px,63.70% 21.5px,64.56% 22.5px,65.12% 21.2px,65.83% 20.3px,66.22% 20.8px,67.25% 18.9px,67.82% 20.8px,68.24% 17.9px,68.64% 20.4px,69.51% 19.6px,70.29% 18.8px,71.09% 20.9px,71.79% 21.4px,72.42% 21.5px,72.80% 22.6px,73.32% 23.9px,74.23% 24.6px,74.90% 23.4px,75.51% 24.5px,76.30% 26.4px,76.71% 25.0px,77.39% 26.1px,78.36% 26.9px,79.14% 27.5px,79.95% 28.7px,80.79% 29.1px,81.30% 30.4px,81.92% 30.2px,82.84% 32.3px,83.87% 29.9px,84.44% 31.1px,85.06% 30.6px,85.79% 30.3px,86.35% 32.8px,87.21% 30.7px,87.63% 32.0px,88.47% 29.0px,89.05% 30.0px,89.87% 28.5px,90.87% 28.6px,91.40% 30.3px,91.85% 29.9px,92.34% 29.9px,92.88% 29.5px,93.88% 30.4px,94.53% 31.3px,95.07% 30.2px,95.69% 30.8px,96.16% 33.1px,96.54% 32.7px,97.53% 32.5px,97.89% 31.9px,98.27% 32.2px,99.10% 31.1px,99.45% 32.1px,99.87% 31.5px,100.00% 31.5px,100% 100%,0 100%); }
       .concerts .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
       .poster-grid {
         display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
         align-items: start; gap: clamp(8px, 1.3vw, 18px); width: 100%; margin-block: auto;
         padding-block: clamp(12px, 2.5vh, 28px);
       }
-      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--paper); padding: 7px 7px 12px; box-shadow: 0 16px 40px rgba(12,26,19,0.24); transition: transform .15s ease, box-shadow .15s ease; }
+      .poster { display: flex; min-width: 0; flex-direction: column; background: var(--ash); color: var(--soot); padding: 7px 7px 12px; box-shadow: 0 16px 40px rgba(29,15,10,0.45); transition: transform .15s ease, box-shadow .15s ease; }
       .poster:nth-child(odd) { transform: rotate(-1deg); }
       .poster:nth-child(even) { transform: rotate(1deg); }
-      .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(12,26,19,0.34); }
-      .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: var(--frost-deep); }
+      .poster:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 24px 54px rgba(29,15,10,0.55); }
+      .poster img { width: 100%; display: block; aspect-ratio: 2894/4096; object-fit: cover; background: #c9a57a; }
       .poster__meta { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 0 0; }
       .poster__details { min-width: 0; }
       .poster__when { font-family: "Montserrat", sans-serif; font-weight: 900; text-transform: uppercase; font-size: clamp(10px, 1.05vw, 14px); line-height: 1.1; overflow-wrap: anywhere; }
-      .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--muted); margin-top: 5px; }
-      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--ink) !important; text-shadow: none !important; background: var(--cta) !important; border: 1px solid var(--accent) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
-      .poster__tix:hover { background: var(--cta-deep) !important; }
+      .poster__where { font-size: clamp(9px, 0.9vw, 11px); line-height: 1.3; color: var(--graphite); margin-top: 5px; }
+      .poster__tix { width: 100% !important; height: auto !important; min-height: 0 !important; max-height: none !important; align-self: stretch; justify-content: center; appearance: none; margin: 0 !important; font-family: "Montserrat", sans-serif !important; font-weight: 800 !important; text-transform: uppercase !important; font-size: clamp(13px, 1.6vw, 15px) !important; line-height: 1.5 !important; letter-spacing: 0.02em !important; color: var(--soot) !important; text-shadow: none !important; background: var(--flame) !important; border: 2px solid var(--soot) !important; border-radius: 2px !important; padding: 15px 26px !important; box-shadow: none !important; }
+      .poster__tix:hover { background: var(--glow) !important; }
+      .poster__tix:focus-visible { outline: 3px solid var(--soot); outline-offset: 3px; }
       .tour-poster-mobile { display: none; }
       .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
-      /* ---- Listen + socials ---- */
-      .listen {
-        background: var(--ink); color: var(--paper);
-        clip-path: polygon(0 18px, 7% 4px, 14% 15px, 22% 4px, 30% 16px, 38% 4px, 47% 15px, 55% 3px, 63% 16px, 71% 5px, 79% 15px, 87% 4px, 95% 15px, 100% 6px, 100% 100%, 0 100%);
-      }
-      .listen .section__eyebrow { color: #93a887; }
+      /* ---- Listen + socials: soot ---- */
+      .listen { --ground: var(--soot); min-height: 0; } /* footer: ends where its content ends, not a full screen */
+      .listen::before { clip-path: polygon(0.00% 21.0px,0.80% 22.5px,1.78% 20.2px,2.58% 21.7px,3.27% 22.9px,3.99% 21.1px,4.99% 21.4px,5.55% 20.1px,6.24% 19.0px,7.01% 20.9px,7.65% 21.1px,8.64% 20.3px,9.46% 19.3px,9.85% 22.4px,10.39% 20.3px,11.36% 22.8px,11.80% 21.7px,12.31% 21.7px,12.66% 22.6px,13.22% 22.1px,13.70% 21.0px,14.07% 23.2px,14.94% 21.4px,15.37% 19.7px,15.80% 19.8px,16.19% 19.2px,16.67% 18.6px,17.48% 19.0px,18.15% 18.6px,18.87% 20.1px,19.43% 18.1px,20.12% 19.6px,21.01% 19.4px,21.96% 19.8px,22.68% 21.5px,23.25% 23.1px,24.08% 20.9px,24.77% 22.5px,25.14% 20.9px,25.91% 23.4px,26.58% 22.9px,27.28% 23.2px,28.23% 26.8px,28.92% 24.8px,29.54% 28.1px,30.11% 26.6px,30.59% 28.9px,31.37% 27.9px,32.15% 29.4px,33.16% 29.1px,33.81% 28.4px,34.80% 27.8px,35.67% 26.3px,36.37% 26.9px,37.16% 26.5px,37.66% 24.6px,38.20% 26.3px,38.94% 25.2px,39.42% 27.7px,39.82% 27.7px,40.70% 26.4px,41.74% 26.2px,42.09% 26.8px,42.72% 26.4px,43.64% 23.4px,44.01% 22.9px,44.90% 25.4px,45.41% 23.4px,46.01% 25.9px,46.87% 26.8px,47.89% 27.1px,48.82% 25.0px,49.17% 27.6px,49.95% 25.5px,50.38% 25.2px,50.96% 25.0px,51.62% 23.1px,52.03% 22.5px,52.46% 21.5px,53.10% 20.6px,54.00% 20.8px,54.67% 20.4px,55.18% 18.0px,55.58% 18.8px,56.18% 18.2px,56.74% 19.8px,57.09% 18.4px,57.71% 17.5px,58.56% 16.7px,58.93% 16.1px,59.96% 15.6px,60.39% 17.1px,61.18% 16.2px,61.76% 15.3px,62.14% 13.2px,63.04% 13.9px,63.93% 13.8px,64.89% 13.5px,65.67% 14.6px,66.15% 17.2px,66.80% 17.4px,67.34% 17.4px,68.32% 17.1px,68.83% 17.0px,69.84% 16.7px,70.49% 14.9px,70.91% 15.8px,71.37% 13.7px,71.74% 13.3px,72.35% 14.0px,72.82% 13.8px,73.69% 12.8px,74.13% 14.2px,75.11% 15.8px,75.85% 13.3px,76.81% 16.1px,77.78% 14.3px,78.39% 14.2px,79.29% 15.2px,79.98% 13.5px,80.54% 13.7px,81.26% 13.3px,81.93% 16.0px,82.44% 14.6px,83.00% 17.4px,83.56% 18.2px,84.55% 20.0px,85.45% 19.0px,86.11% 21.6px,86.63% 21.1px,87.58% 22.4px,88.18% 19.7px,88.54% 20.2px,89.27% 20.0px,90.19% 21.1px,90.97% 21.7px,91.54% 21.3px,92.14% 20.4px,92.56% 22.2px,93.53% 20.0px,94.38% 20.1px,95.02% 20.7px,95.99% 20.4px,96.69% 19.6px,97.22% 18.7px,97.61% 17.6px,98.34% 19.4px,99.15% 17.6px,100.00% 17.6px,100% 100%,0 100%); }
       .listen__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: clamp(28px, 5vw, 56px); align-items: start; }
-      .listen__title { font-size: clamp(34px, 5vw, 64px); color: var(--paper); }
-      /* The band's squiggle mark. Ink-dark PNG: inverted to paper for the dark
-         footer; natural ink as a signature stamp on the hero photo. */
-      .listen__dog { width: clamp(110px, 12vw, 160px); margin-top: 18px; display: block; filter: brightness(0) invert(0.93); }
+      .listen__title { font-size: clamp(34px, 5vw, 64px); color: var(--ash); }
+      /* The band's squiggle mark. Ink-dark PNG: inverted to paper on the dark grounds. */
+      .listen__dog { width: clamp(110px, 12vw, 160px); margin-top: 18px; display: block; filter: brightness(0) invert(0.92); }
       /* the squiggle dog in the void right of «ДЕЛА» — em-sized, scales with the title */
-      .title-dog { display: inline-block; height: 0.55em; width: auto; margin-left: 0.28em; vertical-align: 0.06em; transform: rotate(-4deg); }
-      .listen__col h4 { font-family: "Golos Text", sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 12px; color: #93a887; margin-bottom: 16px; }
+      .title-dog { display: inline-block; height: 0.55em; width: auto; margin-left: 0.28em; vertical-align: 0.06em; transform: rotate(-4deg); filter: brightness(0) invert(0.92); }
+      .listen__col h4 { font-family: "Golos Text", sans-serif; font-weight: 700; font-size: 15px; color: var(--ash-dim); margin-bottom: 16px; }
       .link-list { display: flex; flex-direction: column; gap: 11px; }
-      .link-list a { color: var(--paper); text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.8vw, 18px); width: fit-content; border-bottom: 1px solid transparent; }
-      .link-list a:hover { border-bottom-color: var(--accent); }
-      .listen__foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: clamp(40px, 7vh, 72px); padding-top: 22px; border-top: 1px solid rgba(242,245,231,0.16); font-size: 13px; color: #8a9c7e; }
-      .listen__foot a { color: var(--paper); text-decoration: none; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; border-bottom: 2px solid var(--accent); padding-bottom: 3px; }
+      .link-list a { color: var(--ash); text-decoration: none; font-weight: 500; font-size: clamp(15px, 1.8vw, 18px); width: fit-content; border-bottom: 1px solid transparent; }
+      .link-list a:hover { border-bottom-color: var(--flame); }
+      .listen__foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-top: clamp(40px, 7vh, 72px); padding-top: 22px; border-top: 1px solid rgba(236,223,201,0.16); font-size: 13px; color: var(--ash-dim); }
+      .listen__foot a { color: var(--ash); text-decoration: none; font-family: "Montserrat", sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; border-bottom: 2px solid var(--flame); padding-bottom: 3px; }
 
       @media (max-width: 820px) {
         .nav__links {
           position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 99;
           flex-direction: column; align-items: flex-start; gap: 0;
-          background: var(--ink); padding: 8px 6vw 20px;
-          transform: translateY(-130%); transition: transform .28s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+          background: var(--soot); padding: 8px 6vw 20px;
+          transform: translateY(-130%); transition: transform .28s ease; box-shadow: 0 20px 40px rgba(0,0,0,0.45);
         }
         .nav--open .nav__links { transform: translateY(0); }
-        .nav__links a { color: var(--paper); font-size: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid rgba(242,245,231,0.12); }
-        .nav__links a:hover, .nav__links a.is-play { border-bottom-color: rgba(242,245,231,0.12); color: var(--paper); }
+        .nav__links a { font-size: 16px; width: 100%; padding: 14px 0; border-bottom: 1px solid rgba(236,223,201,0.12); }
+        .nav__links a:hover, .nav__links a.is-play { border-bottom-color: rgba(236,223,201,0.12); }
         .nav__toggle { display: flex; }
       }
       @media (min-width: 761px) and (max-width: 1399px) {
@@ -243,6 +290,8 @@
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
         .single__cover-wrap { max-width: 300px; margin: 0 auto; }
+        .single__name { font-size: 21vw; }
+        :lang(en) .single__name, :lang(zh) .single__name { font-size: 18.5vw; }
         .cue--desktop { display: none; }
         .cue--mobile { display: inline-flex; }
         .poster-grid--desktop { display: none; }
@@ -251,8 +300,11 @@
         /* Phones give the poster more of the screen than the 92vw default wrap;
            eyebrow rides along so both keep the same left edge. */
         .concerts .wrap { width: min(1120px, 96vw); }
-        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: auto; background: var(--paper); border: 7px solid var(--paper); box-shadow: 0 16px 40px rgba(12,26,19,0.24); }
+        /* The tour poster (and its «купить» art) was drawn green for the last
+           single; a sepia pass pulls it onto the same kraft as the desktop posters. */
+        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: auto; background: var(--ash); border: 7px solid var(--ash); box-shadow: 0 16px 40px rgba(29,15,10,0.45); }
         .tour-poster-mobile img { display: block; width: 100%; height: auto; }
+        .tour-poster-mobile img, .tour-poster-mobile__trigger { filter: sepia(0.7) saturate(0.95) hue-rotate(-12deg) brightness(0.92); }
         /* Each city's «купить» = its buyN image, dropped to the right of the row
            and centered on it. TicketsCloud (tcwidget.js) wires the click via
            data-tc-event; !important keeps the widget from restyling the button. */
@@ -267,9 +319,9 @@
           background-position: center !important; background-size: contain !important;
           transition: transform .12s ease, filter .15s ease;
         }
-        .tour-poster-mobile__trigger:hover { transform: translateY(-50%) scale(1.04) !important; filter: brightness(0.96); }
+        .tour-poster-mobile__trigger:hover { transform: translateY(-50%) scale(1.04) !important; }
         .tour-poster-mobile__trigger:active { transform: translateY(-50%) scale(0.98) !important; }
-        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+        .tour-poster-mobile__trigger:focus-visible { outline: 3px solid var(--flame); outline-offset: 3px; border-radius: 8px; }
         /* top = each city row's optical centre, measured off the poster art
            (rows sit on an even 11.0% grid). */
         .tour-poster-mobile__trigger--ufa { top: 31.59% !important; background-image: url("/static/home/buy1.png") !important; }
@@ -285,7 +337,7 @@
            on top `contain`-ed — full-bleed look, all four always visible. */
         .hero__photo {
           min-height: 46vh;
-          background: var(--frost-deep); /* solid; the imagery moves to the layers below */
+          background: var(--soot); /* solid; the imagery moves to the layers below */
           overflow: hidden;
         }
         .hero__photo::before,
@@ -307,25 +359,48 @@
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
-        .cue .arr, .btn, .poster, .nav__links { animation: none; transition: none; }
+        .cue .arr, .btn, .poster, .nav__links, .burn__ember, .burn__core { animation: none; transition: none; }
       }
 
-      /* Listen modal: embeds the band's smartlink (all 5 services) in an iframe. */
-      .listen-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(12,26,19,0.74); padding: 20px; }
+      /* Listen modal: embeds the band's presave smartlink (all services) in an iframe. */
+      .listen-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(29,15,10,0.8); padding: 20px; }
       .listen-modal[hidden] { display: none; }
-      .listen-modal__card { position: relative; width: min(440px, 96vw); height: min(82vh, 760px); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.5); }
+      .listen-modal__card { position: relative; width: min(440px, 96vw); height: min(84vh, 780px); background: var(--rust); border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,138,36,0.35), 0 24px 70px rgba(0,0,0,0.6), 0 0 60px rgba(255,112,20,0.18); }
       .listen-modal__frame { width: 100%; height: 100%; border: 0; display: block; }
-      .listen-modal__close { position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(0,0,0,0.55); color: #fff; font-size: 24px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-      .listen-modal__close:hover { background: rgba(0,0,0,0.78); }
+      .listen-modal__close { position: absolute; top: 8px; right: 8px; z-index: 2; width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(29,15,10,0.7); color: var(--ash); font-size: 24px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+      .listen-modal__close:hover { background: var(--soot); color: var(--flame); }
     </style>
 </head>
 <body>
+    <!-- The burnt lines, defined once. Each edge's strokes <use> its line; the
+         matching clip-path polygon in the CSS is generated from the same points. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="heat" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+          <stop offset="0" stop-color="#e2561a"/><stop offset=".1" stop-color="#ffb347"/><stop offset=".19" stop-color="#ff8a24"/>
+          <stop offset=".3" stop-color="#c9431a"/><stop offset=".41" stop-color="#ffc766"/><stop offset=".5" stop-color="#ff8a24"/>
+          <stop offset=".6" stop-color="#d04a1a"/><stop offset=".72" stop-color="#ffd27d"/><stop offset=".83" stop-color="#ff7a1a"/>
+          <stop offset=".92" stop-color="#ffb347"/><stop offset="1" stop-color="#e2561a"/>
+        </linearGradient>
+        <linearGradient id="heat-core" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+          <stop offset="0" stop-color="#fff3c9" stop-opacity="0"/><stop offset=".1" stop-color="#fff3c9" stop-opacity=".9"/>
+          <stop offset=".17" stop-color="#fff3c9" stop-opacity="0"/><stop offset=".36" stop-color="#fff3c9" stop-opacity="0"/>
+          <stop offset=".41" stop-color="#fff3c9" stop-opacity="1"/><stop offset=".47" stop-color="#fff3c9" stop-opacity="0"/>
+          <stop offset=".66" stop-color="#fff3c9" stop-opacity="0"/><stop offset=".72" stop-color="#fff3c9" stop-opacity="1"/>
+          <stop offset=".8" stop-color="#fff3c9" stop-opacity="0"/><stop offset=".9" stop-color="#fff3c9" stop-opacity=".7"/>
+          <stop offset=".97" stop-color="#fff3c9" stop-opacity="0"/>
+        </linearGradient>
+        <path id="burn-a" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0 80.3L11 77.4L21 78.1L34 74.7L42 74.3L55 76.6L60 77.7L75 75.6L86 72.5L91 73.5L97 71.1L104 69.2L114 69.2L128 67.1L139 65.3L151 64.0L158 66.0L173 65.2L185 63.2L193 63.5L198 66.0L207 67.2L216 68.7L230 66.4L237 71.5L246 73.7L255 71.5L267 77.0L274 75.4L283 80.6L295 78.0L303 78.0L308 80.7L315 78.8L325 75.3L337 71.7L348 68.1L358 65.6L365 66.7L378 60.6L392 57.8L401 59.6L413 55.4L427 55.0L435 57.0L443 54.3L449 52.9L460 52.9L471 53.1L480 55.6L490 54.1L504 52.7L510 56.0L524 53.0L531 54.8L545 50.9L559 52.0L571 48.5L577 46.1L591 46.0L603 46.1L616 48.3L624 47.0L637 47.5L644 50.1L657 51.1L665 52.9L672 49.3L680 51.7L686 50.9L694 53.3L701 52.6L714 55.2L726 53.5L737 50.2L742 49.2L756 50.8L771 46.6L782 48.3L795 48.2L810 49.1L820 53.9L834 56.6L846 58.5L860 57.1L872 59.3L886 56.5L899 57.7L909 56.2L918 55.8L929 53.5L941 57.5L955 56.2L963 55.7L974 53.3L988 50.1L1000 48.3L1011 49.2L1018 49.7L1028 49.2L1043 48.3L1048 48.9L1060 49.7L1066 53.6L1078 52.6L1092 52.7L1103 52.0L1113 54.2L1127 53.4L1136 51.3L1144 48.6L1154 50.8L1167 49.0L1182 45.1L1189 44.7L1196 42.1L1205 41.8L1215 37.9L1229 37.5L1238 31.6L1244 34.2L1249 32.9L1260 30.3L1273 28.5L1279 30.4L1284 32.0L1292 28.9L1297 31.0L1307 30.7L1318 30.9L1333 29.2L1340 27.7L1346 25.2L1356 27.7L1363 25.5L1371 27.1L1382 26.6L1394 25.3L1407 26.7L1413 26.1L1425 20.6L1435 20.8L1440 20.8"/>
+        <path id="burn-b" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0 17.6L7 18.5L20 17.7L30 17.2L35 17.8L46 17.5L59 19.0L66 19.0L81 22.4L95 22.8L101 22.1L110 21.8L125 22.9L132 24.3L138 24.7L147 23.4L156 23.2L163 21.7L176 22.3L189 22.4L204 24.8L216 24.7L227 24.7L233 23.9L247 22.9L261 24.6L270 22.4L279 21.8L294 20.6L300 19.2L312 21.2L322 18.9L332 19.2L340 18.6L350 18.5L357 17.1L365 19.7L374 18.9L382 17.6L388 20.2L400 19.3L412 20.6L426 21.8L435 21.9L450 20.5L464 19.9L472 19.0L486 18.5L492 20.5L505 19.5L518 18.3L526 19.2L535 19.0L540 19.6L554 21.8L567 20.0L574 21.3L585 20.1L590 18.2L603 19.1L617 17.3L626 16.5L640 14.7L650 14.0L663 12.8L675 15.8L680 14.8L692 15.9L702 14.5L711 17.2L725 15.3L731 15.4L737 16.7L743 18.3L755 16.2L765 17.0L775 16.7L782 16.7L790 18.5L801 16.5L813 19.5L826 19.7L831 18.9L836 20.2L843 20.4L851 20.8L859 19.2L868 20.5L882 21.0L892 22.0L906 20.5L917 21.5L930 22.5L938 21.2L948 20.3L954 20.8L968 18.9L977 20.8L983 17.9L988 20.4L1001 19.6L1012 18.8L1024 20.9L1034 21.4L1043 21.5L1048 22.6L1056 23.9L1069 24.6L1079 23.4L1087 24.5L1099 26.4L1105 25.0L1114 26.1L1128 26.9L1140 27.5L1151 28.7L1163 29.1L1171 30.4L1180 30.2L1193 32.3L1208 29.9L1216 31.1L1225 30.6L1235 30.3L1243 32.8L1256 30.7L1262 32.0L1274 29.0L1282 30.0L1294 28.5L1309 28.6L1316 30.3L1323 29.9L1330 29.9L1337 29.5L1352 30.4L1361 31.3L1369 30.2L1378 30.8L1385 33.1L1390 32.7L1404 32.5L1410 31.9L1415 32.2L1427 31.1L1432 32.1L1438 31.5L1440 31.5"/>
+      </defs>
+    </svg>
+
     <nav class="nav" id="nav">
       <div class="nav__inner">
         <a class="nav__brand" href="#top"><img src="/static/home/logo.svg" data-i18n-attr="alt:logo_alt" alt="Дела поважнее"></a>
         <div class="nav__right">
           <div class="nav__links" id="nav-links">
-            <a href="#single" data-i18n="nav_single">Сингл «31 августа»</a>
+            <a href="#single" data-i18n="nav_single">Сингл «Пламя»</a>
             <a href="#concerts" data-i18n="nav_concerts">Концерты</a>
             <a href="#listen" data-i18n="nav_listen">Слушать</a>
             <a class="is-play" href="/game" data-i18n="nav_play">Играть →</a>
@@ -342,37 +417,37 @@
       </div>
     </nav>
 
-    <header id="top" class="screen hero">
+    <header id="top" class="screen hero rust">
       <div class="wrap" style="display:flex; flex-direction:column; flex:1; min-height:0;">
         <div class="hero__head">
-          <h1 class="display hero__title" data-i18n-html="hero_title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span></h1>
-          <p class="hero__tag" data-i18n-html="hero_tag">новый сингл<b>«31 августа»</b></p>
+          <h1 class="display hero__title" data-i18n-html="hero_title">Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br>поважнее</h1>
+          <p class="hero__tag" data-i18n-html="hero_tag">новый сингл<b>«Пламя»</b></p>
         </div>
         <div class="hero__photo" role="img" data-i18n-attr="aria-label:hero_photo_aria" aria-label="Группа «Дела поважнее»">
-          <a class="cue" href="#single" data-i18n-html="hero_cue">Сингл «31 августа» <span class="arr">↓</span></a>
+          <a class="cue" href="#single" data-i18n-html="hero_cue">Сингл «Пламя» <span class="arr">↓</span></a>
         </div>
       </div>
     </header>
 
-    <section id="single" class="screen single">
+    <section id="single" class="screen sheet single">
+      <div class="burn" aria-hidden="true">
+        <svg class="burn__scorch" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
+        <svg class="burn__char" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
+        <svg class="burn__ember" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
+        <svg class="burn__core" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
+      </div>
       <div class="wrap">
         <div class="section__eyebrow eyebrow" data-i18n="single_eyebrow">Пресейв</div>
         <div class="single__grid">
           <div class="single__cover-wrap">
-            <img class="single__cover" src="/static/home/31_avgusta.jpg" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «31 августа»">
+            <img class="single__cover" src="/static/home/plamya.webp" width="852" height="852" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «Пламя»: горящий лист бумаги поверх страницы с рукописным текстом">
           </div>
           <div>
-            <div class="release-row">
-              <!-- Restore before the next single: release-date badge. (i18n key
-                   "release_date" is kept in the dictionary for restoration.)
-              <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span>
-              -->
-              <a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
-            </div>
-            <h2 class="display single__title" data-i18n-html="single_title">Новый<br>сингл <em>«31 августа»</em></h2>
+            <div class="release-row"><!-- Restore before the next single: release-date badge. (i18n key "release_date" is kept in the dictionary for restoration.) <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span> --><a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a></div>
+            <h2 class="display single__title" data-i18n-html="single_title"><span class="single__kicker">Новый сингл</span><span class="single__name">Пламя</span></h2>
             <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее — он придёт в твой плейлист в день выхода. И чем больше пресейвов, тем выше песня поднимется в стримингах.</p>
             <div class="single__cta">
-              <a class="btn btn--fill" href="https://dnkmusic.ru/august_31" target="_blank" rel="noopener" data-listen-open data-i18n="btn_presave">Сделать пресейв</a>
+              <a class="btn btn--fill" href="https://dnkmusic.ru/_plamya_" target="_blank" rel="noopener" data-listen-open data-i18n="btn_presave">Сделать пресейв</a>
             </div>
           </div>
         </div>
@@ -381,9 +456,13 @@
       </div>
     </section>
 
-    <section id="concerts" class="screen concerts">
+    <section id="concerts" class="screen sheet rust concerts">
+      <div class="burn" aria-hidden="true">
+        <svg class="burn__scorch" viewBox="0 0 1440 44" preserveAspectRatio="none"><use href="#burn-b"/></svg>
+        <svg class="burn__char" viewBox="0 0 1440 44" preserveAspectRatio="none"><use href="#burn-b"/></svg>
+      </div>
       <div class="wrap">
-        <div class="section__eyebrow eyebrow" data-i18n="concerts_eyebrow">Концерты · презентация альбома</div>
+        <div class="section__eyebrow eyebrow" data-i18n-html="concerts_eyebrow">Концерты <small>презентация альбома</small></div>
         <div class="poster-grid poster-grid--desktop">
           <article class="poster">
             <img src="/static/home/уфа а4.png" data-i18n-attr="alt:poster_ufa_alt" alt="Афиша концерта в Уфе, 31 октября, MusicHall27">
@@ -447,7 +526,7 @@
       </div>
     </section>
 
-    <section id="listen" class="screen listen">
+    <section id="listen" class="screen sheet listen">
       <div class="wrap">
         <div class="section__eyebrow eyebrow" data-i18n="listen_eyebrow">Ссылки</div>
         <div class="listen__grid">
@@ -493,17 +572,17 @@
         var I18N = {
           ru: {
             title: "Дела поважнее – Официальный сайт",
-            meta_desc: "Дела поважнее – новый сингл «31 августа». Сделай пресейв и приходи на концерты.",
+            meta_desc: "Дела поважнее – новый сингл «Пламя». Сделай пресейв и приходи на концерты.",
             logo_alt: "Дела поважнее", nav_menu: "Меню",
-            nav_single: "Сингл «31 августа»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
-            hero_title: 'Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">поважнее</span>',
-            hero_tag: 'новый сингл<b>«31 августа»</b>', hero_photo_aria: "Группа «Дела поважнее»",
-            hero_cue: 'Сингл «31 августа» <span class="arr">↓</span>',
-            single_eyebrow: "Пресейв", single_cover_alt: "Обложка сингла «31 августа»", release_date: "Релиз · 17 июля 2026",
-            cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: 'Новый<br>сингл <em>«31 августа»</em>',
+            nav_single: "Сингл «Пламя»", nav_concerts: "Концерты", nav_listen: "Слушать", nav_play: "Играть →",
+            hero_title: 'Дела<img class="title-dog" src="/static/home/dog.png" alt=""><br>поважнее',
+            hero_tag: 'новый сингл<b>«Пламя»</b>', hero_photo_aria: "Группа «Дела поважнее»",
+            hero_cue: 'Сингл «Пламя» <span class="arr">↓</span>',
+            single_eyebrow: "Пресейв", single_cover_alt: "Обложка сингла «Пламя»: горящий лист бумаги поверх страницы с рукописным текстом", release_date: "Релиз · 17 июля 2026",
+            cue_concerts: 'Концерты <span class="arr">↓</span>', single_title: '<span class="single__kicker">Новый сингл</span><span class="single__name">Пламя</span>',
             single_lead: "Сохрани сингл заранее — он придёт в твой плейлист в день выхода. И чем больше пресейвов, тем выше песня поднимется в стримингах.",
             btn_presave: "Сделать пресейв",
-            concerts_eyebrow: "Концерты · презентация альбома",
+            concerts_eyebrow: 'Концерты <small>презентация альбома</small>',
             poster_ufa_alt: "Афиша концерта в Уфе, 31 октября, MusicHall27",
             ufa_when: "31 октября<br>Уфа", ufa_where: "MusicHall27<br>ул. Кирова, 27",
             poster_ekb_alt: "Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»",
@@ -525,17 +604,17 @@
           },
           en: {
             title: "Dela povazhnee – Official site",
-            meta_desc: "Dela povazhnee – new single «31 avgusta». Pre-save it and come to the shows.",
+            meta_desc: "Dela povazhnee – new single «Plamya». Pre-save it and come to the shows.",
             logo_alt: "Dela povazhnee", nav_menu: "Menu",
-            nav_single: "Single «31 avgusta»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
-            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
-            hero_tag: 'new single<b>«31 avgusta»</b>', hero_photo_aria: "Dela povazhnee band",
-            hero_cue: 'Single «31 avgusta» <span class="arr">↓</span>',
-            single_eyebrow: "Pre-save", single_cover_alt: "«31 avgusta» single cover", release_date: "Out · July 17, 2026",
-            cue_concerts: 'Shows <span class="arr">↓</span>', single_title: 'New<br>single <em>«31 avgusta»</em>',
+            nav_single: "Single «Plamya»", nav_concerts: "Shows", nav_listen: "Listen", nav_play: "Play →",
+            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br>povazhnee',
+            hero_tag: 'new single<b>«Plamya»</b>', hero_photo_aria: "Dela povazhnee band",
+            hero_cue: 'Single «Plamya» <span class="arr">↓</span>',
+            single_eyebrow: "Pre-save", single_cover_alt: "«Plamya» single cover: a burning sheet of paper over a handwritten page", release_date: "Out · July 17, 2026",
+            cue_concerts: 'Shows <span class="arr">↓</span>', single_title: '<span class="single__kicker">New single</span><span class="single__name">Plamya</span>',
             single_lead: "Pre-save it now and it lands in your library the day it drops. Every pre-save also pushes the song higher on streaming.",
             btn_presave: "Pre-save the single",
-            concerts_eyebrow: "Shows · album presentation",
+            concerts_eyebrow: 'Shows <small>album presentation</small>',
             poster_ufa_alt: "Ufa show poster, October 31, MusicHall27",
             ufa_when: "October 31<br>Ufa", ufa_where: "MusicHall27<br>Kirova 27",
             poster_ekb_alt: "Ekaterinburg show poster, November 1, Pristanishche",
@@ -557,17 +636,17 @@
           },
           zh: {
             title: "Dela povazhnee – 官方网站",
-            meta_desc: "Dela povazhnee 全新单曲《31 avgusta》。立即预存，来看现场演出。",
+            meta_desc: "Dela povazhnee 全新单曲《Plamya》。立即预存，来看现场演出。",
             logo_alt: "Dela povazhnee", nav_menu: "菜单",
-            nav_single: "单曲《31 avgusta》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
-            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br><span class="l2">povazhnee</span>',
-            hero_tag: '全新单曲<b>《31 avgusta》</b>', hero_photo_aria: "Dela povazhnee 乐队",
-            hero_cue: '单曲《31 avgusta》<span class="arr">↓</span>',
-            single_eyebrow: "预存", single_cover_alt: "《31 avgusta》单曲封面", release_date: "发行 · 2026年7月17日",
-            cue_concerts: '演出 <span class="arr">↓</span>', single_title: '全新<br>单曲 <em>《31 avgusta》</em>',
+            nav_single: "单曲《Plamya》", nav_concerts: "演出", nav_listen: "收听", nav_play: "开始游戏 →",
+            hero_title: 'Dela<img class="title-dog" src="/static/home/dog.png" alt=""><br>povazhnee',
+            hero_tag: '全新单曲<b>《Plamya》</b>', hero_photo_aria: "Dela povazhnee 乐队",
+            hero_cue: '单曲《Plamya》<span class="arr">↓</span>',
+            single_eyebrow: "预存", single_cover_alt: "《Plamya》单曲封面：燃烧的纸张覆盖在手写歌词页上", release_date: "发行 · 2026年7月17日",
+            cue_concerts: '演出 <span class="arr">↓</span>', single_title: '<span class="single__kicker">全新单曲</span><span class="single__name">Plamya</span>',
             single_lead: "现在就预存这首单曲——上线当天它会自动进入你的音乐库。预存越多，歌曲在流媒体上的排名越高。",
             btn_presave: "预存单曲",
-            concerts_eyebrow: "演出 · 专辑首演",
+            concerts_eyebrow: '演出 <small>专辑首演</small>',
             poster_ufa_alt: "乌法演出海报，10月31日，MusicHall27",
             ufa_when: "10月31日<br>乌法", ufa_where: "MusicHall27<br>Kirova 27",
             poster_ekb_alt: "叶卡捷琳堡演出海报，11月1日，Pristanishche",
@@ -667,7 +746,7 @@
         var frame = document.getElementById("listen-frame");
         var closeBtn = document.getElementById("listen-close");
         if (!modal || !frame) return;
-        var URL = "https://dnkmusic.ru/august_31";
+        var URL = "https://dnkmusic.ru/_plamya_";
         function open() {
           if (frame.getAttribute("src") !== URL) frame.setAttribute("src", URL);
           modal.hidden = false;
@@ -725,8 +804,9 @@
     <div id="listen-modal" class="listen-modal" hidden>
       <div class="listen-modal__card">
         <button type="button" class="listen-modal__close" id="listen-close" aria-label="Закрыть">×</button>
-        <iframe id="listen-frame" class="listen-modal__frame" title="Пресейв сингла «31 августа»" src="about:blank" allow="autoplay; clipboard-write"></iframe>
+        <iframe id="listen-frame" class="listen-modal__frame" title="Пресейв сингла «Пламя»" src="about:blank" allow="autoplay; clipboard-write"></iframe>
       </div>
     </div>
 </body>
 </html>
+

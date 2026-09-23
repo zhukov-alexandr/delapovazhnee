@@ -11,9 +11,10 @@ POSTER_NAMES = (
     "mobile_afisha.jpg",
 )
 
-# The «31 августа» cover: ships at 900px so the 500px desktop slot still gets a
-# retina image, and stays inside the same 300 KB budget as the posters.
-SINGLE_COVER = "31_avgusta.jpg"
+# The «Пламя» cover: 852px lossy WebP (same spec as the game's 19_2 cover) so the
+# ~420px desktop slot still gets a retina image, inside the posters' 300 KB budget.
+SINGLE_COVER = "plamya.webp"
+PRESAVE_URL = "https://dnkmusic.ru/_plamya_"
 
 EVENT_IDS = (
     "6a46a070983da59ac77d8ccd",
@@ -93,7 +94,7 @@ def test_single_section_offers_one_presave_cta(client):
     ctas = re.findall(r'<a class="btn[^"]*"[^>]*href="([^"]+)"', section)
 
     # One button, not two: the «сыграй и послушай» link to the game is gone.
-    assert ctas == ["https://dnkmusic.ru/august_31"]
+    assert ctas == [PRESAVE_URL]
     assert "Сделать пресейв" in section
     assert "data-listen-open" in section  # opens the smartlink in-page, not a new tab
     assert "/game" not in section
@@ -104,15 +105,17 @@ def test_presave_opens_embedded_not_offsite(client):
 
     # The modal iframe is what the CTA actually shows; https matters because an
     # http:// frame would be blocked as mixed content on the live site.
-    assert 'var URL = "https://dnkmusic.ru/august_31";' in html
+    assert f'var URL = "{PRESAVE_URL}";' in html
     assert 'id="listen-frame"' in html
-    assert "dnkmusic.ru/devyatnadtsat" not in html  # the previous single is fully gone
+    assert "dnkmusic.ru/august_31" not in html  # the previous single is fully gone
+    assert "dnkmusic.ru/devyatnadtsat" not in html
 
 
 def test_home_references_new_single_cover(client):
     html = client.get("/").text
     assert f"/static/home/{SINGLE_COVER}" in html
-    assert "/static/sprites/19_2.jpg" not in html
+    assert "/static/home/31_avgusta.jpg" not in html
+    assert "31 августа" not in html
 
 
 def test_single_cover_is_at_most_300kb():
