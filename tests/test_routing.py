@@ -88,16 +88,26 @@ def test_home_forwards_utm_tags_to_ticketscloud(client):
     assert html.count('data-tc-utm_source="site"') == 10
 
 
-def test_single_section_offers_one_presave_cta(client):
+def test_single_section_offers_one_listen_cta(client):
     html = client.get("/").text
     section = html.split('<section id="single"', 1)[1].split("</section>", 1)[0]
     ctas = re.findall(r'<a class="btn[^"]*"[^>]*href="([^"]+)"', section)
 
-    # One button, not two: the «сыграй и послушай» link to the game is gone.
+    # «Пламя» is out: the same smartlink now lists the streaming services, so
+    # the one button says «listen», not «pre-save».
     assert ctas == [PRESAVE_URL]
-    assert "Сделать пресейв" in section
+    assert "Слушать песню" in section
     assert "data-listen-open" in section  # opens the smartlink in-page, not a new tab
     assert "/game" not in section
+
+
+def test_no_presave_wording_left_on_the_page(client):
+    html = client.get("/").text
+    # the pre-save lead stays only inside an HTML comment, for the next single
+    visible = re.sub(r"<!--.*?-->", "", html, flags=re.S)
+    markup = visible.split("<script>", 1)[0]
+    assert "пресейв" not in markup.lower()
+    assert "Сделай пресейв" not in html
 
 
 def test_presave_opens_embedded_not_offsite(client):
