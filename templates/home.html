@@ -27,11 +27,11 @@
     <!-- /Yandex.Metrika counter -->
 
     <style>
-      /* Everything here is lifted off the «Пламя» cover: a rust-brown sheet
-         burning away along a ragged line, and under it a cream page of pencil
-         lyrics. The page is built the same way — rust sheets (hero, concerts)
-         and the lyric paper (presave) meet along burnt edges, and exactly one
-         of those edges is still alight: the one that reveals the presave.
+      /* Everything here is lifted off the «Пламя» cover: a cream page of pencil
+         lyrics burning along a ragged line, lying on a rust-brown surface. The
+         page is built the same way — the rust ground (hero, concerts) and the
+         lyric paper (presave) meet along burnt edges of the paper, and exactly
+         one of those edges is still alight: the top of the presave page.
          The rust and the handwriting are real crops of the cover
          (plamya-rust.webp, plamya-lyrics.webp), not CSS imitations. */
       :root {
@@ -159,15 +159,22 @@
       .burn { position: absolute; top: 0; left: 0; width: 100%; height: var(--h); pointer-events: none; z-index: 0; }
       .burn svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
       .burn use { fill: none; }
-      .burn__scorch use { stroke: #5b2410; stroke-width: 18px; }
-      .burn__scorch { filter: blur(6px); opacity: 0.55; transform: translateY(4px); }
-      .burn__char use { stroke: var(--soot); stroke-width: 6px; }
-      .burn__char { filter: blur(0.8px); transform: translateY(-2.5px); }
+      /* It's the lyric PAPER that burns; the rust is the surface it lies on. So
+         every mark sits on the paper's side of the line (--paper: 1 = paper
+         below the line, -1 = paper above), and the only thing on the rust
+         side is the shadow the paper's edge casts onto it. */
+      .burn { --paper: -1; }
+      .single .burn { --paper: 1; }
+      .burn__shadow use { stroke: #1a0905; stroke-width: 16px; }
+      .burn__shadow { filter: blur(7px); opacity: 0.55; transform: translateY(calc(var(--paper) * -6px)); }
+      /* the char is a thin rim right under the ember — the paper ends exactly
+         where it burns, with nothing soft between the fire and the page */
+      .burn__char use { stroke: var(--soot); stroke-width: 4px; }
+      .burn__char { filter: blur(0.5px); transform: translateY(calc(var(--paper) * 1px)); }
       .burn__ember use { stroke: url(#heat); stroke-width: 3px; }
       .burn__core use { stroke: url(#heat-core); stroke-width: 1.2px; }
       .burn__ember, .burn__core { animation: smoulder 3.6s ease-in-out infinite; }
-      /* the glow leans upward: the fire lights the sheet it is eating */
-      .burn__ember { filter: drop-shadow(0 0 2px rgba(255,190,90,0.95)) drop-shadow(0 0 10px rgba(255,112,20,0.85)) drop-shadow(0 -8px 26px rgba(255,96,16,0.45)); }
+      .burn__ember { filter: drop-shadow(0 0 2px rgba(255,190,90,0.95)) drop-shadow(0 0 10px rgba(255,112,20,0.85)) drop-shadow(0 0 22px rgba(255,96,16,0.35)); }
       .burn__core { animation-delay: -1.3s; }
       /* irregular on purpose — an ember breathes, it doesn't pulse */
       @keyframes smoulder {
@@ -471,7 +478,7 @@
 
     <section id="single" class="screen sheet single">
       <div class="burn" aria-hidden="true">
-        <svg class="burn__scorch" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
+        <svg class="burn__shadow" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
         <svg class="burn__char" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
         <svg class="burn__ember" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
         <svg class="burn__core" viewBox="0 0 1440 100" preserveAspectRatio="none"><use href="#burn-a"/></svg>
@@ -498,7 +505,7 @@
 
     <section id="concerts" class="screen sheet rust concerts">
       <div class="burn" aria-hidden="true">
-        <svg class="burn__scorch" viewBox="0 0 1440 44" preserveAspectRatio="none"><use href="#burn-b"/></svg>
+        <svg class="burn__shadow" viewBox="0 0 1440 44" preserveAspectRatio="none"><use href="#burn-b"/></svg>
         <svg class="burn__char" viewBox="0 0 1440 44" preserveAspectRatio="none"><use href="#burn-b"/></svg>
       </div>
       <div class="wrap">
