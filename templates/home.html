@@ -103,7 +103,7 @@
       /* ---- Fixed nav: a strip of soot over everything ---- */
       .nav {
         position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 100;
-        background: rgba(29,15,10,0.9); backdrop-filter: blur(8px);
+        background: var(--soot);
         border-bottom: 1px solid rgba(236,223,201,0.12);
       }
       .nav__inner { width: min(1120px, 92vw); margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; }
@@ -143,6 +143,18 @@
            x in % of the width, y in px — so clip and strokes stay in register
            at any width. ---- */
       .sheet { --h: var(--edge); margin-top: calc(-1 * var(--h)); padding-top: calc(var(--line-top) + var(--gap-top)); isolation: isolate; }
+      /* Landing: a nav link parks the section's label 17px under the nav on
+         every device — the burnt edge above it slides under the nav instead of
+         eating the screen. --land is how far below the section's top that is
+         (0 for concerts, ~56px for the single's deep edge); the section is
+         then one LARGE viewport tall from there (lvh: on iOS Safari the page
+         shows through the floating bar too, so a small-viewport-tall section
+         let the neighbours in), with the next edge peeking at the bottom. */
+      .sheet {
+        --land: calc(var(--line-top) + var(--gap-top) - var(--nav-h) - 17px);
+        scroll-margin-top: calc(-1 * var(--land));
+        min-height: calc(100lvh - var(--peek) + var(--land));
+      }
       /* the element itself stays transparent — only the clipped ::before is ground */
       .sheet, .sheet.rust { background: none; }
       .sheet::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--ground); }
@@ -215,7 +227,10 @@
         width: 17.5em; justify-content: center;
       }
       .cue:hover { background: var(--flame); border-color: var(--flame); color: var(--soot); }
-      .single .cue { background: var(--soot); border-color: var(--soot); } /* translucent soot on paper reads as mud */
+      /* same button as the hero's cue; only the fill goes opaque — the hero's
+         translucent soot reads dark over the photo but as mud over the paper */
+      .single .cue { background: var(--soot); }
+      .single .cue:hover { background: var(--flame); }
       .cue .arr { animation: bob 1.6s ease-in-out infinite; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
@@ -237,7 +252,7 @@
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
       /* One section = one screen here too: the cover gives way to the height.
          What's left under it in the column is the desktop cue's corner. */
-      .single__cover-wrap { width: min(100%, calc(100svh - 400px)); justify-self: center; align-self: start; position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(29,15,10,0.42), 0 4px 12px rgba(29,15,10,0.25); }
+      .single__cover-wrap { width: min(100%, calc(100svh - 344px)); justify-self: center; align-self: start; position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(29,15,10,0.42), 0 4px 12px rgba(29,15,10,0.25); }
       /* The wrap fills the one-screen section, so the desktop cue (base .cue
          offsets) lands in the SAME on-screen spot as the hero's cue: bottom-left
          of the screen. Mobile uses a static cue in the release-date row instead. */
@@ -245,7 +260,7 @@
       /* +6px on both axes mirrors the hero photo's paper border, so both cues
          land on the exact same screen pixel */
       .cue--desktop { left: calc(clamp(14px, 2vw, 26px) + 6px); bottom: calc(clamp(14px, 2vw, 24px) + 6px); }
-      .cue--flow { position: static; width: auto; } /* mobile row cue keeps natural width */
+      .cue--flow { position: static; } /* mobile row cue: in the flow, same size as the hero's */
       .cue--mobile { display: none; }
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
       .release-row:empty { display: none; }
@@ -317,12 +332,12 @@
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; gap: 14px; }
         /* Phones: the whole single — label, cover, cue, title, text, button — is
-           one screen on every model. Everything but the cover has a fixed size
-           (~480px with the nav, burnt edges and the peek); the cover takes the
-           height that's left, up to 300px. */
+           one screen on every model. From the landed label down, everything but
+           the cover is a fixed ~370px; the cover takes what's left, up to 300px,
+           so the button stays above Safari's bar (svh) and clear of the next
+           section's edge (lvh − peek). */
         .single .section__eyebrow { margin-bottom: 12px; }
-        .single__cover-wrap { width: clamp(96px, calc(96svh - 520px), 300px); }
-        .single .cue--flow { padding: 9px 16px; }
+        .single__cover-wrap { width: clamp(72px, min(96svh - 374px, 96lvh - 462px), 300px); }
         .release-row { margin-bottom: 10px; }
         .single__lead { max-width: none; font-size: 14px; line-height: 1.45; margin: 12px 0 16px; }
         .cue--desktop { display: none; }
@@ -394,15 +409,7 @@
       }
       /* ≤380px wide the text wraps to a 4th line — 20px more for the cover to give */
       @media (max-width: 380px) {
-        .single__cover-wrap { width: clamp(96px, calc(96svh - 540px), 300px); }
-      }
-      /* the smallest phones with the browser bars out (SE in Safari): the label
-         and the «Концерты» cue go, the cover may shrink further — the button
-         still makes the screen */
-      @media (max-width: 760px) and (max-height: 600px) {
-        .single { --gap-top: 30px; } /* no label to make room for */
-        .single .section__eyebrow, .single .release-row { display: none; }
-        .single__cover-wrap { width: clamp(84px, calc(96svh - 434px), 300px); }
+        .single__cover-wrap { width: clamp(72px, min(96svh - 401px, 96lvh - 482px), 300px); }
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
