@@ -49,6 +49,11 @@
            the SVG viewBoxes — change them only together with those. */
         --edge-a: 100px; /* the burning edge that opens the presave */
         --edge: 44px;   /* the cold burnt edges further down */
+        /* Spacing is measured from the burnt LINE, not from the edge box it sits
+           in — the lines run at different depths (see --line-top below), so
+           box-based padding gave every section a different gap. */
+        --gap-top: 52px;    /* burnt line → section label */
+        --gap-bottom: 28px; /* last content → next section's burnt line */
         /* the band name's size — «Пламя» uses it too. Capped by height as well:
            on short, wide windows a width-only size ate the screen and squeezed
            the hero photo into a strip. */
@@ -137,14 +142,20 @@
            strokes (char, scorch, ember) are SVGs drawn with the same points —
            x in % of the width, y in px — so clip and strokes stay in register
            at any width. ---- */
-      .sheet { --h: var(--edge); margin-top: calc(-1 * var(--h)); padding-top: calc(max(var(--nav-h), var(--h)) + clamp(16px, 3vh, 36px)); isolation: isolate; }
+      .sheet { --h: var(--edge); margin-top: calc(-1 * var(--h)); padding-top: calc(var(--line-top) + var(--gap-top)); isolation: isolate; }
       /* the element itself stays transparent — only the clipped ::before is ground */
       .sheet, .sheet.rust { background: none; }
       .sheet::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--ground); }
       .sheet.rust::before { background: var(--rust) url("/static/home/plamya-rust.webp") center / cover no-repeat; }
       .sheet > .wrap { position: relative; z-index: 1; }
-      /* the next sheet slides up over this one's last --edge px — keep content clear of it */
-      .single, .concerts { padding-bottom: calc(var(--edge) + clamp(20px, 3.5vh, 40px)); }
+      /* Where each generated line runs, in px from its section's top: --line-top
+         is its lowest point under the label (left 30%), and the next line's
+         highest point sits 13px (cold edges) / 21px (the burning one) into its box.
+         Regenerate the paths → re-measure these. */
+      .single { --line-top: 81px; }
+      .concerts { --line-top: 25px; }
+      .listen { --line-top: 28px; }
+      .single, .concerts { padding-bottom: calc(var(--edge) - 13px + var(--gap-bottom)); }
       .burn { position: absolute; top: 0; left: 0; width: 100%; height: var(--h); pointer-events: none; z-index: 0; }
       .burn svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
       .burn use { fill: none; }
@@ -164,13 +175,12 @@
         58% { opacity: .8; } 71% { opacity: 1; } 86% { opacity: .86; } 100% { opacity: .82; }
       }
 
-      .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--ash-dim); margin-bottom: clamp(22px, 4vw, 40px); }
+      .section__eyebrow { display: flex; align-items: center; gap: 14px; color: var(--ash-dim); margin-bottom: clamp(18px, min(4vw, 4vh), 40px); }
       .section__eyebrow::after { content: ""; height: 2px; flex: 1; background: currentColor; opacity: 0.35; }
       .section__eyebrow small { font-size: inherit; font-weight: 500; opacity: 0.8; }
 
       /* ---- Hero: the unburnt sheet ---- */
-      /* the rim's highest point sits ~20px into the edge, so the photo clears it */
-      .hero { padding-bottom: calc(var(--edge-a) - 8px); }
+      .hero { padding-bottom: calc(var(--edge-a) - 21px + var(--gap-bottom)); }
       .hero.rust {
         background:
           radial-gradient(90% 55% at 72% 100%, rgba(255,122,34,0.34), rgba(255,122,34,0) 70%),
@@ -218,7 +228,9 @@
       }
       .single .section__eyebrow { color: var(--graphite); }
       .single__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
-      .single__cover-wrap { position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(29,15,10,0.42), 0 4px 12px rgba(29,15,10,0.25); }
+      /* One section = one screen here too: the cover gives way to the height.
+         What's left under it in the column is the desktop cue's corner. */
+      .single__cover-wrap { width: min(100%, calc(100svh - 400px)); justify-self: center; align-self: start; position: relative; transform: rotate(-2.5deg); box-shadow: 0 26px 60px rgba(29,15,10,0.42), 0 4px 12px rgba(29,15,10,0.25); }
       /* The wrap fills the one-screen section, so the desktop cue (base .cue
          offsets) lands in the SAME on-screen spot as the hero's cue: bottom-left
          of the screen. Mobile uses a static cue in the release-date row instead. */
@@ -239,7 +251,7 @@
       .single__text { container-type: inline-size; }
       .single__name { display: block; font-size: min(var(--display-xl), 25cqi); letter-spacing: -0.045em; line-height: 0.82; margin-left: -0.04em; }
       :lang(en) .single__name, :lang(zh) .single__name { font-size: min(var(--display-xl), 22.5cqi); }
-      .single__lead { max-width: 42ch; margin: clamp(16px, 2.2vw, 26px) 0 clamp(22px, 3.5vw, 34px); color: var(--graphite); font-size: clamp(15px, 1.9vw, 19px); }
+      .single__lead { max-width: 42ch; margin: clamp(12px, min(2.2vw, 3vh), 26px) 0 clamp(16px, min(3.5vw, 3.5vh), 34px); color: var(--graphite); font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts: back onto a rust sheet ---- */
       .concerts::before { clip-path: polygon(0.00% 17.6px,0.50% 18.5px,1.41% 17.7px,2.10% 17.2px,2.45% 17.8px,3.21% 17.5px,4.11% 19.0px,4.61% 19.0px,5.65% 22.4px,6.61% 22.8px,6.98% 22.1px,7.67% 21.8px,8.68% 22.9px,9.14% 24.3px,9.57% 24.7px,10.23% 23.4px,10.82% 23.2px,11.29% 21.7px,12.24% 22.3px,13.13% 22.4px,14.15% 24.8px,15.02% 24.7px,15.77% 24.7px,16.21% 23.9px,17.13% 22.9px,18.12% 24.6px,18.75% 22.4px,19.41% 21.8px,20.45% 20.6px,20.81% 19.2px,21.66% 21.2px,22.35% 18.9px,23.08% 19.2px,23.58% 18.6px,24.31% 18.5px,24.79% 17.1px,25.38% 19.7px,25.96% 18.9px,26.52% 17.6px,26.92% 20.2px,27.80% 19.3px,28.62% 20.6px,29.60% 21.8px,30.23% 21.9px,31.24% 20.5px,32.20% 19.9px,32.81% 19.0px,33.77% 18.5px,34.16% 20.5px,35.05% 19.5px,35.97% 18.3px,36.50% 19.2px,37.14% 19.0px,37.53% 19.6px,38.51% 21.8px,39.37% 20.0px,39.89% 21.3px,40.61% 20.1px,40.97% 18.2px,41.90% 19.1px,42.86% 17.3px,43.50% 16.5px,44.44% 14.7px,45.16% 14.0px,46.04% 12.8px,46.86% 15.8px,47.23% 14.8px,48.02% 15.9px,48.77% 14.5px,49.40% 17.2px,50.38% 15.3px,50.79% 15.4px,51.16% 16.7px,51.60% 18.3px,52.40% 16.2px,53.13% 17.0px,53.82% 16.7px,54.28% 16.7px,54.89% 18.5px,55.62% 16.5px,56.46% 19.5px,57.34% 19.7px,57.70% 18.9px,58.09% 20.2px,58.56% 20.4px,59.08% 20.8px,59.64% 19.2px,60.26% 20.5px,61.23% 21.0px,61.93% 22.0px,62.94% 20.5px,63.70% 21.5px,64.56% 22.5px,65.12% 21.2px,65.83% 20.3px,66.22% 20.8px,67.25% 18.9px,67.82% 20.8px,68.24% 17.9px,68.64% 20.4px,69.51% 19.6px,70.29% 18.8px,71.09% 20.9px,71.79% 21.4px,72.42% 21.5px,72.80% 22.6px,73.32% 23.9px,74.23% 24.6px,74.90% 23.4px,75.51% 24.5px,76.30% 26.4px,76.71% 25.0px,77.39% 26.1px,78.36% 26.9px,79.14% 27.5px,79.95% 28.7px,80.79% 29.1px,81.30% 30.4px,81.92% 30.2px,82.84% 32.3px,83.87% 29.9px,84.44% 31.1px,85.06% 30.6px,85.79% 30.3px,86.35% 32.8px,87.21% 30.7px,87.63% 32.0px,88.47% 29.0px,89.05% 30.0px,89.87% 28.5px,90.87% 28.6px,91.40% 30.3px,91.85% 29.9px,92.34% 29.9px,92.88% 29.5px,93.88% 30.4px,94.53% 31.3px,95.07% 30.2px,95.69% 30.8px,96.16% 33.1px,96.54% 32.7px,97.53% 32.5px,97.89% 31.9px,98.27% 32.2px,99.10% 31.1px,99.45% 32.1px,99.87% 31.5px,100.00% 31.5px,100% 100%,0 100%); }
@@ -296,8 +308,16 @@
         .poster__tix { font-size: 13px !important; }
       }
       @media (max-width: 760px) {
-        .single__grid { grid-template-columns: 1fr; }
-        .single__cover-wrap { max-width: 300px; margin: 0 auto; }
+        .single__grid { grid-template-columns: 1fr; gap: 14px; }
+        /* Phones: the whole single — label, cover, cue, title, text, button — is
+           one screen on every model. Everything but the cover has a fixed size
+           (~480px with the nav, burnt edges and the peek); the cover takes the
+           height that's left, up to 300px. */
+        .single .section__eyebrow { margin-bottom: 12px; }
+        .single__cover-wrap { width: clamp(96px, calc(96svh - 520px), 300px); }
+        .single .cue--flow { padding: 9px 16px; }
+        .release-row { margin-bottom: 10px; }
+        .single__lead { max-width: none; font-size: 14px; line-height: 1.45; margin: 12px 0 16px; }
         .cue--desktop { display: none; }
         .cue--mobile { display: inline-flex; }
         .poster-grid--desktop { display: none; }
@@ -308,7 +328,9 @@
         .concerts .wrap { width: min(1120px, 96vw); }
         /* The tour poster (and its «купить» art) was drawn green for the last
            single; a sepia pass pulls it onto the same kraft as the desktop posters. */
-        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px); margin: auto; background: var(--ash); border: 7px solid var(--ash); box-shadow: 0 16px 40px rgba(29,15,10,0.45); }
+        /* one screen, like the single: the poster (1080×1529 + 7px frame) gives way to
+           the height left after the label, the edges and the peek */
+        .tour-poster-mobile { position: relative; display: block; width: min(100%, 560px, calc((100svh - 232px) * 0.7063 + 14px)); margin: auto; background: var(--ash); border: 7px solid var(--ash); box-shadow: 0 16px 40px rgba(29,15,10,0.45); }
         .tour-poster-mobile img { display: block; width: 100%; height: auto; }
         .tour-poster-mobile img, .tour-poster-mobile__trigger { filter: sepia(0.7) saturate(0.95) hue-rotate(-12deg) brightness(0.92); }
         /* Each city's «купить» = its buyN image, dropped to the right of the row
@@ -362,6 +384,18 @@
         .hero__photo::after {
           background: url("/static/home/band-mobile.jpg") center / contain no-repeat;
         }
+      }
+      /* ≤380px wide the text wraps to a 4th line — 20px more for the cover to give */
+      @media (max-width: 380px) {
+        .single__cover-wrap { width: clamp(96px, calc(96svh - 540px), 300px); }
+      }
+      /* the smallest phones with the browser bars out (SE in Safari): the label
+         and the «Концерты» cue go, the cover may shrink further — the button
+         still makes the screen */
+      @media (max-width: 760px) and (max-height: 600px) {
+        .single { --gap-top: 30px; } /* no label to make room for */
+        .single .section__eyebrow, .single .release-row { display: none; }
+        .single__cover-wrap { width: clamp(84px, calc(96svh - 434px), 300px); }
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
@@ -708,32 +742,6 @@
         document.querySelectorAll(".lang-btn").forEach(function (b) {
           b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
         });
-      })();
-
-      // «Сингл «Пламя»» links: land with «Пресейв» just under the fixed nav (not
-      // the section's burnt top edge), and if the screen is too short to fit
-      // everything down to the presave button, scroll on until the button shows.
-      (function () {
-        var section = document.getElementById("single");
-        var label = section.querySelector(".section__eyebrow");
-        var button = section.querySelector(".single__cta .btn");
-        function target() {
-          var navH = document.getElementById("nav").offsetHeight;
-          var toLabel = label.getBoundingClientRect().top + window.scrollY - navH - 12;
-          var toButton = button.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 16;
-          return Math.max(toLabel, toButton);
-        }
-        document.querySelectorAll('a[href="#single"]').forEach(function (a) {
-          a.addEventListener("click", function (e) {
-            e.preventDefault();
-            var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            window.scrollTo({ top: target(), behavior: reduce ? "auto" : "smooth" });
-            if (history.replaceState) history.replaceState(null, "", "#single");
-          });
-        });
-        if (location.hash === "#single") {
-          window.addEventListener("load", function () { window.scrollTo(0, target()); });
-        }
       })();
 
       // Mobile nav toggle.
