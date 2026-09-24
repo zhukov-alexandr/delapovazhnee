@@ -49,6 +49,10 @@
            the SVG viewBoxes — change them only together with those. */
         --edge-a: 100px; /* the burning edge that opens the presave */
         --edge: 44px;   /* the cold burnt edges further down */
+        /* the band name's size — «Пламя» uses it too. Capped by height as well:
+           on short, wide windows a width-only size ate the screen and squeezed
+           the hero photo into a strip. */
+        --display-xl: clamp(44px, min(12.6vw, 19vh), 180px);
       }
 
       /* On the paper an orange ring is 1.8:1 — soot is what reads there. */
@@ -139,6 +143,8 @@
       .sheet::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--ground); }
       .sheet.rust::before { background: var(--rust) url("/static/home/plamya-rust.webp") center / cover no-repeat; }
       .sheet > .wrap { position: relative; z-index: 1; }
+      /* the next sheet slides up over this one's last --edge px — keep content clear of it */
+      .single, .concerts { padding-bottom: calc(var(--edge) + clamp(20px, 3.5vh, 40px)); }
       .burn { position: absolute; top: 0; left: 0; width: 100%; height: var(--h); pointer-events: none; z-index: 0; }
       .burn svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
       .burn use { fill: none; }
@@ -173,11 +179,11 @@
           var(--rust);
       }
       .hero__head { position: relative; }
-      .hero__title { font-size: clamp(44px, 12.6vw, 180px); letter-spacing: -0.03em; color: var(--ash); }
+      .hero__title { font-size: var(--display-xl); letter-spacing: -0.03em; color: var(--ash); }
       .hero__tag { position: absolute; top: 4px; right: 0; text-align: right; font-family: "Golos Text", sans-serif; font-weight: 600; color: var(--ash-dim); font-size: clamp(13px, 1.8vw, 18px); line-height: 1.3; }
       .hero__tag b { display: block; color: var(--flame); font-weight: 700; }
       .hero__photo {
-        position: relative; margin-top: clamp(22px, 3.5vw, 40px); flex: 1 1 auto; min-height: 0;
+        position: relative; margin-top: clamp(22px, 3.5vw, 40px); flex: 1 1 auto; min-height: clamp(180px, 34vh, 420px);
         background: var(--soot) url("/static/home/band.jpg") center 28% / cover no-repeat;
         border: 6px solid var(--ash); box-shadow: 0 22px 54px rgba(29,15,10,0.5);
       }
@@ -228,9 +234,11 @@
       .single__cta { display: flex; flex-wrap: wrap; gap: 12px; }
       .single__title { color: var(--soot); }
       .single__kicker { display: block; font-size: clamp(20px, 2.6vw, 34px); letter-spacing: -0.01em; color: var(--graphite); margin-bottom: 0.3em; }
-      .single__name { display: block; font-size: clamp(64px, 10.2vw, 148px); letter-spacing: -0.045em; line-height: 0.82; margin-left: -0.04em; }
-      /* Latin «PLAMYA» runs ~13% wider than «ПЛАМЯ» — scaled down to fit the column */
-      :lang(en) .single__name, :lang(zh) .single__name { font-size: clamp(56px, 8.9vw, 130px); }
+      /* same size as the band name, unless the text column is too narrow for it
+         (cqi = % of that column): «ПЛАМЯ» runs ~3.85em wide, Latin «PLAMYA» ~4.2em */
+      .single__text { container-type: inline-size; }
+      .single__name { display: block; font-size: min(var(--display-xl), 25cqi); letter-spacing: -0.045em; line-height: 0.82; margin-left: -0.04em; }
+      :lang(en) .single__name, :lang(zh) .single__name { font-size: min(var(--display-xl), 22.5cqi); }
       .single__lead { max-width: 42ch; margin: clamp(16px, 2.2vw, 26px) 0 clamp(22px, 3.5vw, 34px); color: var(--graphite); font-size: clamp(15px, 1.9vw, 19px); }
 
       /* ---- Concerts: back onto a rust sheet ---- */
@@ -290,8 +298,6 @@
       @media (max-width: 760px) {
         .single__grid { grid-template-columns: 1fr; }
         .single__cover-wrap { max-width: 300px; margin: 0 auto; }
-        .single__name { font-size: 21vw; }
-        :lang(en) .single__name, :lang(zh) .single__name { font-size: 18.5vw; }
         .cue--desktop { display: none; }
         .cue--mobile { display: inline-flex; }
         .poster-grid--desktop { display: none; }
@@ -442,7 +448,7 @@
           <div class="single__cover-wrap">
             <img class="single__cover" src="/static/home/plamya.webp" width="852" height="852" data-i18n-attr="alt:single_cover_alt" alt="Обложка сингла «Пламя»: горящий лист бумаги поверх страницы с рукописным текстом">
           </div>
-          <div>
+          <div class="single__text">
             <div class="release-row"><!-- Restore before the next single: release-date badge. (i18n key "release_date" is kept in the dictionary for restoration.) <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span> --><a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a></div>
             <h2 class="display single__title" data-i18n-html="single_title"><span class="single__kicker">Новый сингл</span><span class="single__name">Пламя</span></h2>
             <p class="single__lead" data-i18n="single_lead">Сохрани сингл заранее — он придёт в твой плейлист в день выхода. И чем больше пресейвов, тем выше песня поднимется в стримингах.</p>
@@ -702,6 +708,32 @@
         document.querySelectorAll(".lang-btn").forEach(function (b) {
           b.addEventListener("click", function () { apply(b.getAttribute("data-lang")); });
         });
+      })();
+
+      // «Сингл «Пламя»» links: land with «Пресейв» just under the fixed nav (not
+      // the section's burnt top edge), and if the screen is too short to fit
+      // everything down to the presave button, scroll on until the button shows.
+      (function () {
+        var section = document.getElementById("single");
+        var label = section.querySelector(".section__eyebrow");
+        var button = section.querySelector(".single__cta .btn");
+        function target() {
+          var navH = document.getElementById("nav").offsetHeight;
+          var toLabel = label.getBoundingClientRect().top + window.scrollY - navH - 12;
+          var toButton = button.getBoundingClientRect().bottom + window.scrollY - window.innerHeight + 16;
+          return Math.max(toLabel, toButton);
+        }
+        document.querySelectorAll('a[href="#single"]').forEach(function (a) {
+          a.addEventListener("click", function (e) {
+            e.preventDefault();
+            var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            window.scrollTo({ top: target(), behavior: reduce ? "auto" : "smooth" });
+            if (history.replaceState) history.replaceState(null, "", "#single");
+          });
+        });
+        if (location.hash === "#single") {
+          window.addEventListener("load", function () { window.scrollTo(0, target()); });
+        }
       })();
 
       // Mobile nav toggle.
