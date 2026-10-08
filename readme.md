@@ -23,6 +23,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 Открыть:
 - `/` — **игра** (открывается сразу);
 - `/home` — **лендинг** (старый сайт);
+- `/tickets` — **билеты**: все концерты тура, у каждого своя кнопка;
 - `/admin` — **дашборд/админка** (логин из `.env`).
 
 ## Переменные окружения (`.env`)
@@ -98,10 +99,10 @@ node tests/js/sprites.smoke.mjs           # рендер-функции (no-cras
 ```
 main.py                # FastAPI: роуты, монтирование статики, инициализация схемы
 server/                # config, ab (50/50), db, metrics (Bayes+Fisher), qr, api, admin
-templates/             # game.html, home.html (лендинг), admin_login.html, admin.html
+templates/             # game.html, home.html (лендинг), tickets.html (билеты), admin_login.html, admin.html
 static/js/             # config, physics, obstacles, ab, gamestate, sprites, game, audio, boot, selftest
 static/css/            # game.css (закат), admin.css (простой)
-static/home/           # ассеты лендинга (styles.css, resources/, фавиконки)
+static/home/           # ассеты лендинга и страницы билетов (site.css, site.js, афиши, фавиконки)
 tests/                 # pytest (бэкенд) + tests/js (node)
 db/                    # sqlite (создаётся автоматически; в .gitignore)
 ```

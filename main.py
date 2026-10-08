@@ -37,6 +37,13 @@ def create_app(settings: Settings) -> FastAPI:
     def home_page():
         return FileResponse(BASE_DIR / "templates" / "home.html")
 
+    # Tickets: every concert of the tour with its own buy button. A plain file
+    # too, for the same reason as the landing.
+    @app.get("/tickets", response_class=HTMLResponse)
+    @app.get("/tickets/", response_class=HTMLResponse)
+    def tickets_page():
+        return FileResponse(BASE_DIR / "templates" / "tickets.html")
+
     # Old landing path → root, so existing /home links keep working.
     @app.get("/home", response_class=HTMLResponse)
     @app.get("/home/", response_class=HTMLResponse)
@@ -63,7 +70,7 @@ def create_app(settings: Settings) -> FastAPI:
     async def _no_cache(request: Request, call_next):
         response = await call_next(request)
         path = request.url.path
-        if path.startswith("/static/") or path in ("/", "/game", "/game/"):
+        if path.startswith("/static/") or path in ("/", "/game", "/game/", "/tickets", "/tickets/"):
             response.headers["Cache-Control"] = "no-cache"
         return response
 

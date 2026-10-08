@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Билеты – Дела поважнее</title>
+    <meta name="description" content="Билеты на концерты группы «Дела поважнее»: презентация альбома «Сочинение». Бунырево, Уфа, Екатеринбург, Новосибирск, Алматы, Астана, Москва, Санкт-Петербург.">
+    <meta name="theme-color" content="#000000">
+    <meta property="og:site_name" content="Дела поважнее">
+    <link rel="icon" href="/static/home/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/home/icon-192.png">
+    <link rel="apple-touch-icon" href="/static/home/apple-touch-icon.png">
+    <link rel="manifest" href="/static/home/site.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Roboto+Condensed:ital,wght@0,400;0,600;1,500;1,600&display=swap">
+    <link rel="stylesheet" href="/static/home/site.css">
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+        ym(98554115, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/98554115" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+
+    <style>
+      /* The tour, one concert per row, in date order — the poster's own list
+         (date · city · venue) with each concert's poster beside it and its way
+         in at the end of the line. Palette, type, nav and buttons come from
+         /static/home/site.css (shared with the landing). */
+      .tickets { padding: calc(var(--nav-h) + clamp(28px, 6vh, 64px)) 0 clamp(40px, 8vh, 88px); }
+      .tickets__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: clamp(26px, 4vw, 46px); }
+      .tickets__title { font-size: clamp(52px, 10vw, 132px); }
+      .tickets__sub { margin-top: 14px; font-size: clamp(15px, 1.8vw, 20px); line-height: 1.2; color: var(--pencil); }
+      .tickets__mark { flex: 0 0 auto; width: clamp(96px, 15vw, 190px); height: auto; transform: rotate(-3deg); margin-bottom: 6px; }
+
+      .gigs { list-style: none; }
+      .gig {
+        position: relative; display: grid; grid-template-columns: clamp(104px, 13vw, 150px) minmax(0, 1fr);
+        column-gap: clamp(18px, 3.2vw, 44px); align-items: center; padding: clamp(24px, 3.2vw, 38px) 0;
+      }
+      /* every row is ruled off with a crossed-out pencil line */
+      .gig::before { content: ""; position: absolute; left: -1.5%; right: -1.5%; top: -9px; height: 18px; pointer-events: none; background: var(--strike-1) center / 100% 100% no-repeat; opacity: 0.45; }
+      .gig:nth-child(3n + 2)::before { background-image: var(--strike-2); }
+      .gig:nth-child(3n)::before { background-image: var(--strike-3); }
+      .gig__poster { display: block; width: 100%; height: auto; outline: 1px solid var(--rule); transform: rotate(-1.5deg); }
+      .gig:nth-child(even) .gig__poster { transform: rotate(1.5deg); }
+      .gig__lines { display: grid; gap: clamp(20px, 2.6vw, 30px); }
+      .gig__line { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) auto; column-gap: clamp(16px, 3vw, 40px); align-items: center; }
+      .gig__when { font-size: clamp(18px, 2.1vw, 24px); line-height: 1.15; }
+      .gig__when small { display: block; font-size: 0.8em; color: var(--pencil); }
+      .gig__city { font-size: clamp(26px, 3.7vw, 48px); line-height: 0.95; overflow-wrap: anywhere; }
+      .gig__venue { margin-top: 7px; font-size: clamp(14px, 1.5vw, 17px); line-height: 1.25; color: var(--pencil); }
+      .gig__action { display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
+      .gig__note { font-weight: 600; font-size: clamp(15px, 1.7vw, 18px); line-height: 1.2; }
+      .gig__action .btn { min-width: 10em; }
+      /* TicketsCloud (tcwidget.js) wires the click via data-tc-event and tries to
+         restyle the button; !important keeps it the same button as the others. */
+      .gig__tix { appearance: none; margin: 0 !important; width: auto !important; height: auto !important; min-height: 0 !important; max-height: none !important; font-family: "Roboto Condensed", sans-serif !important; font-style: italic !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; font-size: clamp(15px, 1.7vw, 17px) !important; line-height: 1.2 !important; color: var(--black) !important; text-shadow: none !important; background: var(--chalk) !important; border: 2px solid var(--chalk) !important; border-radius: 0 !important; padding: 15px 28px !important; box-shadow: none !important; }
+      .gig__tix:hover { background: transparent !important; color: var(--chalk) !important; }
+
+      .tickets__foot { position: relative; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding-top: clamp(24px, 3.2vw, 38px); font-size: 14px; color: var(--pencil); }
+      .tickets__foot::before { content: ""; position: absolute; left: -1.5%; right: -1.5%; top: -9px; height: 18px; pointer-events: none; background: var(--strike-2) center / 100% 100% no-repeat; opacity: 0.45; }
+      .tickets__foot a { color: var(--chalk); text-decoration: none; font-size: 15px; border-bottom: 2px solid var(--chalk); padding-bottom: 3px; }
+
+      @media (max-width: 760px) {
+        .tickets__head { align-items: center; }
+        .gig { grid-template-columns: 30vw minmax(0, 1fr); align-items: start; column-gap: 16px; }
+        .gig__line { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+        .gig__when small { display: inline; margin-left: 0.6em; }
+        .gig__action { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px 12px; margin-top: 8px; }
+        .gig__action .btn { min-width: 0; padding: 12px 20px; }
+        .gig__tix { padding: 12px 20px !important; }
+      }
+    </style>
+</head>
+<body>
+    <nav class="nav" id="nav">
+      <div class="nav__inner">
+        <a class="nav__brand" href="/"><span class="wordmark" aria-hidden="true"></span><span class="visually-hidden" data-i18n="logo_alt">Дела поважнее</span></a>
+        <div class="nav__right">
+          <div class="nav__links" id="nav-links">
+            <a href="/#release" data-i18n="nav_release">Альбом «Сочинение»</a>
+            <a href="/#concerts" data-i18n="nav_concerts">Концерты</a>
+            <a href="/tickets" aria-current="page" data-i18n="nav_tickets">Билеты</a>
+            <a href="/#listen" data-i18n="nav_listen">Слушать</a>
+            <a href="/game" data-i18n="nav_play">Играть →</a>
+          </div>
+          <div class="lang-switch" role="group" aria-label="Язык / Language / 语言">
+            <button type="button" class="lang-btn" data-lang="ru">RU</button>
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="zh">中文</button>
+          </div>
+          <button class="nav__toggle" data-i18n-attr="aria-label:nav_menu" aria-label="Меню" aria-expanded="false" aria-controls="nav-links">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="wrap tickets">
+      <header class="tickets__head">
+        <div>
+          <h1 class="tickets__title display" data-i18n="h1">Билеты</h1>
+          <p class="tickets__sub listing" data-i18n="sub">Презентация альбома «Сочинение»</p>
+        </div>
+        <img class="tickets__mark" src="/static/home/mark.webp" width="760" height="610" alt="">
+      </header>
+
+      <ol class="gigs">
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-myata.webp" width="640" height="800" loading="lazy" data-i18n-attr="alt:myata_alt" alt="Афиша концерта в Бунырево, 24 октября, арткэмп «Дикой мяты», вход свободный">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="myata_when">24 октября</span><small data-i18n="myata_time">21:00</small></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="myata_city">Бунырево</h2>
+                <p class="gig__venue listing" data-i18n="myata_venue">Арткэмп «Дикой мяты»</p>
+              </div>
+              <div class="gig__action"><span class="gig__note listing" data-i18n="free">Вход свободный</span><a class="btn btn--line" href="https://wmcamp.ru/#concert" target="_blank" rel="noopener" data-i18n="about">О концерте</a></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-ufa.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:ufa_alt" alt="Афиша концерта в Уфе, 31 октября, MusicHall27">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="ufa_when">31 октября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="ufa_city">Уфа</h2>
+                <p class="gig__venue listing" data-i18n="ufa_venue">MusicHall27, ул. Кирова, 27</p>
+              </div>
+              <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a46a070983da59ac77d8ccd" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-ekb.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:ekb_alt" alt="Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="ekb_when">1 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="ekb_city">Екатеринбург</h2>
+                <p class="gig__venue listing" data-i18n="ekb_venue">Корчма «Пристанище», ул. Бебеля, 124</p>
+              </div>
+              <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a4b6ed19f4bf9931aca2868" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-nsk.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:nsk_alt" alt="Афиша концерта в Новосибирске, 3 ноября, The Rooks">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="nsk_when">3 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="nsk_city">Новосибирск</h2>
+                <p class="gig__venue listing" data-i18n="nsk_venue">The Rooks, ул. Коммунистическая, 45</p>
+              </div>
+              <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a7085d06d1bdc42b48fdf81" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-kz.webp" width="640" height="800" loading="lazy" data-i18n-attr="alt:kz_alt" alt="Афиша концертов в Казахстане: 6 ноября — Алматы, фестиваль «Шабаш»; 7 ноября — Астана, клуб Overhead">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="almaty_when">6 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="almaty_city">Алматы</h2>
+                <p class="gig__venue listing" data-i18n="almaty_venue">Фестиваль «Шабаш»</p>
+              </div>
+              <div class="gig__action"><a class="btn btn--fill" href="https://ticketon.kz/concerts/event/tckt2-dela-povazhnee-shabash-almaty" target="_blank" rel="noopener" data-i18n="tickets">Билеты</a></div>
+            </div>
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="astana_when">7 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="astana_city">Астана</h2>
+                <p class="gig__venue listing" data-i18n="astana_venue">Overhead! Club</p>
+              </div>
+              <div class="gig__action"><a class="btn btn--fill" href="https://ticketon.kz/concerts/event/tckt2-dela-povazhnee-shabash-astana" target="_blank" rel="noopener" data-i18n="tickets">Билеты</a></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-msk.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:msk_alt" alt="Афиша концерта в Москве, 18 ноября, Урбан">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="msk_when">18 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="msk_city">Москва</h2>
+                <p class="gig__venue listing" data-i18n="msk_venue">Урбан, ул. Б. Новодмитровская, 36с24</p>
+              </div>
+              <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a186cb9dd25944b28dbb181" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
+            </div>
+          </div>
+        </li>
+        <li class="gig">
+          <img class="gig__poster" src="/static/home/tour-spb.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:spb_alt" alt="Афиша концерта в Санкт-Петербурге, 21 ноября, Ритмы">
+          <div class="gig__lines">
+            <div class="gig__line">
+              <p class="gig__when listing"><span data-i18n="spb_when">21 ноября</span></p>
+              <div class="gig__where">
+                <h2 class="gig__city display" data-i18n="spb_city">Санкт-Петербург</h2>
+                <p class="gig__venue listing" data-i18n="spb_venue">Ритмы, Кожевенная линия, 34</p>
+              </div>
+              <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a19b3b6f4606596ec821030" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
+            </div>
+          </div>
+        </li>
+      </ol>
+
+      <footer class="tickets__foot">
+        <span data-i18n="footer_copy">© Дела поважнее, 2026</span>
+        <a class="listing" href="/" data-i18n="footer_home">На главную</a>
+      </footer>
+    </main>
+
+    <script>
+      // Dictionary for /static/home/site.js (the i18n engine, shared with the
+      // landing). Names are transliterated, not translated.
+      window.DP_I18N = {
+        ru: {
+          title: "Билеты – Дела поважнее",
+          meta_desc: "Билеты на концерты группы «Дела поважнее»: презентация альбома «Сочинение». Бунырево, Уфа, Екатеринбург, Новосибирск, Алматы, Астана, Москва, Санкт-Петербург.",
+          logo_alt: "Дела поважнее", nav_menu: "Меню",
+          nav_release: "Альбом «Сочинение»", nav_concerts: "Концерты", nav_tickets: "Билеты", nav_listen: "Слушать", nav_play: "Играть →",
+          h1: "Билеты", sub: "Презентация альбома «Сочинение»",
+          tickets: "Билеты", free: "Вход свободный", about: "О концерте",
+          myata_when: "24 октября", myata_time: "21:00", myata_city: "Бунырево", myata_venue: "Арткэмп «Дикой мяты»",
+          myata_alt: "Афиша концерта в Бунырево, 24 октября, арткэмп «Дикой мяты», вход свободный",
+          ufa_when: "31 октября", ufa_city: "Уфа", ufa_venue: "MusicHall27, ул. Кирова, 27", ufa_alt: "Афиша концерта в Уфе, 31 октября, MusicHall27",
+          ekb_when: "1 ноября", ekb_city: "Екатеринбург", ekb_venue: "Корчма «Пристанище», ул. Бебеля, 124", ekb_alt: "Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»",
+          nsk_when: "3 ноября", nsk_city: "Новосибирск", nsk_venue: "The Rooks, ул. Коммунистическая, 45", nsk_alt: "Афиша концерта в Новосибирске, 3 ноября, The Rooks",
+          almaty_when: "6 ноября", almaty_city: "Алматы", almaty_venue: "Фестиваль «Шабаш»",
+          astana_when: "7 ноября", astana_city: "Астана", astana_venue: "Overhead! Club",
+          kz_alt: "Афиша концертов в Казахстане: 6 ноября — Алматы, фестиваль «Шабаш»; 7 ноября — Астана, клуб Overhead",
+          msk_when: "18 ноября", msk_city: "Москва", msk_venue: "Урбан, ул. Б. Новодмитровская, 36с24", msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
+          spb_when: "21 ноября", spb_city: "Санкт-Петербург", spb_venue: "Ритмы, Кожевенная линия, 34", spb_alt: "Афиша концерта в Санкт-Петербурге, 21 ноября, Ритмы",
+          footer_copy: "© Дела поважнее, 2026", footer_home: "На главную"
+        },
+        en: {
+          title: "Tickets – Dela povazhnee",
+          meta_desc: "Tickets for Dela povazhnee shows: the «Sochinenie» album presentation. Bunyrevo, Ufa, Ekaterinburg, Novosibirsk, Almaty, Astana, Moscow, Saint Petersburg.",
+          logo_alt: "Dela povazhnee", nav_menu: "Menu",
+          nav_release: "Album «Sochinenie»", nav_concerts: "Shows", nav_tickets: "Tickets", nav_listen: "Listen", nav_play: "Play →",
+          h1: "Tickets", sub: "«Sochinenie» album presentation",
+          tickets: "Tickets", free: "Free entry", about: "About the show",
+          myata_when: "October 24", myata_time: "21:00", myata_city: "Bunyrevo", myata_venue: "Dikaya Myata art camp",
+          myata_alt: "Bunyrevo show poster, October 24, Dikaya Myata art camp, free entry",
+          ufa_when: "October 31", ufa_city: "Ufa", ufa_venue: "MusicHall27, Kirova 27", ufa_alt: "Ufa show poster, October 31, MusicHall27",
+          ekb_when: "November 1", ekb_city: "Ekaterinburg", ekb_venue: "Pristanishche, Bebelya 124", ekb_alt: "Ekaterinburg show poster, November 1, Pristanishche",
+          nsk_when: "November 3", nsk_city: "Novosibirsk", nsk_venue: "The Rooks, Kommunisticheskaya 45", nsk_alt: "Novosibirsk show poster, November 3, The Rooks",
+          almaty_when: "November 6", almaty_city: "Almaty", almaty_venue: "Shabash festival",
+          astana_when: "November 7", astana_city: "Astana", astana_venue: "Overhead! Club",
+          kz_alt: "Kazakhstan shows poster: November 6 — Almaty, Shabash festival; November 7 — Astana, Overhead club",
+          msk_when: "November 18", msk_city: "Moscow", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_alt: "Moscow show poster, November 18, Urban",
+          spb_when: "November 21", spb_city: "Saint Petersburg", spb_venue: "Ritmy, Kozhevennaya liniya 34", spb_alt: "Saint Petersburg show poster, November 21, Ritmy",
+          footer_copy: "© Dela povazhnee, 2026", footer_home: "Home"
+        },
+        zh: {
+          title: "购票 – Dela povazhnee",
+          meta_desc: "Dela povazhnee 演出门票：专辑《Sochinenie》首演。Bunyrevo、乌法、叶卡捷琳堡、新西伯利亚、阿拉木图、阿斯塔纳、莫斯科、圣彼得堡。",
+          logo_alt: "Dela povazhnee", nav_menu: "菜单",
+          nav_release: "专辑《Sochinenie》", nav_concerts: "演出", nav_tickets: "购票", nav_listen: "收听", nav_play: "开始游戏 →",
+          h1: "购票", sub: "专辑《Sochinenie》首演",
+          tickets: "购票", free: "免费入场", about: "演出详情",
+          myata_when: "10月24日", myata_time: "21:00", myata_city: "Bunyrevo", myata_venue: "Dikaya Myata 艺术营",
+          myata_alt: "Bunyrevo 演出海报，10月24日，Dikaya Myata 艺术营，免费入场",
+          ufa_when: "10月31日", ufa_city: "乌法", ufa_venue: "MusicHall27, Kirova 27", ufa_alt: "乌法演出海报，10月31日，MusicHall27",
+          ekb_when: "11月1日", ekb_city: "叶卡捷琳堡", ekb_venue: "Pristanishche, Bebelya 124", ekb_alt: "叶卡捷琳堡演出海报，11月1日，Pristanishche",
+          nsk_when: "11月3日", nsk_city: "新西伯利亚", nsk_venue: "The Rooks, Kommunisticheskaya 45", nsk_alt: "新西伯利亚演出海报，11月3日，The Rooks",
+          almaty_when: "11月6日", almaty_city: "阿拉木图", almaty_venue: "Shabash 音乐节",
+          astana_when: "11月7日", astana_city: "阿斯塔纳", astana_venue: "Overhead! Club",
+          kz_alt: "哈萨克斯坦演出海报：11月6日 — 阿拉木图，Shabash 音乐节；11月7日 — 阿斯塔纳，Overhead 俱乐部",
+          msk_when: "11月18日", msk_city: "莫斯科", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_alt: "莫斯科演出海报，11月18日，Urban",
+          spb_when: "11月21日", spb_city: "圣彼得堡", spb_venue: "Ritmy, Kozhevennaya liniya 34", spb_alt: "圣彼得堡演出海报，11月21日，Ritmy",
+          footer_copy: "© Dela povazhnee, 2026", footer_home: "返回首页"
+        }
+      };
+    </script>
+    <script src="/static/home/site.js"></script>
+    <!-- UTM passthrough: campaign tags on this page's URL ride along into
+         the TicketsCloud checkout, so a ticket sale is attributed to the ad that
+         brought the visitor. Deliberately NOT wrapped in DOMContentLoaded — that
+         fires after the widget script below has already run; a plain sync script
+         here lands between the parsed buttons and the widget. The landing sends
+         its tags here in the /tickets link and in sessionStorage (site.js). -->
+    <script>
+      (function () {
+        // utm_source stays pinned to "site" in the markup — this page IS the source.
+        var KEYS = ["utm_medium", "utm_campaign", "utm_content", "utm_term"];
+        var STORE = "dp_utm";
+        var params = new URLSearchParams(location.search);
+        var utm = {};
+        KEYS.forEach(function (k) {
+          var v = params.get(k);
+          if (v) utm[k] = v.slice(0, 200); // cap absurd values; setAttribute can't inject markup
+        });
+        try {
+          if (Object.keys(utm).length) {
+            sessionStorage.setItem(STORE, JSON.stringify(utm));
+          } else {
+            var saved = JSON.parse(sessionStorage.getItem(STORE) || "{}");
+            if (saved && typeof saved === "object") utm = saved;
+          }
+        } catch (_) { /* private mode / storage off — tags from this URL still apply */ }
+        // Nothing to pass: the source tag already hard-coded on each button stands.
+        if (!Object.keys(utm).length) return;
+        document.querySelectorAll("[data-tc-event]").forEach(function (btn) {
+          KEYS.forEach(function (k) {
+            if (utm[k]) btn.setAttribute("data-tc-" + k, utm[k]);
+          });
+        });
+      })();
+    </script>
+    <script src="https://ticketscloud.com/static/scripts/widget/tcwidget.js"></script>
+</body>
+</html>

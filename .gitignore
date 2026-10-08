@@ -14,3 +14,7 @@ __pycache__/
 db/
 .env
 .pytest_cache/
+# Тяжёлые исходники дизайна (31 и 4 МБ): на сайт идут их сжатые копии
+# static/home/tour-*.webp, sochinenie.webp, mark.webp, sochinenie-ground.webp.
+static/home/Сочинение@2x.png
+static/home/обложка (1).jpeg

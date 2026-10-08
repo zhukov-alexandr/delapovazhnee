@@ -19,3 +19,10 @@ deploy
 *.md
 static/assets
 static/home/cover.*
+# Исходники афиш и обложек — в образ идут только их сжатые .webp-копии
+# (tour-*.webp, sochinenie.webp, mark.webp, sochinenie-ground.webp).
+static/home/Сочинение@2x.png
+static/home/обложка (1).jpeg
+static/home/казахстан.jpeg
+static/home/мята.jpeg
+static/home/* а4.png
