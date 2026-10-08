@@ -55,6 +55,9 @@
       .gig__when small { display: block; font-size: 0.8em; color: var(--pencil); }
       .gig__city { font-size: clamp(26px, 3.7vw, 48px); line-height: 0.95; overflow-wrap: anywhere; }
       .gig__venue { margin-top: 7px; font-size: clamp(14px, 1.5vw, 17px); line-height: 1.25; color: var(--pencil); }
+      /* what this concert is, where it differs from the page's heading (Bunyrevo
+         is not the album presentation) — in the type's own cream, so it's read */
+      .gig__program { margin-top: 5px; font-size: clamp(14px, 1.5vw, 17px); line-height: 1.25; font-weight: 600; }
       .gig__action { display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
       .gig__note { font-weight: 600; font-size: clamp(15px, 1.7vw, 18px); line-height: 1.2; }
       .gig__action .btn { min-width: 10em; }
@@ -120,6 +123,7 @@
               <div class="gig__where">
                 <h2 class="gig__city display" data-i18n="myata_city">Бунырево</h2>
                 <p class="gig__venue listing" data-i18n="myata_venue">Арткэмп «Дикой мяты»</p>
+                <p class="gig__program listing" data-i18n="myata_program">Не презентация: играем любимые песни</p>
               </div>
               <div class="gig__action"><span class="gig__note listing" data-i18n="free">Вход свободный</span><a class="btn btn--line" href="https://wmcamp.ru/#concert" target="_blank" rel="noopener" data-i18n="about">О концерте</a></div>
             </div>
@@ -231,6 +235,7 @@
           h1: "Билеты", sub: "Презентация альбома «Сочинение»",
           tickets: "Билеты", free: "Вход свободный", about: "О концерте",
           myata_when: "24 октября", myata_time: "21:00", myata_city: "Бунырево", myata_venue: "Арткэмп «Дикой мяты»",
+          myata_program: "(Любимые песни)",
           myata_alt: "Афиша концерта в Бунырево, 24 октября, арткэмп «Дикой мяты», вход свободный",
           ufa_when: "31 октября", ufa_city: "Уфа", ufa_venue: "MusicHall27, ул. Кирова, 27", ufa_alt: "Афиша концерта в Уфе, 31 октября, MusicHall27",
           ekb_when: "1 ноября", ekb_city: "Екатеринбург", ekb_venue: "Корчма «Пристанище», ул. Бебеля, 124", ekb_alt: "Афиша концерта в Екатеринбурге, 1 ноября, корчма «Пристанище»",
@@ -250,6 +255,7 @@
           h1: "Tickets", sub: "«Sochinenie» album presentation",
           tickets: "Tickets", free: "Free entry", about: "About the show",
           myata_when: "October 24", myata_time: "21:00", myata_city: "Bunyrevo", myata_venue: "Dikaya Myata art camp",
+          myata_program: "Not the album presentation: we play the favourites",
           myata_alt: "Bunyrevo show poster, October 24, Dikaya Myata art camp, free entry",
           ufa_when: "October 31", ufa_city: "Ufa", ufa_venue: "MusicHall27, Kirova 27", ufa_alt: "Ufa show poster, October 31, MusicHall27",
           ekb_when: "November 1", ekb_city: "Ekaterinburg", ekb_venue: "Pristanishche, Bebelya 124", ekb_alt: "Ekaterinburg show poster, November 1, Pristanishche",
@@ -269,6 +275,7 @@
           h1: "购票", sub: "专辑《Sochinenie》首演",
           tickets: "购票", free: "免费入场", about: "演出详情",
           myata_when: "10月24日", myata_time: "21:00", myata_city: "Bunyrevo", myata_venue: "Dikaya Myata 艺术营",
+          myata_program: "非专辑首演：演唱大家喜爱的歌曲",
           myata_alt: "Bunyrevo 演出海报，10月24日，Dikaya Myata 艺术营，免费入场",
           ufa_when: "10月31日", ufa_city: "乌法", ufa_venue: "MusicHall27, Kirova 27", ufa_alt: "乌法演出海报，10月31日，MusicHall27",
           ekb_when: "11月1日", ekb_city: "叶卡捷琳堡", ekb_venue: "Pristanishche, Bebelya 124", ekb_alt: "叶卡捷琳堡演出海报，11月1日，Pristanishche",

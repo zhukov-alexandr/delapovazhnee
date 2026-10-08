@@ -151,6 +151,18 @@ def test_dikaya_myata_is_free_entry_with_a_link_to_the_festival(client):
     assert ">Билеты<" not in line
 
 
+def test_only_bunyrevo_is_marked_as_not_the_album_presentation(client):
+    # The page is headed «Презентация альбома «Сочинение»», and Bunyrevo is the
+    # one concert that isn't: it gets a note saying what is played instead.
+    html = client.get("/tickets").text
+    lines = html.split('<div class="gig__line">')[1:]
+    noted = [l for l in lines if "gig__program" in l]
+
+    assert len(noted) == 1
+    assert ">Бунырево</h2>" in noted[0]
+    assert "Не презентация: играем любимые песни" in noted[0]
+
+
 def test_landing_sends_ticket_buyers_to_the_tickets_page(client):
     html = client.get("/").text
     section = html.split('<section id="concerts"', 1)[1].split("</section>", 1)[0]
