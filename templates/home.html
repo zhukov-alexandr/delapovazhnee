@@ -117,21 +117,20 @@
       .cue .arr { animation: bob 1.6s ease-in-out infinite; font-style: normal; }
       @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
-      /* ---- Single ---- */
+      /* ---- Release (the album) ---- */
       .release__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: center; }
       /* One section = one screen here too: the cover gives way to the height.
          What's left under it in the column is the desktop cue's corner. */
       .release__cover-wrap { width: min(100%, calc(100svh - 344px)); justify-self: center; align-self: start; position: relative; transform: rotate(-2.5deg); }
       /* the sleeve is the same black as the page — a hairline keeps its edge */
       .release__cover { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; display: block; background: var(--black); outline: 1px solid var(--rule); }
-      /* The wrap fills the one-screen section, so the desktop cue lands in the
-         SAME on-screen spot as the hero's cue: bottom-left of the screen. Mobile
-         uses a static cue in the release-date row instead. */
+      /* The wrap fills the one-screen section, so the cue to the next section
+         lands where the hero's cue is: bottom-left of the screen. */
       .release .wrap { flex: 1 1 auto; position: relative; }
-      .cue--desktop { bottom: 0; left: clamp(14px, 2vw, 26px); }
-      .cue--flow { position: static; } /* mobile row cue: in the flow, same size as the hero's */
-      .cue--mobile { display: none; }
+      .release__cue { bottom: 0; left: clamp(14px, 2vw, 26px); }
+      #single { position: absolute; top: 0; } /* old anchor: lands exactly where #release does */
       .release-row { display: flex; align-items: stretch; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+      .release-row:empty { display: none; } /* nothing in it until a release-date badge comes back */
       .release__cta { display: flex; flex-wrap: wrap; gap: 12px; }
       .release__title + .release__cta { margin-top: clamp(20px, min(3.5vw, 4vh), 34px); } /* no lead above it */
       .release__kicker { display: block; font-family: "Roboto Condensed", sans-serif; font-weight: 500; letter-spacing: 0.03em; line-height: 1.1; font-size: clamp(18px, 2.2vw, 28px); color: var(--pencil); margin-bottom: 0.45em; }
@@ -147,12 +146,40 @@
            above the torn faces (the hero already shows the band); phones get the
            whole vertical sheet. One button leads to /tickets. ---- */
       .concerts .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-      .tour-row { display: flex; align-items: flex-end; gap: clamp(20px, 3.5vw, 44px); margin-block: auto; }
-      /* the poster gives way to the height, like the album cover: 2000×1316 */
-      .tour { display: block; flex: 0 1 auto; width: min(100%, calc((100svh - 262px) * 1.5198)); }
-      .tour img { display: block; width: 100%; height: auto; }
-      .tour__cta { flex: 0 0 auto; padding-bottom: 4px; }
-      .tour__cta .btn { min-width: 11em; font-size: clamp(17px, 1.9vw, 20px); padding: 18px 30px; }
+      .concerts .section__eyebrow { margin-bottom: 4px; } /* the poster brings its own top margin */
+      .tour-row { display: flex; align-items: stretch; gap: clamp(14px, 1.8vw, 24px); margin-block: auto; }
+      /* Desktop poster (tour-d.webp, 2000×1276): the sheet's type with a margin
+         of its handwriting around it — 3.08% left/right, 3.5% top/bottom. The
+         margin hangs outside .tour and fades out, so the poster has no edge on
+         the page and its type starts on the page's own left line. .tour is the
+         type block; it gives way to the height like the album cover
+         (width = image height × 1.4764). */
+      .tour { display: block; flex: 0 1 auto; min-width: 0; width: min(100%, calc((100svh - 200px) * 1.4764)); }
+      .tour picture { display: block; margin-inline: -3.08%; }
+      .tour img {
+        display: block; width: 100%; height: auto;
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3.4%, #000 96.6%, transparent);
+        -webkit-mask-composite: source-in;
+        mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3.4%, #000 96.6%, transparent);
+        mask-composite: intersect;
+      }
+      /* The button belongs to the list of dates, so it stands beside the list
+         (rows 44.5%–96.5% of the poster's height), and a pencilled brace gathers
+         the eight rows into it — the way the drafts on the cover annotate
+         themselves. */
+      .tour__cta { flex: 0 0 auto; display: grid; grid-template-rows: 44.5fr 52fr 3.5fr; }
+      .tour__aside { grid-row: 2; position: relative; display: flex; align-items: center; padding-left: 52px; }
+      .tour__brace { position: absolute; left: 0; top: 0; width: 30px; height: 100%; overflow: visible; }
+      .tour__brace path { fill: none; stroke: var(--chalk); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
+      .tour__cta .btn { min-width: 9.5em; }
+      /* too narrow for poster + button side by side: the button goes under the list */
+      @media (max-width: 1000px) {
+        .tour-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+        .tour { width: min(100%, calc((100svh - 264px) * 1.4764)); }
+        .tour__cta { display: block; }
+        .tour__aside { padding-left: 0; }
+        .tour__brace { display: none; }
+      }
 
       /* ---- Listen + socials ---- */
       .listen { min-height: 0; } /* footer: ends where its content ends, not a full screen */
@@ -188,27 +215,37 @@
            the guys end, so the four of them render as large as possible. */
         .hero__photo::after { background: url("/static/home/band-mobile.jpg") center / contain no-repeat; }
 
-        .release__grid { grid-template-columns: 1fr; gap: 14px; }
-        /* Phones: the whole release — label, cover, cue, title, button — is one
-           screen on every model. From the landed label down, everything but the
-           cover has a fixed size; the cover takes what's left, up to 300px, so
-           the button stays above Safari's bar (svh) and inside the section
-           (lvh − peek). Release mode (no lead text): with the pre-save lead back,
-           take ~70px more off both (~90px at ≤380px wide). */
-        .release .section__eyebrow { margin-bottom: 12px; }
-        .release__cover-wrap { width: clamp(72px, min(96svh - 316px, 96lvh - 360px), 300px); }
-        .cue--desktop { display: none; }
-        .cue--mobile { display: inline-flex; }
-        .release-row { margin-bottom: 10px; }
+        /* Phones: each sheet is one screen on every model, and its content is
+           composed inside the part of the screen you can actually see. The wrap
+           is that part: from the landed label down to just above Safari's bar
+           (svh), never past the section's own bottom (lvh − peek). The label
+           stays on top; what's below it is centred in the rest, so spare height
+           is shared out above and below instead of piling up at the bottom. */
+        .release, .concerts { padding-bottom: 20px; }
+        .release .wrap, .concerts .wrap {
+          flex: 0 0 auto; display: flex; flex-direction: column;
+          min-height: min(100svh - var(--nav-h) - var(--label-gap) - 14px, 100lvh - var(--peek) - var(--nav-h) - var(--label-gap) - 20px);
+        }
+
+        /* Album: cover + title + button in the middle, the cue to the concerts
+           at the bottom of the visible screen (where the hero has its cue).
+           Everything but the cover has a fixed size (~260px with the label and
+           the cue); the cover takes the rest, up to the column's width. With the
+           pre-save lead back, take ~70px more off both (~90px at ≤380px wide). */
+        .release .section__eyebrow { margin-bottom: 0; }
+        .release__grid { grid-template-columns: 1fr; gap: 18px; margin-block: auto; padding-block: 14px 18px; }
+        .release__cover-wrap { width: clamp(72px, min(95svh - 338px, 95lvh - 382px), 92%); }
+        .release__cue { position: static; align-self: flex-start; }
         .release__lead { max-width: none; font-size: 15px; line-height: 1.4; margin: 12px 0 16px; }
 
-        /* the whole vertical poster (1170×1358), then the button, in one screen */
+        /* Concerts: the whole vertical poster (tour-m.webp, 1170×1358, with the
+           faces — it keeps its edges), then the button, full width */
         .concerts .section__eyebrow { margin-bottom: 12px; flex-wrap: wrap; row-gap: 0; }
-        /* top-aligned: centring in an lvh-tall section would push the button under Safari's bar */
-        .tour-row { flex-direction: column; align-items: stretch; gap: 14px; margin-block: 0; }
-        .tour { align-self: center; width: min(100%, calc(min(100svh - 228px, 100lvh - 262px) * 0.8615)); }
-        .tour__cta { padding: 0; }
-        .tour__cta .btn { width: 100%; padding: 15px 28px; }
+        .tour-row { align-items: stretch; gap: 14px; }
+        .tour { align-self: center; width: min(100%, calc(min(100svh - 218px, 100lvh - 262px) * 0.8615)); }
+        .tour picture { margin-inline: 0; }
+        .tour img { -webkit-mask-image: none; mask-image: none; }
+        .tour__cta .btn { width: 100%; }
 
         .listen__grid { grid-template-columns: 1fr; gap: 32px; }
       }
@@ -272,7 +309,7 @@
             <img class="release__cover" src="/static/home/sochinenie.webp" width="852" height="852" data-i18n-attr="alt:release_cover_alt" alt="Обложка альбома «Сочинение»: знак группы белой краской на чёрном листе, исписанном черновиками">
           </div>
           <div class="release__text">
-            <div class="release-row"><!-- Restore before the next single: release-date badge. (i18n key "release_date" is kept in the dictionary for restoration.) <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span> --><a class="cue cue--flow cue--mobile" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a></div>
+            <div class="release-row"><!-- Restore before the next single: release-date badge. (i18n key "release_date" is kept in the dictionary for restoration.) <span class="release-date" data-i18n="release_date">Релиз · 17 июля 2026</span> --></div>
             <h2 class="display release__title" data-i18n-html="release_title"><span class="release__kicker">Новый альбом</span><span class="release__name">Сочинение</span></h2>
             <!-- Restore before the next release: pre-save lead copy. (i18n key
                  "release_lead" is kept in the dictionary for restoration.)
@@ -283,8 +320,8 @@
             </div>
           </div>
         </div>
-        <!-- desktop: same on-screen spot as the hero's cue (bottom-left of the screen) -->
-        <a class="cue cue--desktop" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
+        <!-- the way on to the concerts: bottom-left of the screen, like the hero's cue -->
+        <a class="cue release__cue" href="#concerts" data-i18n-html="cue_concerts">Концерты <span class="arr">↓</span></a>
       </div>
     </section>
 
@@ -295,11 +332,14 @@
           <a class="tour" href="/tickets">
             <picture>
               <source media="(max-width: 760px)" srcset="/static/home/tour-m.webp" width="1170" height="1358">
-              <img src="/static/home/tour-d.webp" width="2000" height="1316" data-i18n-attr="alt:tour_alt" alt="Афиша тура «Презентация альбома Сочинение»: 24 октября — Бунырево, арткэмп «Дикой мяты»; 31 октября — Уфа, MusicHall27; 1 ноября — Екатеринбург, корчма «Пристанище»; 3 ноября — Новосибирск, The Rooks; 6 ноября — Алматы; 7 ноября — Астана, Overhead! Club; 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы">
+              <img src="/static/home/tour-d.webp" width="2000" height="1276" data-i18n-attr="alt:tour_alt" alt="Афиша тура «Презентация альбома Сочинение»: 24 октября — Бунырево, арткэмп «Дикой мяты»; 31 октября — Уфа, MusicHall27; 1 ноября — Екатеринбург, корчма «Пристанище»; 3 ноября — Новосибирск, The Rooks; 6 ноября — Алматы; 7 ноября — Астана, Overhead! Club; 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы">
             </picture>
           </a>
           <div class="tour__cta">
-            <a class="btn btn--fill" href="/tickets" data-i18n="btn_tickets">Билеты</a>
+            <div class="tour__aside">
+              <svg class="tour__brace" viewBox="0 0 40 400" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path vector-effect="non-scaling-stroke" d="M2.7 1.7L7.0 2.3L10.1 4.4L13.8 8.0L15.8 9.4L17.1 13.8L17.8 18.6L18.5 27.7L19.4 35.0L19.3 55.0L18.8 78.4L19.3 101.1L19.4 120.7L19.1 144.5L19.0 165.0L19.2 173.0L20.5 182.3L21.3 186.1L23.6 191.5L26.0 195.8L28.7 196.9L32.6 198.7L36.6 199.4L32.8 199.6L28.2 203.2L25.4 205.4L23.1 208.2L21.8 212.2L19.9 217.9L19.4 225.0L18.8 234.8L18.8 256.2L19.4 276.7L18.5 299.1L19.3 322.4L18.7 343.5L18.6 365.9L18.3 374.3L18.6 381.6L17.4 386.9L15.0 389.1L13.8 393.9L10.5 396.7L7.3 397.6L2.8 396.0 M3.9 2.6L7.6 4.6L10.9 4.8L14.7 5.7L16.5 10.6L17.5 14.1L19.3 19.7L20.0 25.3L19.6 32.8L19.9 57.4L20.0 78.9L19.8 100.8L19.5 121.3L20.1 144.7L19.8 164.7L19.9 173.3L20.6 182.1L21.8 188.0L24.4 189.8L26.4 194.7L29.1 197.0L33.8 197.7L38.0 198.8L33.5 202.3L29.3 201.2L26.0 205.4L23.5 207.4L22.2 214.6L20.8 218.5L20.3 224.4L20.0 233.0L20.0 257.5L19.4 278.2L20.0 298.9L19.6 323.6L20.4 342.8L20.1 367.4L19.4 374.0L18.6 379.7L18.2 385.8L16.7 388.4L14.1 394.2L11.6 395.1L7.9 398.1L4.0 395.5"/></svg>
+              <a class="btn btn--fill" href="/tickets" data-i18n="btn_tickets">Билеты</a>
+            </div>
           </div>
         </div>
       </div>

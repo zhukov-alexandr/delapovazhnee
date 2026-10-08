@@ -6,6 +6,15 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
+# Слои идут от редко меняющихся к часто меняющимся: при правке кода или HTML пересобирается
+# и скачивается сервером только слой `COPY . .` (~11 МБ), остальные берутся из кэша
+# (кэш сборки в CI — см. cache-from/cache-to в .github/workflows/deploy.yml).
+
+# Непривилегированный пользователь и каталог БД под именованный volume. Стоит ДО копирования
+# кода: приложение пишет только в /app/db, так что владельца у остальных файлов менять не нужно.
+# (Раньше `chown -R app /app` шёл после COPY и дублировал весь код и статику вторым слоем.)
+RUN useradd -m app && mkdir -p /app/db && chown app /app/db
+
 # Зависимости отдельным слоем (кэшируется, пока requirements.txt не меняется).
 COPY requirements.txt .
 RUN pip install -r requirements.txt
@@ -18,8 +27,6 @@ COPY . .
 ARG APP_VERSION=dev
 ENV APP_VERSION=$APP_VERSION
 
-# Непривилегированный пользователь; каталог БД под именованный volume.
-RUN useradd -m app && mkdir -p /app/db && chown -R app /app
 USER app
 
 EXPOSE 8000

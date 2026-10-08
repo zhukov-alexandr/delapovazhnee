@@ -50,11 +50,22 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      # Buildx нужен, чтобы сохранять кэш слоёв между запусками (у каждого run'а чистый раннер).
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Build & push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          # Кэш слоёв лежит в GHCR под тегом :buildcache (а не в кэше Actions: тот привязан к
+          # ветке/тегу, и run для нового тега не увидел бы кэш предыдущего). Пока не менялся
+          # requirements.txt, слой с зависимостями не пересобирается и его digest не меняется —
+          # сервер при деплое скачивает только слой с кодом.
+          cache-from: type=registry,ref=${{ steps.img.outputs.name }}:buildcache
+          cache-to: type=registry,ref=${{ steps.img.outputs.name }}:buildcache,mode=max
+          # Без аттестаций: образ остаётся обычным манифестом под одну платформу, как раньше.
+          provenance: false
           build-args: |
             APP_VERSION=${{ github.ref_name }}
           tags: |
@@ -64,6 +75,9 @@ jobs:
   deploy:
     needs: build-push
     runs-on: ubuntu-latest
+    # Обычно шаг занимает около минуты. Без лимита зависший ssh держит run до 6 часов
+    # (так было с v1.7: образ скачался, дальше тишина).
+    timeout-minutes: 10
     permissions:
       contents: read
       packages: read
@@ -88,17 +102,23 @@ jobs:
         run: |
           set -euo pipefail
           PORT="${VDS_SSH_PORT:-22}"
-          COMMON="-i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new"
+          # ConnectTimeout/ServerAlive*: если сервер перестал отвечать, ssh падает за минуту, а не висит.
+          COMMON="-i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=4"
           # Порт: scp хочет -P (заглавную), ssh — -p (строчную). Не путать!
           # Кладём compose-файл и Caddyfile рядом (сервер не хранит git-репозиторий).
           scp $COMMON -P "$PORT" docker-compose.yml "$VDS_USER@$VDS_HOST:$VDS_PATH/docker-compose.yml"
           scp $COMMON -P "$PORT" deploy/Caddyfile   "$VDS_USER@$VDS_HOST:$VDS_PATH/Caddyfile"
           # На сервере: логин в GHCR (приватный образ) run'овым GITHUB_TOKEN, тянем нужный тег,
           # поднимаем, чистим старьё.
+          # - pull только сервиса app: caddy:2 лежит на Docker Hub, меняется редко, и проверять его
+          #   при каждом деплое незачем (если образа нет локально, его скачает `up -d`).
+          #   `timeout 300` — чтобы зависшее скачивание упало само и не дошло до `up -d`.
+          # - prune -af: иначе образы всех прошлых версий копятся и забивают диск (уже было: 502).
+          #   Образы работающих контейнеров (текущий app, caddy) не удаляются.
           ssh $COMMON -p "$PORT" "$VDS_USER@$VDS_HOST" "\
             cd '$VDS_PATH' && \
             echo '$GHCR_TOKEN' | docker login ghcr.io -u '$GHCR_ACTOR' --password-stdin && \
             export IMAGE='$IMAGE' && \
-            docker compose pull && \
+            timeout 300 docker compose pull app && \
             docker compose up -d && \
-            docker image prune -f"
+            docker image prune -af"
