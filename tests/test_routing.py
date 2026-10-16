@@ -146,7 +146,7 @@ def test_dikaya_myata_is_free_entry_with_a_link_to_the_festival(client):
     line = next(l for l in html.split('<div class="gig__line">')[1:] if ">Бунырево</h2>" in l)
 
     assert "Вход свободный" in line
-    assert 'href="https://wmcamp.ru/#concert"' in line
+    assert 'href="https://wmcamp.ru/vacationin/tpost/5er49e2051-2325-oktyabrya-stilnie-vihodnie"' in line
     assert "data-tc-event" not in line      # nothing to buy
     assert ">Билеты<" not in line
 
