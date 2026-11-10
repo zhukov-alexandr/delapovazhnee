@@ -148,26 +148,26 @@
       .concerts .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
       .concerts .section__eyebrow { margin-bottom: 4px; } /* the poster brings its own top margin */
       .tour-row { display: flex; align-items: stretch; gap: clamp(14px, 1.8vw, 24px); margin-block: auto; }
-      /* Desktop poster (tour-d.webp, 2000×1276): the sheet's type with a margin
-         of its handwriting around it — 3.08% left/right, 3.5% top/bottom. The
+      /* Desktop poster (tour-d.webp, 2000×745): the sheet's type with a margin
+         of its handwriting around it — 3.08% left/right, 6% top/bottom. The
          margin hangs outside .tour and fades out, so the poster has no edge on
          the page and its type starts on the page's own left line. .tour is the
          type block; it gives way to the height like the album cover
-         (width = image height × 1.4764). */
-      .tour { display: block; flex: 0 1 auto; min-width: 0; width: min(100%, calc((100svh - 200px) * 1.4764)); }
+         (width = image height × 2.5288). */
+      .tour { display: block; flex: 0 1 auto; min-width: 0; width: min(100%, calc((100svh - 200px) * 2.5288)); }
       .tour picture { display: block; margin-inline: -3.08%; }
       .tour img {
         display: block; width: 100%; height: auto;
-        -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3.4%, #000 96.6%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 5.9%, #000 94.1%, transparent);
         -webkit-mask-composite: source-in;
-        mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 3.4%, #000 96.6%, transparent);
+        mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent), linear-gradient(to bottom, transparent, #000 5.9%, #000 94.1%, transparent);
         mask-composite: intersect;
       }
       /* The button belongs to the list of dates, so it stands beside the list
-         (rows 44.5%–96.5% of the poster's height), and a pencilled brace gathers
-         the eight rows into it — the way the drafts on the cover annotate
+         (rows 76.2%–94% of the poster's height), and a pencilled brace gathers
+         the two rows into it — the way the drafts on the cover annotate
          themselves. */
-      .tour__cta { flex: 0 0 auto; display: grid; grid-template-rows: 44.5fr 52fr 3.5fr; }
+      .tour__cta { flex: 0 0 auto; display: grid; grid-template-rows: 76.2fr 17.8fr 6fr; }
       .tour__aside { grid-row: 2; position: relative; display: flex; align-items: center; padding-left: 52px; }
       .tour__brace { position: absolute; left: 0; top: 0; width: 30px; height: 100%; overflow: visible; }
       .tour__brace path { fill: none; stroke: var(--chalk); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; }
@@ -175,7 +175,7 @@
       /* too narrow for poster + button side by side: the button goes under the list */
       @media (max-width: 1000px) {
         .tour-row { flex-direction: column; align-items: flex-start; gap: 16px; }
-        .tour { width: min(100%, calc((100svh - 264px) * 1.4764)); }
+        .tour { width: min(100%, calc((100svh - 264px) * 2.5288)); }
         .tour__cta { display: block; }
         .tour__aside { padding-left: 0; }
         .tour__brace { display: none; }
@@ -238,11 +238,11 @@
         .release__cue { position: static; align-self: flex-start; }
         .release__lead { max-width: none; font-size: 15px; line-height: 1.4; margin: 12px 0 16px; }
 
-        /* Concerts: the whole vertical poster (tour-m.webp, 1170×1358, with the
+        /* Concerts: the whole vertical poster (tour-m.webp, 1170×1055, with the
            faces — it keeps its edges), then the button, full width */
         .concerts .section__eyebrow { margin-bottom: 12px; flex-wrap: wrap; row-gap: 0; }
         .tour-row { align-items: stretch; gap: 14px; }
-        .tour { align-self: center; width: min(100%, calc(min(100svh - 218px, 100lvh - 262px) * 0.8615)); }
+        .tour { align-self: center; width: min(100%, calc(min(100svh - 218px, 100lvh - 262px) * 1.109)); }
         .tour picture { margin-inline: 0; }
         .tour img { -webkit-mask-image: none; mask-image: none; }
         .tour__cta .btn { width: 100%; }
@@ -331,8 +331,8 @@
         <div class="tour-row">
           <a class="tour" href="/tickets">
             <picture>
-              <source media="(max-width: 760px)" srcset="/static/home/tour-m.webp" width="1170" height="1358">
-              <img src="/static/home/tour-d.webp" width="2000" height="1276" data-i18n-attr="alt:tour_alt" alt="Афиша тура «Презентация альбома Сочинение»: 24 октября — Бунырево, арткэмп «Дикой мяты»; 31 октября — Уфа, MusicHall27; 1 ноября — Екатеринбург, корчма «Пристанище»; 3 ноября — Новосибирск, The Rooks; 6 ноября — Алматы, Lenore Pub; 7 ноября — Астана, Overhead! Club; 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы">
+              <source media="(max-width: 760px)" srcset="/static/home/tour-m.webp" width="1170" height="1055">
+              <img src="/static/home/tour-d.webp" width="2000" height="745" data-i18n-attr="alt:tour_alt" alt="Афиша тура «Презентация альбома Сочинение»: 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы">
             </picture>
           </a>
           <div class="tour__cta">
@@ -399,7 +399,7 @@
           release_lead: "Сохрани альбом заранее — он придёт в твою медиатеку в день выхода. И чем больше пресейвов, тем выше он поднимется в стримингах.",
           btn_release: "Слушать альбом",
           concerts_eyebrow: 'Концерты <small>презентация альбома «Сочинение»</small>', btn_tickets: "Билеты",
-          tour_alt: "Афиша тура «Презентация альбома Сочинение»: 24 октября — Бунырево, арткэмп «Дикой мяты»; 31 октября — Уфа, MusicHall27; 1 ноября — Екатеринбург, корчма «Пристанище»; 3 ноября — Новосибирск, The Rooks; 6 ноября — Алматы, Lenore Pub; 7 ноября — Астана, Overhead! Club; 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы",
+          tour_alt: "Афиша тура «Презентация альбома Сочинение»: 18 ноября — Москва, Урбан; 21 ноября — Санкт-Петербург, Ритмы",
           listen_eyebrow: "Ссылки", listen_title: 'Найти<br>нас',
           streamings: "Стриминги", yandex: "Яндекс Музыка", vkmusic: "VK Музыка",
           socials: "Соцсети", vk: "ВКонтакте", instagram: "Запретграм",
@@ -417,7 +417,7 @@
           release_lead: "Pre-save it now and it lands in your library the day it drops. Every pre-save also pushes the album higher on streaming.",
           btn_release: "Listen to the album",
           concerts_eyebrow: 'Shows <small>«Sochinenie» album presentation</small>', btn_tickets: "Tickets",
-          tour_alt: "«Sochinenie» album presentation tour poster: October 24 — Bunyrevo, Dikaya Myata art camp; October 31 — Ufa, MusicHall27; November 1 — Ekaterinburg, Pristanishche; November 3 — Novosibirsk, The Rooks; November 6 — Almaty, Lenore Pub; November 7 — Astana, Overhead! Club; November 18 — Moscow, Urban; November 21 — Saint Petersburg, Ritmy",
+          tour_alt: "«Sochinenie» album presentation tour poster: November 18 — Moscow, Urban; November 21 — Saint Petersburg, Ritmy",
           listen_eyebrow: "Links", listen_title: 'Find<br>us',
           streamings: "Streaming", yandex: "Yandex Music", vkmusic: "VK Music",
           socials: "Social", vk: "VKontakte", instagram: "Ins****am",
@@ -435,7 +435,7 @@
           release_lead: "现在就预存这张专辑——上线当天它会自动进入你的音乐库。预存越多，专辑在流媒体上的排名越高。",
           btn_release: "收听专辑",
           concerts_eyebrow: '演出 <small>专辑《Sochinenie》首演</small>', btn_tickets: "购票",
-          tour_alt: "专辑《Sochinenie》首演巡演海报：10月24日 — Bunyrevo，Dikaya Myata 艺术营；10月31日 — 乌法，MusicHall27；11月1日 — 叶卡捷琳堡，Pristanishche；11月3日 — 新西伯利亚，The Rooks；11月6日 — 阿拉木图，Lenore Pub；11月7日 — 阿斯塔纳，Overhead! Club；11月18日 — 莫斯科，Urban；11月21日 — 圣彼得堡，Ritmy",
+          tour_alt: "专辑《Sochinenie》首演巡演海报：11月18日 — 莫斯科，Urban；11月21日 — 圣彼得堡，Ritmy",
           listen_eyebrow: "链接", listen_title: '找到<br>我们',
           streamings: "流媒体", yandex: "Yandex Music", vkmusic: "VK Music",
           socials: "社交媒体", vk: "VKontakte", instagram: "Ins****am",

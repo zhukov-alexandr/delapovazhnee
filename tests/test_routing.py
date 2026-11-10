@@ -8,13 +8,8 @@ HOME_ASSETS = Path(__file__).parents[1] / "static" / "home"
 # phones, cut above the torn faces on desktop (the hero already has the band).
 TOUR_POSTERS = ("tour-m.webp", "tour-d.webp")
 
-# The tickets page: one poster per row. Kazakhstan shares one for two dates.
+# The tickets page: one poster per row — only the concerts still ahead.
 GIG_POSTERS = (
-    "tour-myata.webp",
-    "tour-ufa.webp",
-    "tour-ekb.webp",
-    "tour-nsk.webp",
-    "tour-kz.webp",
     "tour-msk.webp",
     "tour-spb.webp",
 )
@@ -25,19 +20,11 @@ GIG_POSTERS = (
 RELEASE_COVER = "sochinenie.webp"
 LISTEN_URL = "https://dnkmusic.ru/sochinenie_"
 
-# TicketsCloud events: Ufa, Ekaterinburg, Novosibirsk, Moscow, Saint Petersburg.
+# TicketsCloud events: Moscow, Saint Petersburg.
 EVENT_IDS = (
-    "6a46a070983da59ac77d8ccd",
-    "6a4b6ed19f4bf9931aca2868",
-    "6a7085d06d1bdc42b48fdf81",
     "6a186cb9dd25944b28dbb181",
     "6a19b3b6f4606596ec821030",
 )
-
-TICKETON = {
-    "Алматы": "https://ticketon.kz/concerts/event/tckt2-dela-povazhnee-shabash-almaty",
-    "Астана": "https://ticketon.kz/concerts/event/tckt2-dela-povazhnee-shabash-astana",
-}
 
 
 def test_root_serves_landing(client):
@@ -85,16 +72,16 @@ def test_tickets_page_is_served(client):
     assert "<title>Билеты – Дела поважнее</title>" in client.get("/tickets").text
 
 
-def test_tickets_page_has_one_ticketscloud_trigger_per_russian_city(client):
+def test_tickets_page_has_one_ticketscloud_trigger_per_city(client):
     html = client.get("/tickets").text
     triggers = re.findall(r'<button\b[^>]*data-tc-event="([^"]+)"[^>]*>', html)
 
     assert sorted(triggers) == sorted(EVENT_IDS)
-    assert html.count('data-tc-utm_source="site"') == 5
-    assert html.count('data-tc-token="') == 5
+    assert html.count('data-tc-utm_source="site"') == 2
+    assert html.count('data-tc-token="') == 2
     assert html.count("https://ticketscloud.com/static/scripts/widget/tcwidget.js") == 1
     # same button as every other on the page, whatever the widget tries to restyle
-    assert html.count('class="gig__tix btn btn--fill tc-background-tomato"') == 5
+    assert html.count('class="gig__tix btn btn--fill tc-background-tomato"') == 2
 
 
 def test_tickets_page_forwards_utm_tags_to_ticketscloud(client):
@@ -119,48 +106,13 @@ def test_landing_hands_campaign_tags_over_to_the_tickets_page():
     assert '["utm_medium", "utm_campaign", "utm_content", "utm_term"]' in js
 
 
-def test_tickets_page_lists_the_whole_tour_in_date_order(client):
+def test_tickets_page_lists_the_remaining_concerts_in_date_order(client):
     html = client.get("/tickets").text
     cities = re.findall(r'<h2 class="gig__city display"[^>]*>([^<]+)</h2>', html)
 
-    assert cities == [
-        "Бунырево", "Уфа", "Екатеринбург", "Новосибирск",
-        "Алматы", "Астана", "Москва", "Санкт-Петербург",
-    ]
+    assert cities == ["Москва", "Санкт-Петербург"]
     for name in GIG_POSTERS:
         assert f"/static/home/{name}" in html
-
-
-def test_kazakhstan_concerts_sell_through_ticketon(client):
-    html = client.get("/tickets").text
-    lines = html.split('<div class="gig__line">')[1:]
-
-    for city, url in TICKETON.items():
-        line = next(l for l in lines if f">{city}</h2>" in l)
-        assert f'href="{url}"' in line
-        assert "data-tc-event" not in line
-
-
-def test_dikaya_myata_is_free_entry_with_a_link_to_the_festival(client):
-    html = client.get("/tickets").text
-    line = next(l for l in html.split('<div class="gig__line">')[1:] if ">Бунырево</h2>" in l)
-
-    assert "Вход свободный" in line
-    assert 'href="https://wmcamp.ru/vacationin/tpost/5er49e2051-2325-oktyabrya-stilnie-vihodnie"' in line
-    assert "data-tc-event" not in line      # nothing to buy
-    assert ">Билеты<" not in line
-
-
-def test_only_bunyrevo_is_marked_as_not_the_album_presentation(client):
-    # The page is headed «Презентация альбома «Сочинение»», and Bunyrevo is the
-    # one concert that isn't: it gets a note saying what is played instead.
-    html = client.get("/tickets").text
-    lines = html.split('<div class="gig__line">')[1:]
-    noted = [l for l in lines if "gig__program" in l]
-
-    assert len(noted) == 1
-    assert ">Бунырево</h2>" in noted[0]
-    assert "Не презентация: играем любимые песни" in noted[0]
 
 
 def test_landing_sends_ticket_buyers_to_the_tickets_page(client):
