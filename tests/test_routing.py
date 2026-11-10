@@ -115,6 +115,14 @@ def test_tickets_page_lists_the_remaining_concerts_in_date_order(client):
         assert f"/static/home/{name}" in html
 
 
+def test_moscow_lists_its_opening_act(client):
+    html = client.get("/tickets").text
+    line = next(l for l in html.split('<div class="gig__line">')[1:] if ">Москва</h2>" in l)
+
+    assert '<p class="gig__support listing" data-i18n="msk_support">Саппорт: Гюнтер</p>' in line
+    assert html.count('class="gig__support') == 1   # only Moscow has one
+
+
 def test_landing_sends_ticket_buyers_to_the_tickets_page(client):
     html = client.get("/").text
     section = html.split('<section id="concerts"', 1)[1].split("</section>", 1)[0]

@@ -55,6 +55,8 @@
       .gig__when small { display: block; font-size: 0.8em; color: var(--pencil); }
       .gig__city { font-size: clamp(26px, 3.7vw, 48px); line-height: 0.95; overflow-wrap: anywhere; }
       .gig__venue { margin-top: 7px; font-size: clamp(14px, 1.5vw, 17px); line-height: 1.25; color: var(--pencil); }
+      /* the opening act: small, under the venue, in the type's own cream so it reads */
+      .gig__support { margin-top: 5px; font-size: clamp(13px, 1.35vw, 15px); line-height: 1.25; font-weight: 600; }
       .gig__action { display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
       .gig__action .btn { min-width: 10em; }
       /* TicketsCloud (tcwidget.js) wires the click via data-tc-event and tries to
@@ -112,13 +114,14 @@
 
       <ol class="gigs">
         <li class="gig">
-          <img class="gig__poster" src="/static/home/tour-msk.webp" width="640" height="906" loading="lazy" data-i18n-attr="alt:msk_alt" alt="Афиша концерта в Москве, 18 ноября, Урбан">
+          <img class="gig__poster" src="/static/home/tour-msk.webp" width="640" height="1138" loading="lazy" data-i18n-attr="alt:msk_alt" alt="Афиша концерта в Москве, 18 ноября, Урбан">
           <div class="gig__lines">
             <div class="gig__line">
               <p class="gig__when listing"><span data-i18n="msk_when">18 ноября</span></p>
               <div class="gig__where">
                 <h2 class="gig__city display" data-i18n="msk_city">Москва</h2>
                 <p class="gig__venue listing" data-i18n="msk_venue">Урбан, ул. Б. Новодмитровская, 36с24</p>
+                <p class="gig__support listing" data-i18n="msk_support">Саппорт: Гюнтер</p>
               </div>
               <div class="gig__action"><button type="button" class="gig__tix btn btn--fill tc-background-tomato" data-tc-event="6a186cb9dd25944b28dbb181" data-tc-token="eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNWQ3ZmI4NjY0MmIyYjZhMzI5NjI1YjMyIn0.f8LLjhDTa68xuLUNnxHyqXfKEhrk4xaUWih52CEt7PU" data-tc-utm_source="site" data-i18n="tickets">Билеты</button></div>
             </div>
@@ -156,7 +159,7 @@
           nav_release: "Альбом «Сочинение»", nav_concerts: "Концерты", nav_tickets: "Билеты", nav_listen: "Слушать", nav_play: "Играть →",
           h1: "Билеты", sub: "Презентация альбома «Сочинение»",
           tickets: "Билеты",
-          msk_when: "18 ноября", msk_city: "Москва", msk_venue: "Урбан, ул. Б. Новодмитровская, 36с24", msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
+          msk_when: "18 ноября", msk_city: "Москва", msk_venue: "Урбан, ул. Б. Новодмитровская, 36с24", msk_support: "Саппорт: Гюнтер", msk_alt: "Афиша концерта в Москве, 18 ноября, Урбан",
           spb_when: "21 ноября", spb_city: "Санкт-Петербург", spb_venue: "Ритмы, Кожевенная линия, 34", spb_alt: "Афиша концерта в Санкт-Петербурге, 21 ноября, Ритмы",
           footer_copy: "© Дела поважнее, 2026", footer_home: "На главную"
         },
@@ -167,7 +170,7 @@
           nav_release: "Album «Sochinenie»", nav_concerts: "Shows", nav_tickets: "Tickets", nav_listen: "Listen", nav_play: "Play →",
           h1: "Tickets", sub: "«Sochinenie» album presentation",
           tickets: "Tickets",
-          msk_when: "November 18", msk_city: "Moscow", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_alt: "Moscow show poster, November 18, Urban",
+          msk_when: "November 18", msk_city: "Moscow", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_support: "Support: Gunter", msk_alt: "Moscow show poster, November 18, Urban",
           spb_when: "November 21", spb_city: "Saint Petersburg", spb_venue: "Ritmy, Kozhevennaya liniya 34", spb_alt: "Saint Petersburg show poster, November 21, Ritmy",
           footer_copy: "© Dela povazhnee, 2026", footer_home: "Home"
         },
@@ -178,7 +181,7 @@
           nav_release: "专辑《Sochinenie》", nav_concerts: "演出", nav_tickets: "购票", nav_listen: "收听", nav_play: "开始游戏 →",
           h1: "购票", sub: "专辑《Sochinenie》首演",
           tickets: "购票",
-          msk_when: "11月18日", msk_city: "莫斯科", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_alt: "莫斯科演出海报，11月18日，Urban",
+          msk_when: "11月18日", msk_city: "莫斯科", msk_venue: "Urban, B. Novodmitrovskaya 36s24", msk_support: "暖场：Gunter", msk_alt: "莫斯科演出海报，11月18日，Urban",
           spb_when: "11月21日", spb_city: "圣彼得堡", spb_venue: "Ritmy, Kozhevennaya liniya 34", spb_alt: "圣彼得堡演出海报，11月21日，Ritmy",
           footer_copy: "© Dela povazhnee, 2026", footer_home: "返回首页"
         }
